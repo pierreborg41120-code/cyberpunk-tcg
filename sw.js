@@ -1,7 +1,7 @@
 // Cyberpunk TCG — fonctionnement hors connexion.
 // Le jeu (un seul gros fichier) est gardé sur l'appareil ; publish.sh change VERSION à chaque mise à jour,
 // ce qui fait télécharger la nouvelle version en arrière-plan.
-const VERSION = '2597c41cc6';
+const VERSION = 'f37b49b913';
 const CACHE = 'cptcg-' + VERSION;
 const EXT = 'cptcg-ext';   // polices et PeerJS (sites externes)
 const CORE = ['./', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'];
