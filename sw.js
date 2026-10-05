@@ -1,9 +1,10 @@
 // Cyberpunk TCG — fonctionnement hors connexion.
 // Le jeu (un seul gros fichier) est gardé sur l'appareil ; publish.sh change VERSION à chaque mise à jour,
 // ce qui fait télécharger la nouvelle version en arrière-plan.
-const VERSION = '73d13456b3';
+const VERSION = '60021dd5a8';
 const CACHE = 'cptcg-' + VERSION;
 const EXT = 'cptcg-ext';   // polices et PeerJS (sites externes)
+const MUS = 'cptcg-musique';   // musiques : téléchargées au premier passage, gardées d'une version à l'autre
 const CORE = ['./', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'];
 
 self.addEventListener('install', e => {
@@ -11,13 +12,23 @@ self.addEventListener('install', e => {
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys()
-    .then(keys => Promise.all(keys.filter(k => k.startsWith('cptcg-') && k !== CACHE && k !== EXT).map(k => caches.delete(k))))
+    .then(keys => Promise.all(keys.filter(k => k.startsWith('cptcg-') && k !== CACHE && k !== EXT && k !== MUS).map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', e => {
   const r = e.request;
   if (r.method !== 'GET') return;
   const u = new URL(r.url);
+  if (u.origin === location.origin && u.pathname.includes('/musique/')) {
+    e.respondWith(caches.open(MUS).then(async c => {
+      const hit = await c.match(u.pathname);
+      if (hit) return hit;
+      const res = await fetch(u.pathname);
+      if (res.ok) c.put(u.pathname, res.clone());
+      return res;
+    }));
+    return;
+  }
   if (u.origin === location.origin) {
     // Le jeu s'ouvre depuis l'appareil (instantané, même hors connexion).
     if (r.mode === 'navigate') { e.respondWith(caches.match('./').then(h => h || fetch(r))); return; }
