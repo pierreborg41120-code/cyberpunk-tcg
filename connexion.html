@@ -3,32 +3,63 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Connexion — Cyberpunk TCG</title>
+<title>Cyberpunk TCG — jouez au jeu de cartes de Night City</title>
+<meta name="description" content="Simulateur gratuit et non officiel du jeu de cartes Cyberpunk TCG : campagne à travers Night City, duels contre l'IA, parties en ligne classées entre amis, 150 cartes à collectionner. Dans le navigateur, sur PC et sur téléphone.">
+<meta property="og:title" content="Cyberpunk TCG — Night City vous attend">
+<meta property="og:description" content="Campagne, duels contre l'IA, parties en ligne entre amis et 150 cartes à collectionner. Gratuit, dans le navigateur.">
+<meta property="og:image" content="https://pierreborg41120-code.github.io/cyberpunk-tcg/hero-poster.webp">
 <meta name="theme-color" content="#07080d">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#07080d;--panel:#0b0d13;--line:#232838;--ylw:#fcee0a;--cyan:#00e5ff;--red:#ff4b5c;--green:#3ddc84;--txt:#e6e8ef;--mut:#8b92a6}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:var(--bg);color:var(--txt);font:500 16px/1.45 'Rajdhani',system-ui,sans-serif;
-  background-image:linear-gradient(rgba(252,238,10,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(252,238,10,.035) 1px,transparent 1px),radial-gradient(ellipse at 50% 0%,rgba(0,229,255,.10),transparent 60%);
-  background-size:44px 44px,44px 44px,100% 100%}
-.wrap{width:min(440px,100%)}
-.brand{margin:0 0 22px}
-.brand h1{margin:0;font:700 clamp(34px,9vw,46px)/1 'Chakra Petch',sans-serif;letter-spacing:.02em;color:var(--ylw);text-transform:uppercase;text-shadow:3px 3px 0 rgba(0,229,255,.35)}
-.brand p{margin:8px 0 0;display:flex;align-items:center;gap:10px;font:600 13px 'Chakra Petch',sans-serif;letter-spacing:.12em;color:var(--mut);text-transform:uppercase}
-.brand p i{display:inline-block;width:28px;height:8px;background:repeating-linear-gradient(-45deg,var(--ylw) 0 5px,transparent 5px 10px)}
-.card{position:relative;padding:26px 26px 22px;background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--ylw);
-  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));box-shadow:0 24px 60px rgba(0,0,0,.55)}
+html{scroll-behavior:smooth}
+html,body{margin:0}
+body{background:var(--bg);color:var(--txt);font:500 17px/1.5 'Rajdhani',system-ui,sans-serif;overflow-x:hidden}
+a{color:var(--cyan)}
+/* ---------- fond : vidéo de Night City (grand écran) ou son image ---------- */
+.bg{position:fixed;inset:0;z-index:-1;background:#05060a url(hero-poster.webp) center/cover}
+.bg video{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s}
+.bg video.on{opacity:1}
+.bg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,6,10,.92) 0%,rgba(5,6,10,.72) 48%,rgba(5,6,10,.55) 100%),linear-gradient(0deg,var(--bg) 0%,transparent 40%)}
+/* ---------- barre du haut ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1240px;margin:0 auto;padding:18px 24px}
+.top img{height:34px;width:auto;display:block}
+.top .pill{display:inline-flex;align-items:center;gap:8px;font:600 12px 'Chakra Petch',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.top .pill i{display:inline-block;width:26px;height:8px;background:repeating-linear-gradient(-45deg,var(--ylw) 0 5px,transparent 5px 10px)}
+/* ---------- accroche + formulaire ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,440px);gap:56px;align-items:center;max-width:1240px;min-height:calc(100vh - 72px);margin:0 auto;padding:12px 24px 64px}
+.pitch h1{margin:0;font:700 clamp(40px,5.6vw,76px)/.98 'Chakra Petch',sans-serif;letter-spacing:-.01em;color:#fff;text-wrap:balance}
+.pitch h1 em{font-style:normal;color:var(--ylw);text-shadow:4px 4px 0 rgba(0,229,255,.28)}
+.pitch .lead{margin:20px 0 0;max-width:34em;font-size:clamp(18px,1.6vw,21px);color:#d4d8e4}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;margin:22px 0 0;padding:0;list-style:none;font:600 14.5px 'Chakra Petch',sans-serif;color:#fff}
+.facts li{display:flex;align-items:center;gap:8px}.facts li::before{content:'';width:7px;height:7px;background:var(--ylw);transform:rotate(45deg)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin:30px 0 0}
+.btn{display:inline-block;padding:13px 22px;border:0;cursor:pointer;font:700 15px 'Chakra Petch',sans-serif;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.btn.y{background:var(--ylw);color:#000}.btn.o{background:transparent;color:var(--cyan);box-shadow:inset 0 0 0 1.5px var(--cyan)}
+.btn:hover{filter:brightness(1.1)}.btn:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+/* l'éventail de cartes : le moment marquant de la page */
+.fan{position:relative;height:300px;margin:40px 0 0;max-width:620px}
+.fan img{position:absolute;bottom:0;left:calc(var(--i) * 18%);width:30%;max-width:190px;aspect-ratio:330/462;object-fit:cover;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,.6);
+  transform-origin:50% 120%;transform:rotate(calc((var(--i) - 2) * 7deg)) translateY(calc(var(--d) * 1px));transition:transform .25s ease, filter .25s}
+.fan img:hover{transform:rotate(calc((var(--i) - 2) * 7deg)) translateY(-22px) scale(1.05);z-index:5;filter:brightness(1.08)}
+@media (prefers-reduced-motion:no-preference){.fan img{animation:deal .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 90ms + 200ms)}
+  @keyframes deal{from{opacity:0;transform:translateY(80px) rotate(0)}}}
+/* ---------- carte du formulaire (inchangée) ---------- */
+.card{position:relative;padding:26px 26px 22px;background:rgba(11,13,19,.94);border:1px solid var(--line);border-top:3px solid var(--ylw);backdrop-filter:blur(6px);
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));box-shadow:0 24px 60px rgba(0,0,0,.55);scroll-margin-top:24px}
 .tabs{display:flex;gap:4px;margin:0 0 20px;border-bottom:1px solid var(--line)}
 .tabs button{all:unset;cursor:pointer;padding:8px 2px 10px;margin-right:18px;font:600 15px 'Chakra Petch',sans-serif;color:var(--mut);border-bottom:2px solid transparent;margin-bottom:-1px}
 .tabs button[aria-selected="true"]{color:var(--txt);border-color:var(--ylw)}
 .tabs button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 h2{margin:0 0 6px;font:700 24px 'Chakra Petch',sans-serif;color:var(--txt)}
-.lead{margin:0 0 18px;color:#c9cddb}
+.card .lead{margin:0 0 18px;color:#c9cddb}
 label{display:block;margin:0 0 14px}
 label>span{display:block;margin-bottom:5px;font:600 13px 'Chakra Petch',sans-serif;letter-spacing:.04em;color:var(--mut)}
 .field{display:flex}
@@ -46,24 +77,88 @@ input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.18)}
 .msg{margin:14px 0 0;padding:9px 11px;border-left:3px solid var(--cyan);background:#0f1420;font-size:15px}
 .msg:empty{display:none}.msg.ko{border-color:var(--red);color:#ffb3bb}.msg.ok{border-color:var(--green)}
 .legal{margin:2px 0 12px;color:var(--mut);font-size:14px}.legal a{color:var(--cyan)}
-.foot{margin:18px 2px 0;color:var(--mut);font-size:13.5px}
+.foot{margin:14px 2px 0;color:var(--mut);font-size:13.5px}
 .foot a{color:var(--mut)}
 .lang{all:unset;cursor:pointer;float:right;margin-top:-2px;font:600 12px 'Chakra Petch',sans-serif;color:var(--mut);letter-spacing:.08em}
 .lang:hover,.lang:focus-visible{color:var(--cyan)}
-@media (max-width:420px){.card{padding:22px 18px 18px}}
+/* ---------- ce qui vous attend ---------- */
+.sec{max-width:1240px;margin:0 auto;padding:72px 24px}
+.sec>h2{margin:0 0 8px;font:700 clamp(28px,3.4vw,42px)/1.05 'Chakra Petch',sans-serif;color:#fff}
+.sec>p{margin:0 0 34px;max-width:40em;color:#c9cddb;font-size:19px}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line)}
+.mode{display:grid;grid-template-columns:76px 1fr;gap:16px;align-items:start;padding:22px 22px 24px;background:rgba(11,13,19,.96)}
+.mode img{width:76px;aspect-ratio:330/462;object-fit:cover;border-radius:6px;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+.mode h3{margin:2px 0 6px;font:700 19px 'Chakra Petch',sans-serif;color:var(--ylw)}
+.mode p{margin:0;color:#d0d4df;font-size:16.5px}
+/* ---------- trois étapes (une vraie suite) ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;padding-top:18px;border-top:3px solid var(--ylw)}
+.steps li::before{content:counter(s);display:block;margin-bottom:6px;font:700 40px/1 'Chakra Petch',sans-serif;color:var(--cyan)}
+.steps b{display:block;font:700 19px 'Chakra Petch',sans-serif;color:#fff;margin-bottom:4px}
+.steps span{color:#c9cddb}
+.end{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;margin-top:44px;padding:26px 28px;background:rgba(252,238,10,.06);border:1px solid rgba(252,238,10,.35)}
+.end p{margin:0;font:700 22px 'Chakra Petch',sans-serif;color:#fff}
+footer{max-width:1240px;margin:0 auto;padding:28px 24px 40px;border-top:1px solid var(--line);color:var(--mut);font-size:14.5px}
+footer a{color:var(--mut)}
+/* ---------- tablettes et téléphones ---------- */
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr;gap:34px;min-height:0;padding-top:4px}
+  .fan{height:220px;margin-top:30px}
+  .modes{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  body{font-size:16.5px}
+  .top{padding:14px 16px}.top img{height:26px}.top .pill{display:none}
+  .hero,.sec{padding-left:16px;padding-right:16px}.sec{padding-top:52px;padding-bottom:52px}
+  .fan{height:170px;margin-left:6px;margin-right:6px}.fan img{left:calc(var(--i) * 16.5% + 2%);width:28%}.modes{grid-template-columns:1fr}
+  .card{padding:22px 18px 18px}
+  .bg::after{background:linear-gradient(180deg,rgba(5,6,10,.7),rgba(5,6,10,.92) 55%,var(--bg))}
+}
 @media (prefers-reduced-motion:no-preference){.card{animation:in .35s ease-out both}@keyframes in{from{opacity:0;transform:translateY(8px)}}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 </head>
 <body>
-<main class="wrap">
-  <header class="brand"><h1>Cyberpunk TCG</h1><p><i aria-hidden="true"></i><span id="sub">Simulateur non officiel</span></p></header>
-  <section class="card" aria-labelledby="t">
+<div class="bg" aria-hidden="true"><video id="bgv" muted loop playsinline preload="none"></video></div>
+<header class="top"><img src="logo.webp" alt="Cyberpunk TCG" width="1320" height="396"><span class="pill"><i aria-hidden="true"></i><span id="sub">Simulateur non officiel</span></span></header>
+<div class="hero">
+  <div class="pitch">
+    <h1 data-l="h1">Devenez une <em>Légende</em> de Night City.</h1>
+    <p class="lead" data-l="lead">Le jeu de cartes Cyberpunk, jouable tout de suite dans votre navigateur. Libérez Night City quartier par quartier, défiez l'IA, affrontez vos amis en ligne et complétez les 150 cartes.</p>
+    <ul class="facts"><li data-l="f1">Gratuit</li><li data-l="f2">PC, tablette et téléphone</li><li data-l="f3">Progression gardée en ligne</li></ul>
+    <div class="cta"><a class="btn y" href="#compte" data-go="signup" data-l="c1">Créer mon compte</a><a class="btn o" href="#compte" data-go="login" data-l="c2">J'ai déjà un compte</a></div>
+    <div class="fan" id="fan" aria-hidden="true"></div>
+  </div>
+  <section class="card" id="compte" aria-labelledby="t">
     <button class="lang" id="lang" type="button">EN</button>
     <div id="view"></div>
     <p class="msg" id="msg" role="status" aria-live="polite"></p>
+    <p class="foot" id="foot"></p>
   </section>
-  <p class="foot" id="foot"></p>
-</main>
+</div>
+<section class="sec" aria-labelledby="modes-t">
+  <h2 id="modes-t" data-l="mt">Ce qui vous attend</h2>
+  <p data-l="mp">Une partie dure de 10 à 20 minutes. Tout ce que vous gagnez reste à vous, sur tous vos appareils.</p>
+  <div class="modes">
+    <article class="mode"><img data-card="royce_pe" alt=""><div><h3 data-l="m1t">Campagne Night City</h3><p data-l="m1p">Six quartiers, de Watson à la tour Arasaka. Chaque gang a son deck, son chef et ses répliques. Missions secondaires dans les quartiers libérés.</p></div></article>
+    <article class="mode"><img data-card="smasher" alt=""><div><h3 data-l="m2t">Duels contre l'IA</h3><p data-l="m2p">Quatre niveaux, de Facile à Expert. L'Expert joue avec un deck optimisé : bonne chance.</p></div></article>
+    <article class="mode"><img data-card="jackie" alt=""><div><h3 data-l="m3t">En ligne, entre amis</h3><p data-l="m3p">Invitez un ami en un clic, jouez des parties classées et grimpez au classement de la saison.</p></div></article>
+    <article class="mode"><img data-card="alt_soul" alt=""><div><h3 data-l="m4t">150 cartes à collectionner</h3><p data-l="m4p">Ouvrez des boosters, cherchez les Brillantes, fabriquez les cartes qui manquent et échangez avec vos amis.</p></div></article>
+    <article class="mode"><img data-card="panam_cn" alt=""><div><h3 data-l="m5t">Défis et événements</h3><p data-l="m5p">Un défi chaque jour, un événement chaque semaine avec son classement, des tournois organisés.</p></div></article>
+    <article class="mode"><img data-card="judy_leg" alt=""><div><h3 data-l="m6t">Pour débuter</h3><p data-l="m6p">Un tutoriel guidé et un mode « Apprendre un deck » où un coach explique chaque coup.</p></div></article>
+  </div>
+</section>
+<section class="sec" aria-labelledby="go-t">
+  <h2 id="go-t" data-l="gt">Commencer</h2>
+  <p data-l="gp">Trois minutes suffisent.</p>
+  <ol class="steps">
+    <li><b data-l="s1t">Créez votre compte</b><span data-l="s1p">Une adresse e-mail et un mot de passe.</span></li>
+    <li><b data-l="s2t">Recevez vos premières cartes</b><span data-l="s2p">Les decks Arasaka et Mercs, plus 3 boosters à ouvrir.</span></li>
+    <li><b data-l="s3t">Jouez</b><span data-l="s3p">Le tutoriel vous guide pour la première partie, puis Night City est à vous.</span></li>
+  </ol>
+  <div class="end"><p data-l="ep">Night City n'attend pas.</p><a class="btn y" href="#compte" data-go="signup" data-l="c1">Créer mon compte</a></div>
+</section>
+<footer><span data-l="ft">Cyberpunk et Cyberpunk TCG sont des marques de CD PROJEKT S.A. Ce simulateur est un projet de fan, gratuit et non officiel, sans lien avec CD PROJEKT ni avec les éditeurs du jeu de cartes.</span> <a href="donnees.html" data-l="fd">Données personnelles</a></footer>
 <script>
 'use strict';
 // Page de connexion du site : e-mail et mot de passe (Supabase). Une fois connecté, direction le jeu.
@@ -105,8 +200,31 @@ function errText(e) {
 }
 function say(t, kind) { const m = document.getElementById('msg'); m.textContent = t; m.className = 'msg' + (kind ? ' ' + kind : ''); }
 
+// Textes de la présentation (français dans la page, anglais ici).
+const EN = { h1: 'Become a Night City <em>Legend</em>.', lead: 'The Cyberpunk card game, playable right now in your browser. Free Night City district by district, challenge the AI, face your friends online and complete all 150 cards.',
+  f1: 'Free', f2: 'PC, tablet and phone', f3: 'Progress saved online', c1: 'Create my account', c2: 'I already have an account',
+  mt: 'What awaits you', mp: 'A game lasts 10 to 20 minutes. Everything you earn stays yours, on all your devices.',
+  m1t: 'Night City campaign', m1p: 'Six districts, from Watson to Arasaka Tower. Every gang has its deck, its boss and its lines. Side missions in freed districts.',
+  m2t: 'Duels against the AI', m2p: 'Four levels, from Easy to Expert. The Expert plays an optimised deck: good luck.',
+  m3t: 'Online, with friends', m3p: 'Invite a friend in one click, play ranked games and climb the season leaderboard.',
+  m4t: '150 cards to collect', m4p: 'Open boosters, hunt for Foils, craft the cards you miss and trade with your friends.',
+  m5t: 'Challenges and events', m5p: 'A challenge every day, an event every week with its own leaderboard, organised tournaments.',
+  m6t: 'For beginners', m6p: 'A guided tutorial and a "Learn a deck" mode where a coach explains every move.',
+  gt: 'Get started', gp: 'Three minutes are enough.', s1t: 'Create your account', s1p: 'An e-mail address and a password.', s2t: 'Get your first cards', s2p: 'The Arasaka and Mercs decks, plus 3 boosters to open.',
+  s3t: 'Play', s3p: 'The tutorial guides you through your first game, then Night City is yours.', ep: "Night City won't wait.",
+  ft: 'Cyberpunk and Cyberpunk TCG are trademarks of CD PROJEKT S.A. This simulator is a free, unofficial fan project, not affiliated with CD PROJEKT or the card game publishers.', fd: 'Personal data' };
+const FR = {}; for (const el of document.querySelectorAll('[data-l]')) FR[el.dataset.l] ??= el.innerHTML;
+function pageText() { for (const el of document.querySelectorAll('[data-l]')) el.innerHTML = lang === 'en' ? EN[el.dataset.l] : FR[el.dataset.l]; document.title = L('Cyberpunk TCG — jouez au jeu de cartes de Night City', 'Cyberpunk TCG — play the Night City card game'); }
+// Les vraies cartes du jeu (dossier cartes/ : version française quand elle existe).
+const CARD_FILES = { johnny_rr: 'fr en', judy_leg: 'fr', smasher: 'fr en', panam_cn: 'fr', v_sk: 'fr en', jackie: 'en', alt_soul: 'fr', royce_pe: 'fr en' };
+const cardSrc = id => { const f = (CARD_FILES[id] || 'en').split(' '); return `cartes/${id}${f.includes(lang) ? (lang === 'fr' ? '-fr' : '') : f[0] === 'fr' ? '-fr' : ''}.webp`; };
+function cardsShow() {
+  document.getElementById('fan').innerHTML = ['judy_leg', 'v_sk', 'johnny_rr', 'smasher', 'panam_cn'].map((id, i) => `<img src="${cardSrc(id)}" alt="" style="--i:${i};--d:${[18, 6, 0, 6, 18][i]}" loading="eager" decoding="async">`).join('');
+  for (const im of document.querySelectorAll('[data-card]')) { im.src = cardSrc(im.dataset.card); im.loading = 'lazy'; }
+}
 function render() {
   document.documentElement.lang = lang;
+  pageText(); cardsShow();
   document.getElementById('sub').textContent = L('Simulateur non officiel', 'Unofficial simulator');
   document.getElementById('lang').textContent = lang === 'en' ? 'FR' : 'EN';
   document.getElementById('lang').setAttribute('aria-label', lang === 'en' ? 'Français' : 'English');
@@ -138,7 +256,7 @@ function render() {
     <div class="links"><button class="link" type="button" data-a="tab-forgot">${L('Mot de passe oublié ?', 'Forgot password?')}</button></div>`;
   document.getElementById('view').innerHTML = h;
   const m = document.getElementById('mail'), p = document.getElementById('pass'), c = document.getElementById('code');
-  (c || (m && !m.value ? m : p || m)).focus();
+  const f = c || (m && !m.value ? m : p || m); if (f && (innerWidth > 980 || c || step !== 'login' && step !== 'signup')) f.focus({ preventScroll: true });
 }
 
 async function submit(kind) {
@@ -183,6 +301,8 @@ function go() { say(L('✓ Connecté. Ouverture du jeu…', '✓ Signed in. Open
 
 document.addEventListener('submit', e => { const f = e.target.closest('[data-f]'); if (f) { e.preventDefault(); submit(f.dataset.f); } });
 document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g) { e.preventDefault(); if (step !== g.dataset.go && ['login', 'signup'].includes(step)) { step = g.dataset.go; say(''); render(); } document.getElementById('compte').scrollIntoView({ block: 'start' }); const f = document.querySelector('#view input'); if (f) f.focus({ preventScroll: true }); return; }
   const b = e.target.closest('[data-a]'); if (!b) return;
   const a = b.dataset.a;
   if (a === 'eye') { for (const x of document.querySelectorAll('input[id^="pass"]')) x.type = x.type === 'password' ? 'text' : 'password'; b.textContent = b.textContent === L('Afficher', 'Show') ? L('Masquer', 'Hide') : L('Afficher', 'Show'); return; }
@@ -212,8 +332,14 @@ const start = async () => {
   render();
 };
 start();
+(function () {
+  const v = document.getElementById('bgv'), c = navigator.connection || {};
+  if (innerWidth < 900 || c.saveData || /2g/.test(c.effectiveType || '') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  v.src = document.createElement('video').canPlayType('video/webm; codecs="av01.0.08M.10"') ? 'hero-1080.webm' : 'hero-1080-vp9.webm';
+  v.oncanplay = () => v.classList.add('on'); v.play().catch(() => {});
+  document.addEventListener('visibilitychange', () => document.hidden ? v.pause() : v.play().catch(() => {}));
+})();
 addEventListener('hashchange', () => { if (/access_token=|error_description=/.test(location.hash)) start(); });   // lien ouvert dans un onglet déjà sur cette page
 </script>
-<style>.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}</style>
 </body>
 </html>

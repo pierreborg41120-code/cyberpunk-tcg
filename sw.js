@@ -1,7 +1,7 @@
 // Cyberpunk TCG — fonctionnement hors connexion.
 // Le jeu (un seul gros fichier) est gardé sur l'appareil ; publish.sh change VERSION à chaque mise à jour,
 // ce qui fait télécharger la nouvelle version en arrière-plan.
-const VERSION = 'e12d8de5e6';
+const VERSION = '95584fa292';
 const CACHE = 'cptcg-' + VERSION;
 const EXT = 'cptcg-ext';   // polices et PeerJS (sites externes)
 const MUS = 'cptcg-musique';   // musiques et vidéo d'accueil : téléchargées au premier passage, gardées d'une version à l'autre
@@ -19,7 +19,8 @@ self.addEventListener('fetch', e => {
   const r = e.request;
   if (r.method !== 'GET') return;
   const u = new URL(r.url);
-  if (u.origin === location.origin && (u.pathname.includes('/musique/') || /\/hero[^/]*\.(webm|webp)$/.test(u.pathname))) {
+  // musique, vidéo d'accueil et grandes images des cartes : téléchargées au premier besoin, gardées d'une version à l'autre
+  if (u.origin === location.origin && (u.pathname.includes('/musique/') || u.pathname.includes('/cartes/') || /\/hero[^/]*\.(webp|webm)$/.test(u.pathname))) {
     e.respondWith(caches.open(MUS).then(async c => {
       const hit = await c.match(u.pathname);
       if (hit) return hit;
