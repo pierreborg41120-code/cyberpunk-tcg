@@ -317,6 +317,9 @@ body.calm .mp.playing .mp-eq i{animation:none;height:70%}
 .pk-tab[aria-selected=true] .pk-n{background:#000;color:var(--ylw)}
 .pk-tab:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .pk-main{padding-top:18px}
+.pk-bonus{display:flex;flex-direction:column;gap:3px;margin:0 auto 14px;max-width:760px;padding:10px 14px;border:1.5px solid var(--mag);background:rgba(255,43,214,.1);font-size:15px;line-height:1.4}
+.pk-bonus b{font:700 16px 'Chakra Petch',sans-serif;color:#fff}
+.pk-bonus span{color:#e6d6ee}
 .pk-msg{margin:0 auto 16px;max-width:760px;padding:10px 14px;border-left:3px solid var(--ylw);background:rgba(252,238,10,.07);font-size:15px;line-height:1.45}
 .pk-msg b{color:var(--ylw)}
 /* booster */
@@ -1022,6 +1025,12 @@ label.set-row{cursor:pointer}
 .set-row .sound.off input[type=range]{opacity:.35}
 .set-row select{padding:5px 8px;font-size:14px}
 .set-langs{display:flex;gap:6px}
+/* un seul onglet à la fois */
+#tabblock{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(4,5,9,.94);backdrop-filter:blur(6px)}
+#tabblock[hidden]{display:none}
+#tabblock .tb-box{width:min(460px,100%);padding:26px 26px 22px;background:#0b0d13;border:1px solid #2a3044;border-top:3px solid var(--ylw);text-align:left}
+#tabblock h2{margin:0 0 8px;font:700 24px 'Chakra Petch',sans-serif;color:var(--ylw)}
+#tabblock p{margin:0 0 16px;font-size:16px;line-height:1.45;color:#d6d9e4}
 /* page de connexion */
 #login{position:fixed;inset:0;z-index:70;display:none;place-items:center;padding:16px;background:rgba(4,5,9,.82);backdrop-filter:blur(6px)}
 #login.on{display:grid}
@@ -1546,13 +1555,16 @@ body.compact #mentor{bottom:calc(var(--peek) + 12px)}
 <div id="packs"></div>
 <div id="camp"></div>
 <div id="login"></div>
+<div id="tabblock" role="alertdialog" aria-modal="true" aria-labelledby="tb-t" hidden></div>
 <div id="online"></div>
 <div id="sandbox"></div>
 
 <script id="music-data">
 /* Musiques libres de droits, normalisées et encodées en Opus 40 kbit/s : intégrés juste en dessous (version locale)
    ou un fichier par morceau dans le dossier musique/ (site). moment : intro (premier morceau de l'accueil), menu, game (partie), overtime. */
-var MUSIC_OK = false;   // devient vrai quand le joueur se connecte, crée son compte, ou clique sur « Jouer » une fois connecté
+var MUSIC_OK = false;
+// Un seul onglet du jeu à la fois (verrou partagé par le navigateur entre les onglets de la même adresse).
+var TAB = { lock: false, held: false };   // devient vrai quand le joueur se connecte, crée son compte, ou clique sur « Jouer » une fois connecté
 const MUSIC_TRACKS = [{"id": "lazerpunk", "title": "Lazerpunk", "artist": "Infraction", "mode": "intro", "dur": 166}, {"id": "futuristic-city", "title": "Cyberpunk Futuristic City", "artist": "Poradovskyi", "mode": "menu", "dur": 129}, {"id": "suspense", "title": "Suspense Cyberpunk", "artist": "prettyjohn1", "mode": "menu", "dur": 87}, {"id": "futuristic", "title": "Cyberpunk Futuristic", "artist": "Poradovskyi", "mode": "menu", "dur": 123}, {"id": "utopia", "title": "Utopia", "artist": "Infraction", "mode": "menu", "dur": 202}, {"id": "virtual-reality", "title": "Virtual Reality", "artist": "Infraction", "mode": "menu", "dur": 209}, {"id": "overnight", "title": "Overnight", "artist": "Infraction", "mode": "menu", "dur": 175}, {"id": "promise-me", "title": "Promise Me", "artist": "Infraction", "mode": "menu", "dur": 182}, {"id": "dont-leave", "title": "Don't Leave", "artist": "Infraction", "mode": "menu", "dur": 158}, {"id": "sorry", "title": "Sorry", "artist": "Infraction", "mode": "menu", "dur": 211}, {"id": "no-more-tears", "title": "No More Tears", "artist": "Infraction", "mode": "menu", "dur": 192}, {"id": "post-blue", "title": "Post Blue", "artist": "Infraction", "mode": "menu", "dur": 160}, {"id": "soft-evil", "title": "Soft Evil", "artist": "Infraction", "mode": "menu", "dur": 154}, {"id": "hs-cyberpunk", "title": "Cyberpunk", "artist": "HumanStudioEd", "mode": "game", "dur": 152}, {"id": "hs-gaming", "title": "Cyberpunk Gaming", "artist": "HumanStudioEd", "mode": "game", "dur": 156}, {"id": "hs-nocopyright", "title": "Cyberpunk II", "artist": "HumanStudioEd", "mode": "game", "dur": 126}, {"id": "leberch", "title": "Cyberpunk", "artist": "Leberch", "mode": "game", "dur": 100}, {"id": "aim-to-head", "title": "Aim To Head (Falling)", "artist": "Infraction", "mode": "game", "dur": 182}, {"id": "atomic", "title": "Atomic", "artist": "Infraction & Alexi Action", "mode": "game", "dur": 173}, {"id": "dune", "title": "Dune", "artist": "Infraction & Alexi Action", "mode": "game", "dur": 143}, {"id": "almost-evil", "title": "Almost Evil", "artist": "Infraction", "mode": "game", "dur": 247}, {"id": "badly", "title": "Badly", "artist": "Infraction", "mode": "game", "dur": 204}, {"id": "behind", "title": "Behind", "artist": "Infraction", "mode": "game", "dur": 204}, {"id": "break-me-down", "title": "Break Me Down", "artist": "Infraction", "mode": "game", "dur": 133}, {"id": "breathe", "title": "Breathe", "artist": "Infraction", "mode": "game", "dur": 112}, {"id": "can-you-feel", "title": "Can You Feel", "artist": "Infraction", "mode": "game", "dur": 223}, {"id": "centipede", "title": "Centipede", "artist": "Infraction", "mode": "game", "dur": 156}, {"id": "chimera", "title": "Chimera", "artist": "Infraction", "mode": "game", "dur": 220}, {"id": "colaphonk", "title": "Colaphonk", "artist": "Infraction", "mode": "game", "dur": 83}, {"id": "control", "title": "Control", "artist": "Infraction", "mode": "game", "dur": 259}, {"id": "cyber-attack", "title": "Cyber Attack", "artist": "Infraction", "mode": "game", "dur": 209}, {"id": "cyberguitar", "title": "Cyberguitar", "artist": "Infraction", "mode": "game", "dur": 204}, {"id": "cyberphonk", "title": "Cyberphonk", "artist": "Infraction", "mode": "game", "dur": 235}, {"id": "cyberpunk-2021", "title": "Cyberpunk 2021", "artist": "Infraction", "mode": "game", "dur": 206}, {"id": "devil-red-dress", "title": "Devil In A Red Dress", "artist": "Infraction", "mode": "game", "dur": 204}, {"id": "diamonds", "title": "Diamonds", "artist": "Infraction", "mode": "game", "dur": 212}, {"id": "dizziness", "title": "Dizziness", "artist": "Infraction", "mode": "game", "dur": 194}, {"id": "error", "title": "Error", "artist": "Infraction", "mode": "game", "dur": 157}, {"id": "human-error", "title": "Human Error", "artist": "Infraction feat. Karl Casey", "mode": "game", "dur": 175}, {"id": "freak", "title": "Freak", "artist": "Infraction", "mode": "game", "dur": 157}, {"id": "freaky", "title": "Freaky", "artist": "Infraction", "mode": "game", "dur": 202}, {"id": "hardwave", "title": "Hardwave", "artist": "Infraction", "mode": "game", "dur": 219}, {"id": "id-phonk", "title": "ID Phonk", "artist": "Infraction", "mode": "game", "dur": 70}, {"id": "mad-at-chu", "title": "Mad At Chu", "artist": "Infraction & Jinaction", "mode": "game", "dur": 180}, {"id": "keep-on-fire", "title": "Keep On Fire", "artist": "Infraction", "mode": "game", "dur": 125}, {"id": "lets-play", "title": "Let's Play", "artist": "Infraction", "mode": "game", "dur": 142}, {"id": "lie", "title": "Lie", "artist": "Infraction", "mode": "game", "dur": 202}, {"id": "loony", "title": "Loony", "artist": "Infraction", "mode": "game", "dur": 164}, {"id": "meds", "title": "Meds", "artist": "Infraction & MOKKA", "mode": "game", "dur": 221}, {"id": "place-to-hide", "title": "Place To Hide", "artist": "Infraction & MOKKA", "mode": "game", "dur": 154}, {"id": "nothing-to-lose", "title": "Nothing To Lose", "artist": "Infraction", "mode": "game", "dur": 197}, {"id": "phonk", "title": "Phonk", "artist": "Infraction", "mode": "game", "dur": 117}, {"id": "phonk-soul", "title": "Phonk Soul", "artist": "Infraction", "mode": "game", "dur": 209}, {"id": "rollin", "title": "Rollin", "artist": "Infraction", "mode": "game", "dur": 90}, {"id": "same-disease", "title": "Same Disease", "artist": "Infraction", "mode": "game", "dur": 105}, {"id": "scammer", "title": "Scammer", "artist": "Infraction", "mode": "game", "dur": 185}, {"id": "shock-absorber", "title": "Shock Absorber", "artist": "Infraction", "mode": "game", "dur": 126}, {"id": "s-witch", "title": "S-Witch", "artist": "Infraction", "mode": "game", "dur": 168}, {"id": "two-blasters", "title": "Two Blasters", "artist": "Infraction", "mode": "game", "dur": 107}, {"id": "virus", "title": "Virus", "artist": "Infraction", "mode": "game", "dur": 192}, {"id": "wanna-feel-it", "title": "Wanna Feel It", "artist": "Infraction", "mode": "game", "dur": 125}, {"id": "hard-cyberpunk", "title": "Hard Cyberpunk", "artist": "Kulakovka", "mode": "overtime", "dur": 191}, {"id": "echoes-terrifier", "title": "Echoes Of The Terrifier", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 162}, {"id": "out-of-control", "title": "Out Of Control", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 192}, {"id": "sekiro", "title": "Sekiro", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 157}, {"id": "voxygen", "title": "Voxygen", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 158}, {"id": "your-love", "title": "Your Love", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 200}, {"id": "chemicals", "title": "Chemicals", "artist": "Infraction", "mode": "overtime", "dur": 243}, {"id": "detonate", "title": "Detonate", "artist": "Infraction", "mode": "overtime", "dur": 251}, {"id": "fast-evil", "title": "Fast Evil", "artist": "Infraction", "mode": "overtime", "dur": 194}, {"id": "just-evil", "title": "Just Evil", "artist": "Infraction", "mode": "overtime", "dur": 224}, {"id": "totally-evil", "title": "Totally Evil", "artist": "Infraction", "mode": "overtime", "dur": 214}, {"id": "night-chat", "title": "Night Chat", "artist": "Infraction", "mode": "overtime", "dur": 199}, {"id": "no-escape", "title": "No Escape", "artist": "Infraction", "mode": "overtime", "dur": 222}];
 </script>
 <script>document.querySelector('#start .hero').dataset.pct = '50 %';</script>
@@ -6047,6 +6059,7 @@ const saveKind = () => !G || G.over || G.tutorial || G.sandbox ? null
   : G.online ? (G.isGuest ? null : 'online') : (G.players[0].isHuman && !G.players[1].isHuman ? 'solo' : null);
 const saveable = () => saveKind() === 'solo';
 function autosave() {
+  if (TAB.lock && !TAB.held) return;   // un autre onglet a la main : on n'écrase pas sa partie
   const kind = HEADLESS ? null : saveKind();
   if (!kind || !G.endTurnResolve || G.busy || G.attack || G.remoteAsking || (kind === 'solo' && G.current !== 0)) return;
   clearTimeout(saveTimer);
@@ -6054,6 +6067,7 @@ function autosave() {
   saveTimer = setTimeout(() => { if (G === g && saveKind() === kind && G.endTurnResolve && !G.busy && !G.remoteAsking) writeSave(kind); }, 250);
 }
 function writeSave(kind = 'solo') {
+  if (TAB.lock && !TAB.held) return;
   const s = { v: 1, t: Date.now(), uid: UID, gameId: G.gameId, players: G.players, current: G.current, first: G.first, round: G.round, overtime: G.overtime,
     tf: G.tf, log: G.log.slice(0, 200), seen: [...G.seen], learn: G.learn ? { key: G.learn.key, deck: G.learn.deck } : null, daily: G.daily || null, campaign: G.campaign ?? null, campMode: G.campMode || null };
   if (kind === 'online') s.net = { code: NET.code, token: NET.token };
@@ -6815,7 +6829,7 @@ function poolAutoBuild(pool, { min = POOL_MIN, max = 40, legends = null, keep = 
 }
 
 /* ---------- écran Boosters / Collection ---------- */
-const PK = { tab: 'open', reveal: null, opening: false, anim: false, f: { color: 'all', type: 'all', rar: 'all', own: 'all' }, welcome: false, daily: false, level: 'medium' };
+const PK = { bonus: [], tab: 'open', reveal: null, opening: false, anim: false, f: { color: 'all', type: 'all', rar: 'all', own: 'all' }, welcome: false, daily: false, level: 'medium' };
 const pkReduced = () => document.body.classList.contains('calm') || matchMedia('(prefers-reduced-motion: reduce)').matches;
 const pkArt = k => typeof PACK_ART !== 'undefined' ? PACK_ART[k] : '';
 const pkFace = id => IMGS[id] && (IMGS[id].full || IMGS[id].fullFr) ? `<img src="${imgFull(id)}" alt="" draggable="false">` : cardHTML(CARDS[id]);
@@ -6825,6 +6839,7 @@ function openPacks(tab) {
   document.getElementById('modal').classList.remove('on');
   netClose();
   document.getElementById('start').style.display = 'none';
+  PK.bonus = [];
   PK.welcome = collInit();
   PK.tab = tab || 'open';
   if (PK.tab !== 'open' || !PK.reveal || PK.reveal.ctx !== 'coll') PK.reveal = null;
@@ -6848,7 +6863,7 @@ function closePacks(keepHidden) {
   if (!el.classList.contains('on')) return;
   el.classList.remove('on');
   const camp = PK.camp;
-  PK.reveal = null; PK.opening = false; PK.anim = false; PK.camp = false;
+  PK.reveal = null; PK.opening = false; PK.anim = false; PK.camp = false; PK.bonus = [];
   if (camp && !keepHidden) return openCamp();
   if (!keepHidden) showStart();
 }
@@ -6880,8 +6895,8 @@ function pkPackHTML(cls = '') {
 function pkOpenHTML() {
   const c = collLoad(), n = c.packs, gift = c.gift === today();
   const owned = r => byRarity(r).filter(id => c.cards[id]).length;
-  const msg = PK.welcome ? `<div class="pk-msg">${L('<b>Bienvenue dans votre collection.</b> Vous commencez avec les cartes des deux decks de base (Arasaka et Mercs) et 3 boosters offerts.', '<b>Welcome to your collection.</b> You start with the cards of both base decks (Arasaka and Mercs) and 3 free boosters.')}</div>`
-    : PK.daily ? `<div class="pk-msg">${L('<b>Cadeau du jour :</b> 1 booster offert. Revenez demain pour le suivant.', '<b>Daily gift:</b> 1 free booster. Come back tomorrow for the next one.')}</div>` : '';
+  const msg = pkBonusHTML() + (PK.welcome ? `<div class="pk-msg">${L('<b>Bienvenue dans votre collection.</b> Vous commencez avec les cartes des deux decks de base (Arasaka et Mercs) et 3 boosters offerts.', '<b>Welcome to your collection.</b> You start with the cards of both base decks (Arasaka and Mercs) and 3 free boosters.')}</div>`
+    : PK.daily ? `<div class="pk-msg">${L('<b>Cadeau du jour :</b> 1 booster offert. Revenez demain pour le suivant.', '<b>Daily gift:</b> 1 free booster. Come back tomorrow for the next one.')}</div>` : '');
   const stack = Math.min(n, 4);
   return `${msg}<section class="pk-stage">
     <div class="pk-zone">
@@ -6924,7 +6939,7 @@ function pkRevealHTML() {
     more = (c.packs ? `<button class="btn solid" data-pk="open">${L(`Booster suivant (${c.packs})`, `Next booster (${c.packs})`)}</button>` : '')
       + `<button class="btn cy" data-pkt="coll">${L('Voir la collection', 'View the collection')}</button>`;
   }
-  return `<section class="pk-reveal">${PK.warn ? `<div class="pk-warn" role="alert">${esc(PK.warn)}</div>` : ''}
+  return `<section class="pk-reveal">${PK.warn ? `<div class="pk-warn" role="alert">${esc(PK.warn)}</div>` : ''}${all ? pkBonusHTML() : ''}
     <div class="pk-rgrid">${R.cards.map((x, i) => pkCardHTML(x, i)).join('')}</div>
     <div class="pk-rbar"><span class="pk-sum">${all
       ? (`${nWish ? `<b class="pk-wsum">★ ${L(`${nWish} carte${nWish > 1 ? 's' : ''} de votre liste de souhaits !`, `${nWish} card${nWish > 1 ? 's' : ''} from your wishlist!`)}</b> · ` : ''}<b>${nNew}</b> ${L(nNew > 1 ? 'nouvelles cartes' : 'nouvelle carte', nNew > 1 ? 'new cards' : 'new card')} · ${L('Collection', 'Collection')} <b>${own}/150</b>`)
@@ -6965,7 +6980,7 @@ async function pkOpen(ctx) {
   let cards;
   {
     if (collLoad().packs <= 0) return;
-    PK.anim = true;
+    PK.anim = true; PK.bonus = [];
     let r;
     try { r = await srv('open_pack'); }
     catch (e) { PK.anim = false; PK.warn = srvErr(e); renderPacks(); return; }
@@ -6988,6 +7003,14 @@ async function pkOpen(ctx) {
     renderPacks(); pkFocusFirst();
   });
 }
+// Boosters offerts par un succès débloqué pendant l'action (ouverture, fabrication…) : on dit d'où ils viennent.
+function pkBonusHTML() {
+  if (!PK.bonus || !PK.bonus.length) return '';
+  const rows = PK.bonus.map(id => ACH.find(a => a.id === id)).filter(Boolean);
+  const n = rows.reduce((t, a) => t + (a.packs || 1), 0);
+  return `<div class="pk-bonus" role="status"><b>🎁 ${L(`+${n} booster${n > 1 ? 's' : ''} offert${n > 1 ? 's' : ''}`, `+${n} free booster${n > 1 ? 's' : ''}`)}</b>
+    ${rows.map(a => `<span>${L(`Succès débloqué « ${esc(a.fr[0])} » (${esc(a.fr[1])}) : +${a.packs || 1} booster${(a.packs || 1) > 1 ? 's' : ''}`, `Achievement unlocked "${esc(a.en[0])}" (${esc(a.en[1])}): +${a.packs || 1} booster${(a.packs || 1) > 1 ? 's' : ''}`)}</span>`).join('')}</div>`;
+}
 function pkFocusFirst() { const f = document.querySelector('#packs .pk-card'); if (f) f.focus({ preventScroll: true }); }
 function pkCollHTML() {
   const c = collLoad(), F = PK.f;
@@ -6998,7 +7021,7 @@ function pkCollHTML() {
   const n = Object.keys(CARDS).filter(id => owned(id)).length, nf = Object.keys(c.foil || {}).filter(id => c.foil[id] > 0).length;
   const total = Object.values(c.cards).reduce((s, k) => s + k, 0);
   const seg = (key, items, label) => `<div class="seg" role="group" aria-label="${label}">${items.map(([v, t, dc]) => `<button data-pkf="${key}" data-pkv="${v}" aria-pressed="${F[key] === v}">${dc ? `<i class="dot" style="--dc:var(--${dc})"></i>` : ''}${t}</button>`).join('')}</div>`;
-  return `<section class="pk-coll">
+  return `${pkBonusHTML()}<section class="pk-coll">
     <div class="pk-chead">
       <div class="pk-big"><b>${n}</b><span>/ 150 ${L('cartes différentes', 'different cards')}</span></div>
       <div class="pk-cbar" role="img" aria-label="${Math.round(n / 1.5)} %"><i style="width:${n / 1.5}%"></i></div>
@@ -7030,7 +7053,7 @@ if (!HEADLESS) {
   el.addEventListener('click', e => {
     const t = e.target;
     const tb = t.closest('[data-pkt]');
-    if (tb) { PK.tab = tb.dataset.pkt; PK.reveal = null; renderPacks(); const f = el.querySelector(`.pk-tab[data-pkt="${PK.tab}"]`); if (f) f.focus({ preventScroll: true }); el.scrollTop = 0; return; }
+    if (tb) { PK.tab = tb.dataset.pkt; PK.reveal = null; PK.bonus = []; renderPacks(); const f = el.querySelector(`.pk-tab[data-pkt="${PK.tab}"]`); if (f) f.focus({ preventScroll: true }); el.scrollTop = 0; return; }
     const card = t.closest('.pk-card');
     if (card) { pkFlip(+card.dataset.pki); return; }
     const cc = t.closest('[data-pkc]');
@@ -7608,7 +7631,9 @@ function srvErr(e) { return L(`Action refusée ou serveur injoignable (${e.messa
 function collApply(sv, quiet) {
   collSave({ v: 1, started: true, cards: sv.cards || {}, foil: sv.foil || {}, wish: sv.wish || {}, packs: sv.packs | 0, opened: sv.opened | 0, scrap: sv.scrap | 0,
     log: sv.log || [], gift: sv.gift || '', dayPacks: sv.day_packs | 0, dayCap: sv.day_cap | 0 });
+  const had = loadAch(), fresh = Object.keys(sv.ach || {}).filter(id => !had[id] && ACH.some(a => a.id === id));
   for (const id of Object.keys(sv.ach || {})) achMark(id, quiet);
+  if (!quiet && fresh.length) PK.bonus = [...(PK.bonus || []), ...fresh];
   for (const m of ['story', 'classic']) {
     const sc = sv.camp && sv.camp[m]; if (!sc) continue;
     const lc = campLoad(m);
@@ -7641,7 +7666,7 @@ function authErr(e) {
 // Synchronisation : si l'autre appareil a enregistré entre-temps et que rien n'a changé ici, on reprend ses données telles quelles ;
 // si les deux ont changé (ou à la première connexion sur cet appareil), on fusionne comme l'import d'un fichier ; puis on envoie le résultat.
 async function cloudSync(force, serverWins) {
-  if (HEADLESS || CLOUD_BUSY || !cloudSession() || !navigator.onLine) return;
+  if (HEADLESS || CLOUD_BUSY || !cloudSession() || !navigator.onLine || (TAB.lock && !TAB.held)) return;
   if (typeof G !== 'undefined' && G && !G.over && !force) return;   // pas pendant une partie
   CLOUD_BUSY = true;
   try {
@@ -7903,6 +7928,40 @@ if (!HEADLESS) {
   setInterval(() => { if (cloudSession() && cloudHash(cloudSnapshot()) !== cloudState().hash) cloudSync(); }, 60e3);
   addEventListener('online', () => cloudSync());
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloudSession() && cloudHash(cloudSnapshot()) !== cloudState().hash) cloudSync(true); });
+}
+
+/* ---------- un seul onglet du jeu à la fois ----------
+   Deux onglets partageraient la même partie en cours et la même sauvegarde (et joueraient deux musiques).
+   L'onglet ouvert en dernier propose de « jouer ici » ; l'autre se met alors en pause. */
+function tabBlock(why) {
+  TAB.held = false;
+  const el = document.getElementById('tabblock');
+  el.innerHTML = `<div class="tb-box"><h2 id="tb-t">${why === 'stolen' ? L('Le jeu est ouvert dans un autre onglet', 'The game is open in another tab') : L('Le jeu est déjà ouvert', 'The game is already open')}</h2>
+    <p>${why === 'stolen' ? L('Vous avez continué à jouer dans un autre onglet. Celui-ci est en pause pour ne pas mélanger vos parties et votre sauvegarde.', 'You carried on playing in another tab. This one is paused so your games and save are not mixed up.')
+      : L("Le jeu est déjà ouvert dans un autre onglet ou une autre fenêtre de ce navigateur. Il ne fonctionne que dans un seul à la fois, pour ne pas mélanger vos parties et votre sauvegarde.", 'The game is already open in another tab or window of this browser. It only works in one at a time, so your games and save are not mixed up.')}</p>
+    <button class="btn solid big" id="tb-here">${why === 'stolen' ? L('Reprendre ici', 'Resume here') : L('Jouer dans cet onglet', 'Play in this tab')}</button></div>`;
+  el.hidden = false;
+  try { MUSIC.stop(); } catch (e) {}
+  document.getElementById('tb-here').onclick = () => {
+    // l'onglet mis en pause a peut-être des données anciennes : il se recharge et prend la main
+    if (why === 'stolen') { try { sessionStorage.setItem('cptcg-steal', '1'); } catch (e) {} location.reload(); return; }
+    tabLock(true);
+  };
+  document.getElementById('tb-here').focus();
+}
+function tabLock(steal) {
+  if (!TAB.lock) return;
+  navigator.locks.request('cptcg-onglet', steal ? { steal: true } : { ifAvailable: true }, lock => {
+    if (!lock) { tabBlock('other'); return; }
+    TAB.held = true;
+    const el = document.getElementById('tabblock'); el.hidden = true; el.innerHTML = '';
+    return new Promise(() => {});   // gardé tant que l'onglet reste ouvert
+  }).catch(e => { if (e && e.name === 'AbortError') tabBlock('stolen'); });
+}
+if (!HEADLESS && navigator.locks && navigator.locks.request) {
+  TAB.lock = true;
+  let steal = false; try { steal = sessionStorage.getItem('cptcg-steal') === '1'; sessionStorage.removeItem('cptcg-steal'); } catch (e) {}
+  tabLock(steal);
 }
 
 /* ---------- raccourcis clavier : en partie (touche ?) et depuis les paramètres ---------- */
