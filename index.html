@@ -1086,6 +1086,21 @@ label.set-row{cursor:pointer}
 #invite-toast p{margin:0 0 10px;display:flex;align-items:center;gap:10px;color:#fff;font-size:16px}
 #invite-toast .sc-av{flex:none}
 #invite-toast .row{display:flex;gap:8px}
+/* fenêtres de confirmation du jeu (à la place de celles du navigateur) */
+#uidlg{position:fixed;inset:0;z-index:400;display:grid;place-items:center;padding:16px;background:rgba(4,5,9,.72);backdrop-filter:blur(3px)}
+#uidlg[hidden]{display:none}
+.ud-box{width:min(440px,100%);padding:22px 22px 18px;background:#0b0d13;border:1px solid #2a3044;border-top:3px solid var(--ylw);box-shadow:0 20px 60px rgba(0,0,0,.6);
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));animation:udIn .16s ease-out}
+.ud-box.danger{border-top-color:var(--red)}
+@keyframes udIn{from{opacity:0;transform:translateY(6px) scale(.98)}}
+@media (prefers-reduced-motion:reduce){.ud-box{animation:none}}
+.ud-box h2{margin:0 0 8px;font:700 20px 'Chakra Petch',sans-serif;color:var(--ylw)}
+.ud-box.danger h2{color:#ff8a95}
+.ud-box p{margin:0 0 16px;font-size:16.5px;line-height:1.45;color:#e6e8ef}
+.ud-box input{box-sizing:border-box;width:100%;margin:0 0 16px;padding:10px 12px;background:#05070c;border:1.5px solid #2a3044;color:#fff;font:600 18px 'Chakra Petch',sans-serif;letter-spacing:.08em}
+.ud-box input:focus{outline:none;border-color:var(--cyan)}
+.ud-acts{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.ud-box.danger .btn.solid{background:var(--red);border-color:var(--red);color:#fff}
 /* un seul onglet à la fois */
 #tabblock{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(4,5,9,.94);backdrop-filter:blur(6px)}
 #tabblock[hidden]{display:none}
@@ -1621,6 +1636,7 @@ body.compact #mentor{bottom:calc(var(--peek) + 12px)}
 <div id="camp"></div>
 <div id="social"></div>
 <div id="invite-toast" role="status" aria-live="polite" hidden></div>
+<div id="uidlg" hidden></div>
 <div id="login"></div>
 <div id="tabblock" role="alertdialog" aria-modal="true" aria-labelledby="tb-t" hidden></div>
 <div id="online"></div>
@@ -5180,7 +5196,7 @@ function deckCraftCost(d, have = collCounts()) {
 }
 function collCraftDeck(d) {
   const need = { ...d.list }; for (const id of d.legends) need[id] = 1;
-  return srv('craft_deck', { need }).then(() => true, e => { alert(srvErr(e)); return false; });
+  return srv('craft_deck', { need }).then(() => true, e => { uiAlert(srvErr(e)); return false; });
 }
 function renderCardSeg() {
   if (!CARDSEG_READY) return;
@@ -5557,7 +5573,7 @@ async function builderAction(a) {
   if (a === 'back') { hideHover(); showStart(); return; }
   if (a === 'build') { openBuilder(); return; }
   if (a === 'reset') { Object.assign(B, { color: 'all', type: 'all', cost: 'all', kw: '', text: '' }); renderBuilder(); return; }
-  if (a === 'clear') { if (confirm(L('Vider le deck ?', 'Clear the deck?'))) { d.legends = []; d.list = {}; } }
+  if (a === 'clear') { if (await uiConfirm(L('Vider le deck ?', 'Clear the deck?'), { ok: L('Vider', 'Clear'), danger: true })) { d.legends = []; d.list = {}; } }
   if (a === 'auto' && B.pool) {
     const nd = poolAutoBuild(B.pool, { min: bMin(), max: Math.max(bMin() === POOL_MIN ? 40 : DECK_MIN, deckSize(d)), legends: d.legends, keep: d.list, name: d.name });
     d.legends = nd.legends; d.list = nd.list;
@@ -5584,7 +5600,7 @@ async function builderAction(a) {
     bFlash(L(`Deck « ${name} » enregistré${validateDeck(d).length ? ' (pas encore valide pour jouer)' : ''}.`, `Deck "${name}" saved${validateDeck(d).length ? ' (not yet valid to play)' : ''}.`), true);
     return;
   }
-  if (a === 'delete') { if (confirm(L(`Supprimer le deck « ${d.name} » ?`, `Delete the deck "${d.name}"?`))) { delete all[d.name]; saveCustomDecks(all); } }
+  if (a === 'delete') { if (await uiConfirm(L(`Supprimer le deck « ${d.name} » ?`, `Delete the deck "${d.name}"?`), { ok: L('Supprimer', 'Delete'), danger: true })) { delete all[d.name]; saveCustomDecks(all); } }
   if (a === 'export') { shareDeck(d); return; }
   if (a === 'import') { importDeck(nd => { B.deck = nd; bFlash(L(`Deck « ${nd.name} » importé : enregistrez-le pour le garder.`, `Deck "${nd.name}" imported: save it to keep it.`), true); }); return; }
   renderBuilder();
@@ -5642,7 +5658,7 @@ if (!HEADLESS) {
 }
 
 if (!HEADLESS) {
-  document.addEventListener('click', e => {
+  document.addEventListener('click', async e => {
     const lb = e.target.closest('.lang');
     if (lb) { setLang(lb.dataset.lang); return; }
     const sh = e.target.closest('[data-sharedeck]');
@@ -5655,13 +5671,13 @@ if (!HEADLESS) {
     const del = e.target.closest('[data-deldeck]');
     if (del) {
       const name = del.dataset.deldeck;
-      if (confirm(L(`Supprimer définitivement le deck « ${name} » ?`, `Permanently delete the deck "${name}"?`))) { const all = loadCustomDecks(); delete all[name]; saveCustomDecks(all); renderStartDecks(); }
+      if (await uiConfirm(L(`Supprimer définitivement le deck « ${name} » ?`, `Permanently delete the deck "${name}"?`), { ok: L('Supprimer', 'Delete'), danger: true })) { const all = loadCustomDecks(); delete all[name]; saveCustomDecks(all); renderStartDecks(); }
       return;
     }
     const cd = e.target.closest('[data-craftdeck]');
     if (cd) {
       const d = getDeck(cd.dataset.craftdeck), cost = deckCraftCost(d);
-      if (confirm(L(`Fabriquer les cartes manquantes de « ${d.name} » pour ${cost} composants ?`, `Craft the missing cards of "${d.name}" for ${cost} components?`))) collCraftDeck(d).then(ok => {
+      if (await uiConfirm(L(`Fabriquer les cartes manquantes de « ${d.name} » pour ${cost} composants ?`, `Craft the missing cards of "${d.name}" for ${cost} components?`), { ok: L('Fabriquer', 'Craft') })) collCraftDeck(d).then(ok => {
         if (!ok) return;
         try { SFX.play('enter'); } catch (x) {}
         renderCardSeg(); const n = document.querySelector(`#start .deckpick[data-deck="${CSS.escape(cd.dataset.craftdeck)}"]`); if (n) n.focus();
@@ -7120,7 +7136,7 @@ function pkCollHTML() {
 const LVL_NAME = () => ({ easy: L('Facile', 'Easy'), medium: L('Moyen', 'Medium'), hard: L('Difficile', 'Hard'), expert: 'Expert' });
 if (!HEADLESS) {
   const el = document.getElementById('packs');
-  el.addEventListener('click', e => {
+  el.addEventListener('click', async e => {
     const t = e.target;
     const tb = t.closest('[data-pkt]');
     if (tb) { PK.tab = tb.dataset.pkt; PK.reveal = null; PK.bonus = []; renderPacks(); const f = el.querySelector(`.pk-tab[data-pkt="${PK.tab}"]`); if (f) f.focus({ preventScroll: true }); el.scrollTop = 0; return; }
@@ -7141,7 +7157,7 @@ if (!HEADLESS) {
       case 'buypack': collBuyPack().then(ok => { renderPacks(); if (ok) { const n = el.querySelector('.pk-tab[data-pkt="open"]'); if (n) n.focus({ preventScroll: true }); } }); break;
       case 'dismantle': {
         const v = collScrapValue(collLoad());
-        if (!v || !confirm(L(`Démonter tous les doubles en trop contre ${v} composants ? Vous gardez 3 exemplaires de chaque carte (Brillantes comprises).`, `Dismantle every extra duplicate for ${v} components? You keep 3 copies of each card (foils included).`))) break;
+        if (!v || !await uiConfirm(L(`Démonter tous les doubles en trop contre ${v} composants ? Vous gardez 3 exemplaires de chaque carte (Brillantes comprises).`, `Dismantle every extra duplicate for ${v} components? You keep 3 copies of each card (foils included).`), { ok: L('Démonter', 'Dismantle') })) break;
         collDismantle().then(() => renderPacks()); break;
       }
       case 'buildcoll': try { localStorage.setItem('cptcg-collmode', '1'); } catch (e) {} closePacks(true); openBuilder(); break;
@@ -7194,8 +7210,8 @@ function collScrapValue(c) {
 }
 function collDismantle() { return srv('dismantle').then(r => r.gained, e => { PK.warn = srvErr(e); return 0; }); }
 // Fabriquer : jusqu'à 3 exemplaires d'une carte (pas de Brillante).
-function collCraft(id) { return srv('craft', { cid: id }).then(() => true, e => { alert(srvErr(e)); return false; }); }
-function collWish(id) { return srv('wish_toggle', { cid: id }).then(() => true, e => { alert(srvErr(e)); return false; }); }
+function collCraft(id) { return srv('craft', { cid: id }).then(() => true, e => { uiAlert(srvErr(e)); return false; }); }
+function collWish(id) { return srv('wish_toggle', { cid: id }).then(() => true, e => { uiAlert(srvErr(e)); return false; }); }
 function craftHTML(id) {
   const c = collLoad(), r = rarity(id), cost = CRAFT_COST[r], have = c.cards[id] || 0, sc = c.scrap || 0;
   const why = have >= MAX_COPIES ? L('Vous avez déjà 3 exemplaires.', 'You already have 3 copies.') : sc < cost ? L(`Il vous manque ${cost - sc} composant${cost - sc > 1 ? 's' : ''}.`, `You need ${cost - sc} more component${cost - sc > 1 ? 's' : ''}.`) : '';
@@ -7576,7 +7592,7 @@ function campSetMode(m) {
 }
 if (!HEADLESS) {
   const el = document.getElementById('camp');
-  el.addEventListener('click', e => {
+  el.addEventListener('click', async e => {
     const dd = e.target.closest('[data-cpd]');
     if (dd) { if (CP_MODE === 'story' && !campLoad().started) return; CP_SEL = +dd.dataset.cpd; renderCamp(); const n = el.querySelector(`[data-cpd="${CP_SEL}"]`); if (n) n.focus({ preventScroll: true }); return; }
     const m = e.target.closest('[data-cpm]');
@@ -7584,18 +7600,18 @@ if (!HEADLESS) {
     const sb = e.target.closest('[data-cpstart]');
     if (sb) {
       const have = Object.values(collLoad().cards).reduce((a, b) => a + b, 0);
-      if (have && !confirm(L(`Commencer le mode Histoire avec ${sb.dataset.cpstart === 'arasaka' ? 'Arasaka' : 'Mercs'} ? Votre collection actuelle (${have} cartes) sera remise à zéro ; vos succès et statistiques restent.`, `Start story mode with ${sb.dataset.cpstart === 'arasaka' ? 'Arasaka' : 'Mercs'}? Your current collection (${have} cards) will be reset; your achievements and statistics stay.`))) return;
-      storyStart(sb.dataset.cpstart).then(() => { CP_SEL = 0; campOpenPacks(); }, e => alert(srvErr(e))); return;
+      if (have && !await uiConfirm(L(`Commencer le mode Histoire avec ${sb.dataset.cpstart === 'arasaka' ? 'Arasaka' : 'Mercs'} ? Votre collection actuelle (${have} cartes) sera remise à zéro ; vos succès et statistiques restent.`, `Start story mode with ${sb.dataset.cpstart === 'arasaka' ? 'Arasaka' : 'Mercs'}? Your current collection (${have} cards) will be reset; your achievements and statistics stay.`), { ok: L('Commencer', 'Start'), danger: true })) return;
+      storyStart(sb.dataset.cpstart).then(() => { CP_SEL = 0; campOpenPacks(); }, e => uiAlert(srvErr(e))); return;
     }
     const a = e.target.closest('[data-cp]'); if (!a) return;
     const act = a.dataset.cp;
     if (act === 'back') closeCamp();
     else if (act === 'fight') campStart(campLoad().prog);
-    else if (act === 'reset' && confirm(CP_MODE === 'story' ? L('Rejouer la campagne depuis Watson ? Vous gardez votre collection.', 'Replay the campaign from Watson? You keep your collection.') : L('Recommencer la campagne depuis Watson ? Les boosters déjà gagnés restent à vous.', 'Restart the campaign from Watson? Boosters already earned stay yours.'))) {
+    else if (act === 'reset' && await uiConfirm(CP_MODE === 'story' ? L('Rejouer la campagne depuis Watson ? Vous gardez votre collection.', 'Replay the campaign from Watson? You keep your collection.') : L('Recommencer la campagne depuis Watson ? Les boosters déjà gagnés restent à vous.', 'Restart the campaign from Watson? Boosters already earned stay yours.'), { ok: L('Recommencer', 'Restart') })) {
       const c = campLoad(); srv('camp_reset', { mode: CP_MODE }).catch(() => {});
       campSave({ ...c, prog: 0, done: false, wins: {}, told: {}, ai: {}, runs: (c.runs || 0) + 1 }); CP_SEL = 0; renderCamp();
     }
-    else if (act === 'snew' && confirm(L("Recommencer l'histoire à zéro ? Vous choisirez un nouveau deck de départ et votre collection sera remise à zéro.", 'Restart the story from scratch? You will pick a new starter deck and your collection will be reset.'))) {
+    else if (act === 'snew' && await uiConfirm(L("Recommencer l'histoire à zéro ? Vous choisirez un nouveau deck de départ et votre collection sera remise à zéro.", 'Restart the story from scratch? You will pick a new starter deck and your collection will be reset.'), { ok: L('Recommencer', 'Restart'), danger: true })) {
       const c = campLoad('story'); c.started = false; campSave(c); renderCamp(); const n = el.querySelector('[data-cpstart]'); if (n) n.focus({ preventScroll: true });
     }
     else if (act === 'copen') campOpenPacks();
@@ -7919,18 +7935,18 @@ async function loginAct(a) {
   if (a === 'export') { exportData(); return loginSay(L('✓ Fichier téléchargé (dossier Téléchargements).', '✓ File downloaded (Downloads folder).')); }
   if (a === 'delete') {
     const pf = cloudState().profile || {}, ses = cloudSession();
-    if (!confirm(L('Supprimer définitivement votre compte ? Votre collection, vos decks et votre progression seront effacés et ne pourront pas être récupérés.', 'Permanently delete your account? Your collection, decks and progress will be erased and cannot be recovered.'))) return;
+    if (!await uiConfirm(L('Supprimer définitivement votre compte ? Votre collection, vos decks et votre progression seront effacés et ne pourront pas être récupérés.', 'Permanently delete your account? Your collection, decks and progress will be erased and cannot be recovered.'), { ok: L('Continuer', 'Continue'), danger: true, title: L('Supprimer mon compte', 'Delete my account') })) return;
     const word = L('SUPPRIMER', 'DELETE');
-    if ((prompt(L(`Pour confirmer, tapez ${word} :`, `To confirm, type ${word}:`)) || '').trim().toUpperCase() !== word) return loginSay(L('Suppression annulée.', 'Deletion cancelled.'));
+    if (((await uiPrompt(L(`Dernière vérification : tapez ${word} pour effacer votre compte.`, `Last check: type ${word} to erase your account.`), { ok: L('Supprimer définitivement', 'Delete permanently'), danger: true, title: L('Supprimer mon compte', 'Delete my account') })) || '').trim().toUpperCase() !== word) return loginSay(L('Suppression annulée.', 'Deletion cancelled.'));
     loginSay(L('Suppression…', 'Deleting…'));
     try { await cloudToken(); await cloudFetch('/rest/v1/rpc/delete_account', { method: 'POST', body: {} }); }
     catch (e) { return loginSay(L(`Suppression impossible : ${e.message}`, `Could not delete: ${e.message}`), true); }
     try { for (const k of Object.keys(localStorage)) if (k.startsWith('cptcg-') && !['cptcg-lang', 'cptcg-music', 'cptcg-sound', 'cptcg-prefs'].includes(k)) localStorage.removeItem(k); } catch (e) {}
-    alert(L('Votre compte a été supprimé.', 'Your account has been deleted.'));
+    await uiAlert(L('Votre compte a été supprimé.', 'Your account has been deleted.'));
     return location.reload();
   }
   else if (a === 'sync') { loginSay(L('Synchronisation…', 'Syncing…')); await cloudSync(true); LG.msg = ''; renderLogin(); }
-  else if (a === 'out' && confirm(L('Se déconnecter ? Vos données restent sur cet appareil et dans votre compte.', 'Sign out? Your data stays on this device and in your account.'))) {
+  else if (a === 'out' && await uiConfirm(L('Se déconnecter ? Vos données restent sur cet appareil et dans votre compte.', 'Sign out? Your data stays on this device and in your account.'), { ok: L('Se déconnecter', 'Sign out') })) {
     const ses = cloudSession();
     loginSay(L('Envoi de vos dernières modifications…', 'Sending your latest changes…'));
     await cloudSync(true);
@@ -8101,7 +8117,7 @@ async function socAct(a, b) {
       SOC.bad = false; await socLoad(); return;
     }
     if (a === 'accept' || a === 'refuse') { await socRpc('friend_respond', { other: id, accept: a === 'accept' }); SOC.msg = a === 'accept' ? L(`✓ ${f.pseudo} et vous êtes maintenant amis.`, `✓ You and ${f.pseudo} are now friends.`) : ''; await socLoad(); presenceTick(); return; }
-    if (a === 'remove') { if (f.status === 'friend' && !confirm(L(`Retirer ${f.pseudo} de vos amis ?`, `Remove ${f.pseudo} from your friends?`))) return; await socRpc('friend_remove', { other: id }); SOC.msg = ''; await socLoad(); return; }
+    if (a === 'remove') { if (f.status === 'friend' && !await uiConfirm(L(`Retirer ${f.pseudo} de vos amis ?`, `Remove ${f.pseudo} from your friends?`), { ok: L('Retirer', 'Remove'), danger: true })) return; await socRpc('friend_remove', { other: id }); SOC.msg = ''; await socLoad(); return; }
     if (a === 'invite') return inviteFriend(f);
   } catch (e) {
     socSay(/introuvable/.test(e.message) ? L("Aucun joueur n'a ce pseudo.", 'No player has this nickname.') : /vous/.test(e.message) ? L("C'est votre propre pseudo.", 'That is your own nickname.') : L(`Impossible : ${e.message}`, `Not possible: ${e.message}`), true);
@@ -8180,6 +8196,41 @@ if (!HEADLESS) {
   document.getElementById('b-friends').onclick = () => openSocial('friends');
   document.getElementById('b-admin').onclick = () => openSocial('admin');
 }
+
+/* ---------- fenêtres de confirmation, d'information et de saisie, au style du jeu ----------
+   Elles remplacent confirm(), alert() et prompt() du navigateur (qui affichent l'adresse du site et ne se personnalisent pas). */
+let UD = null;
+function uiDialog({ title = '', text, ok = 'OK', cancel = null, danger = false, input = false }) {
+  if (UD) UD.done(null);
+  return new Promise(resolve => {
+    const el = document.getElementById('uidlg'), back = document.activeElement;
+    el.innerHTML = `<div class="ud-box ${danger ? 'danger' : ''}" role="${cancel ? 'alertdialog' : 'dialog'}" aria-modal="true" ${title ? 'aria-labelledby="ud-t"' : 'aria-label="' + escAttr(text.slice(0, 80)) + '"'} aria-describedby="ud-p">
+      ${title ? `<h2 id="ud-t">${esc(title)}</h2>` : ''}<p id="ud-p">${esc(text)}</p>${input ? '<input id="ud-in" autocomplete="off" spellcheck="false">' : ''}
+      <div class="ud-acts">${cancel ? `<button class="btn" data-ud="no">${esc(cancel)}</button>` : ''}<button class="btn solid" data-ud="ok">${esc(ok)}</button></div></div>`;
+    el.hidden = false;
+    const done = v => {
+      if (!UD || UD.done !== done) return;
+      UD = null; el.hidden = true; el.innerHTML = ''; document.removeEventListener('keydown', key, true);
+      if (back && back.isConnected) try { back.focus({ preventScroll: true }); } catch (e) {}
+      resolve(v);
+    };
+    const yes = () => done(input ? document.getElementById('ud-in').value : true), no = () => done(input ? null : cancel ? false : true);
+    // Échap annule, Entrée valide, Tab reste dans la fenêtre ; rien ne passe aux écrans en dessous
+    const key = e => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); no(); }
+      else if (e.key === 'Enter' && !(e.target.closest && e.target.closest('[data-ud="no"]'))) { e.preventDefault(); e.stopImmediatePropagation(); yes(); }
+      else if (e.key === 'Tab') { const f = [...el.querySelectorAll('input, button')], i = f.indexOf(document.activeElement); e.preventDefault(); e.stopImmediatePropagation(); f[(i + (e.shiftKey ? f.length - 1 : 1) + f.length) % f.length].focus(); }
+      else e.stopImmediatePropagation();
+    };
+    document.addEventListener('keydown', key, true);
+    el.onclick = e => { const b = e.target.closest('[data-ud]'); if (b) b.dataset.ud === 'ok' ? yes() : no(); else if (e.target === el && cancel) no(); };
+    UD = { done };
+    (el.querySelector('#ud-in') || el.querySelector(danger && cancel ? '[data-ud="no"]' : '[data-ud="ok"]')).focus();
+  });
+}
+const uiConfirm = (text, o = {}) => uiDialog({ text, title: o.title, ok: o.ok || L('Confirmer', 'Confirm'), cancel: o.cancel || L('Annuler', 'Cancel'), danger: o.danger });
+const uiAlert = (text, o = {}) => uiDialog({ text, title: o.title, ok: o.ok || 'OK' });
+const uiPrompt = (text, o = {}) => uiDialog({ text, title: o.title, ok: o.ok || 'OK', cancel: o.cancel || L('Annuler', 'Cancel'), danger: o.danger, input: true });
 
 /* ---------- un seul onglet du jeu à la fois ----------
    Deux onglets partageraient la même partie en cours et la même sauvegarde (et joueraient deux musiques).
@@ -8311,10 +8362,10 @@ if (!HEADLESS) {
 
 /* ---------- abandon : compte comme une défaite ---------- */
 // Partie sauvegardée abandonnée depuis l'accueil : défaite enregistrée à partir de la sauvegarde.
-function abandonSaved(kind) {
+async function abandonSaved(kind) {
   const sv = loadSave(kind);
   if (!sv) { renderResume(); return; }
-  if (!confirm(L('Abandonner cette partie ? Elle comptera comme une défaite dans vos statistiques.', 'Abandon this game? It will count as a loss in your statistics.'))) return;
+  if (!await uiConfirm(L('Abandonner cette partie ? Elle comptera comme une défaite dans vos statistiques.', 'Abandon this game? It will count as a loss in your statistics.'), { ok: L('Abandonner', 'Abandon'), danger: true })) return;
   const [me, op] = sv.players, all = loadStats();
   if (sv.gameId && !all.some(x => x.id === sv.gameId)) {
     all.push({ id: sv.gameId, date: Date.now(), mode: kind === 'online' ? 'online' : 'ai', level: kind === 'online' ? null : op.level, deck: me.deckName, oppDeck: op.deckName,
@@ -8483,8 +8534,8 @@ function openStats() {
   m.innerHTML = `<div class="mbox"><h3>${L('📊 Statistiques et succès', '📊 Statistics and achievements')}</h3><div class="stats">${achHTML()}</div>${statsHTML()}
     <div class="opts" style="margin-top:12px">${has ? `<button class="opt plain" data-resetstats>${L('Réinitialiser', 'Reset')}</button>` : ''}<button class="opt plain cancel" data-close>${L('Fermer', 'Close')}</button></div></div>`;
   m.classList.add('on');
-  m.onclick = e => {
-    if (e.target.closest('[data-resetstats]')) { if (confirm(L('Effacer toutes vos statistiques ?', 'Erase all your statistics?'))) { saveStats([]); openStats(); } return; }
+  m.onclick = async e => {
+    if (e.target.closest('[data-resetstats]')) { if (await uiConfirm(L('Effacer toutes vos statistiques ?', 'Erase all your statistics?'), { ok: L('Effacer', 'Erase'), danger: true })) { saveStats([]); openStats(); } return; }
     if (e.target.closest('[data-close]') || e.target === m) { m.classList.remove('on'); m.innerHTML = ''; m.onclick = null; }
   };
 }
