@@ -1040,6 +1040,23 @@ label.set-row{cursor:pointer}
 .lg-msg{margin:12px 0 0;font-size:14.5px;color:var(--cyan)}.lg-msg:empty{display:none}.lg-msg.ko{color:#ffb3bb}
 #data-import{display:none!important}
 body:has(#login.on) #autoplay{display:none}
+.lg-box.wide{width:min(720px,100%)}
+.ac-head{display:flex;align-items:center;gap:16px;margin:0 0 6px}
+.ac-head h2{margin:0}
+.ac-mail{margin:2px 0 0;color:var(--mut);font-size:14px}
+.ac-av{flex:none;display:grid;place-items:center;width:64px;height:64px;border-radius:50%;border:2px solid var(--ylw);background:#141824 center 20%/cover;font-size:28px}
+.lg-box>.ac-av{width:56px;height:56px;margin:0 0 10px}
+.ac-sec{margin:18px 0 0;padding:16px 0 0;border-top:1px solid #1d2232}
+.ac-sec h3{margin:0 0 10px;font:700 17px 'Chakra Petch',sans-serif;color:#fff}
+.ac-lbl{margin:10px 0 6px;font:600 13px 'Chakra Petch',sans-serif;letter-spacing:.04em;color:var(--mut)}
+.ac-avs{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:8px}
+.ac-pick{all:unset;box-sizing:border-box;cursor:pointer;aspect-ratio:1;border-radius:50%;border:2px solid #2a3044;background:#141824 center 20%/cover}
+.ac-pick:hover{border-color:var(--cyan)}.ac-pick:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.ac-pick[aria-checked="true"]{border-color:var(--ylw);box-shadow:0 0 0 3px rgba(252,238,10,.3)}
+.ac-two{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.ac-danger h3{color:#ff8a95}
+.lg-help a,.lg-note a{color:var(--cyan)}
+@media (max-width:560px){.ac-two{grid-template-columns:1fr}}
 .lg-links{display:flex;flex-wrap:wrap;gap:6px 18px;margin:14px 0 0}
 .lg-f .lg-pw{display:flex;margin:0;font:inherit;letter-spacing:0;color:inherit}.lg-pw input{flex:1;min-width:0}
 .lg-eye{flex:none;padding:0 12px;background:#05070c;border:1.5px solid #2a3044;border-left:0;color:var(--mut);font:600 12px 'Chakra Petch',sans-serif;cursor:pointer}
@@ -3746,6 +3763,8 @@ function newGame(deckKey, opts = {}) {
   if (!opts.online && !opts.tutorial && !opts.sandbox && !opts.bothAI) G.replay = { deckKey, opts: { aiDeck: opts.aiDeck, level: opts.level, learn: opts.learn, daily: opts.daily, campaign: opts.campaign, campMode: opts.campMode } };
   if (opts.learn) { G.learn = { key: typeof deckKey === 'string' && LEARN_DECKS[deckKey] ? deckKey : null, deck: deckKey }; G.advice = false; }
   G.gameId = Date.now().toString(36) + rnd(1e6).toString(36);
+  // Le serveur note le début de la partie : sans ça (ou si elle dure moins de 45 s), elle ne rapporte rien.
+  if (!HEADLESS && !opts.tutorial && !opts.sandbox && !opts.bothAI && cloudSession()) srv('start_game', { gid: G.gameId }).catch(() => {});
   if (opts.sandbox) {
     G.advice = false; G.speed = 250;
     for (const p of G.players) { p.deck.push(...p.deck.map(c => inst(c.id))); shuffle(p.deck); }   // deck doublé : pas de Deckout
@@ -6686,6 +6705,8 @@ function gainRowsHTML(r) {
     else if (x.k === 'ach') { const a = ACH.find(y => y.id === x.id); rows.push([a ? L(`Succès « ${a.fr[0]} »`, `Achievement "${a.en[0]}"`) : L('Succès', 'Achievement'), x.n]); }
   }
   if (r.dup) return `<p class="pk-rew none">${L('Récompenses déjà reçues pour cette partie.', 'Rewards already received for this game.')}</p>`;
+  if (r.refused === 'too_fast') return `<p class="pk-rew none">${L('Partie terminée en moins de 45 secondes : elle ne rapporte pas de booster.', 'Game finished in under 45 seconds: it does not earn boosters.')}</p>`;
+  if (r.refused === 'not_started') return `<p class="pk-rew none">${L("Le début de cette partie n'a pas pu être enregistré sur le serveur (connexion coupée ?) : elle ne rapporte pas de booster.", 'The start of this game could not be recorded on the server (connection lost?): it does not earn boosters.')}</p>`;
   if (!rows.length) return `<p class="pk-rew none">${L('Pas de booster cette fois : gagnez une partie pour en recevoir.', 'No booster this time: win a game to earn some.')}</p>`;
   const tot = rows.reduce((a, [, n]) => a + n, 0) - (r.capped || 0);
   return `<div class="gain"><b class="gain-t"><span class="pk-rew-ic" aria-hidden="true"></span>${L('Boosters gagnés', 'Boosters earned')}</b>
@@ -7661,8 +7682,11 @@ function renderLogin() {
     body = `<h2 id="lg-t">${L('Pas de connexion', 'No connection')}</h2>
       <p class="lg-lead">${L("Le jeu a besoin d'internet : votre collection et votre progression sont gardées sur le serveur. Vérifiez votre connexion puis réessayez.", 'The game needs the internet: your collection and progress are kept on the server. Check your connection, then try again.')}</p>
       <div class="lg-acts"><button class="btn solid big" data-lg="retry">${L('Réessayer', 'Try again')}</button></div>`;
+  } else if (ses && !LG.auto) {
+    body = accountHTML(st, ses);
   } else if (ses) {
-    body = `<h2 id="lg-t">${L('Votre compte', 'Your account')}</h2>
+    const pf = st.profile || {};
+    body = `${pf.avatar && IMGS[pf.avatar] && IMGS[pf.avatar].art ? `<span class="ac-av art-${pf.avatar}" aria-hidden="true"></span>` : ''}<h2 id="lg-t">${pf.pseudo ? esc(pf.pseudo) : L('Votre compte', 'Your account')}</h2>
       <p class="lg-lead">${L('Connecté avec', 'Signed in as')} <b>${esc(ses.email || '')}</b>. ${L('Votre collection, vos decks, votre campagne et vos statistiques se synchronisent tout seuls entre vos appareils.', 'Your collection, decks, campaign and statistics sync on their own between your devices.')}</p>
       <p class="lg-sync ${st.err ? 'ko' : ''}">${st.err ? L(`Synchronisation impossible pour l'instant (${esc(st.err)}). Le jeu réessaiera tout seul.`, `Sync not possible right now (${esc(st.err)}). The game will try again on its own.`) : st.last ? L(`✓ Dernière synchronisation : ${loginTime(st.last)}`, `✓ Last sync: ${loginTime(st.last)}`) : L('Synchronisation en cours…', 'Syncing…')}</p>
       <div class="lg-acts"><button class="btn solid big" data-lg="play">${L('Jouer', 'Play')}</button><button class="btn cy" data-lg="sync">${L('Synchroniser maintenant', 'Sync now')}</button><button class="btn" data-lg="out">${L('Se déconnecter', 'Sign out')}</button></div>`;
@@ -7673,6 +7697,7 @@ function renderLogin() {
     if (LG.step === 'signup') body = `<h2 id="lg-t">${L('Créer un compte', 'Create an account')}</h2>
       <p class="lg-lead">${L('Votre collection, vos decks et votre campagne seront gardés sur le serveur et vous les retrouverez sur tous vos appareils.', 'Your collection, decks and campaign will be kept on the server and you will find them on all your devices.')}</p>
       ${mail}${pass('lg-pass', 'new-password', L('Mot de passe (8 caractères minimum)', 'Password (8 characters minimum)'))}${pass('lg-pass2', 'new-password', L('Confirmer le mot de passe', 'Confirm the password'))}
+      <p class="lg-help">${L(`En créant un compte, vous acceptez que vos données de jeu soient gardées comme expliqué dans <a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Données personnelles</a>.`, `By creating an account, you agree that your game data is kept as explained in <a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Personal data</a>.`)}</p>
       <div class="lg-acts"><button class="btn solid big" data-lg="signup">${L('Créer mon compte', 'Create my account')}</button></div>
       <p class="lg-links"><button class="linkbtn" data-lg="to-login">${L("J'ai déjà un compte", 'I already have an account')}</button></p>`;
     else if (LG.step === 'forgot') body = `<h2 id="lg-t">${L('Mot de passe oublié', 'Forgot password')}</h2>
@@ -7685,18 +7710,20 @@ function renderLogin() {
       <div class="lg-acts"><button class="btn solid big" data-lg="signin">${L('Se connecter', 'Sign in')}</button></div>
       <p class="lg-links"><button class="linkbtn" data-lg="to-signup">${L('Créer un compte', 'Create an account')}</button><button class="linkbtn" data-lg="to-forgot">${L('Mot de passe oublié ?', 'Forgot password?')}</button></p>`;
   }
-  el.innerHTML = `<div class="lg-box" role="dialog" aria-modal="true" aria-labelledby="lg-t">
+  el.innerHTML = `<div class="lg-box ${ses && !LG.auto && navigator.onLine ? 'wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="lg-t">
     ${pkArt('logo') ? `<img class="lg-logo" src="${pkArt('logo')}" alt="">` : ''}
     ${body}
     <p class="lg-msg ${LG.bad ? 'ko' : ''}" role="status">${LG.msg}</p>
-    ${ses ? '' : `<p class="lg-note">${L("Un compte est nécessaire pour jouer : votre collection et votre progression sont gardées sur le serveur, et vous les retrouvez sur tous vos appareils.", 'An account is required to play: your collection and progress are kept on the server, and you find them on all your devices.')}</p>`}
+    ${ses ? '' : `<p class="lg-note">${L(`<a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Données personnelles</a> · `, `<a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Personal data</a> · `)}${L("Un compte est nécessaire pour jouer : votre collection et votre progression sont gardées sur le serveur, et vous les retrouvez sur tous vos appareils.", 'An account is required to play: your collection and progress are kept on the server, and you find them on all your devices.')}</p>`}
     ${ses && !LG.auto ? `<button class="set-x lg-x" data-lg="close" aria-label="${L('Fermer', 'Close')}">✕</button>` : ''}</div>`;
   const f = (el.querySelector('#lg-mail') && !el.querySelector('#lg-mail').value ? el.querySelector('#lg-mail') : el.querySelector('#lg-pass')) || el.querySelector('#lg-mail') || el.querySelector('[data-lg="play"], [data-lg="retry"]');
-  if (f) f.focus({ preventScroll: true });
+  if (f && !el.querySelector('.ac-head')) f.focus({ preventScroll: true });
+  else if (el.querySelector('.ac-head') && !el.contains(document.activeElement)) el.querySelector('.lg-x, #ac-pseudo').focus({ preventScroll: true });
 }
 function openLogin(auto) {
   const el = document.getElementById('login');
-  LG.auto = !!auto; LG.msg = ''; LG.bad = false;
+  LG.auto = !!auto; LG.msg = ''; LG.bad = false; LG.av = LG.pseudo = undefined;
+  if (cloudSession()) profileLoad();
   if (!LG.step || LG.step === 'mail' || LG.step === 'code') LG.step = 'login';
   el.classList.add('on'); renderLogin();
 }
@@ -7716,6 +7743,38 @@ function loginAtStart() {
   openLogin(true); return true;
 }
 function loginSay(t, bad) { LG.msg = t; LG.bad = !!bad; const m = document.querySelector('#login .lg-msg'); if (m) { m.textContent = t; m.classList.toggle('ko', !!bad); } }
+// Adresse du site (liens vers les pages Données personnelles, même depuis la version locale).
+const SITE_BASE = typeof location !== 'undefined' && location.protocol.startsWith('http') ? location.origin + location.pathname.replace(/[^/]*$/, '') : 'https://pierreborg41120-code.github.io/cyberpunk-tcg/';
+/* ---------- Mon compte : profil (pseudo, avatar), mot de passe, synchronisation, données, suppression ---------- */
+function accountHTML(st, ses) {
+  const pf = st.profile || {}, legs = Object.values(CARDS).filter(c => c.type === 'LEGEND' && IMGS[c.id] && IMGS[c.id].art);
+  const seen = new Set(), uniq = legs.filter(c => !seen.has(c.name + c.id) && seen.add(c.name + c.id));
+  const av = LG.av !== undefined ? LG.av : pf.avatar || null;
+  return `<div class="ac-head">${av && IMGS[av] ? `<span class="ac-av art-${av}" aria-hidden="true"></span>` : '<span class="ac-av none" aria-hidden="true">👤</span>'}
+      <div><h2 id="lg-t">${pf.pseudo ? esc(pf.pseudo) : L('Mon compte', 'My account')}</h2><p class="ac-mail">${esc(ses.email || '')}</p></div></div>
+    <section class="ac-sec"><h3>${L('Profil', 'Profile')}</h3>
+      <label class="lg-f"><span>${L('Pseudo (3 à 20 caractères, visible par les autres joueurs)', 'Nickname (3 to 20 characters, visible to other players)')}</span><input id="ac-pseudo" maxlength="20" autocomplete="nickname" value="${escAttr(LG.pseudo !== undefined ? LG.pseudo : pf.pseudo || '')}"></label>
+      <p class="ac-lbl">${L('Avatar', 'Avatar')}</p>
+      <div class="ac-avs" role="radiogroup" aria-label="${L('Avatar', 'Avatar')}">${uniq.map(c => `<button type="button" role="radio" class="ac-pick art-${c.id}" data-av="${c.id}" aria-checked="${av === c.id}" title="${escAttr(c.name)}" aria-label="${escAttr(c.name)}"></button>`).join('')}</div>
+      <div class="lg-acts"><button class="btn solid" data-lg="profile">${L('Enregistrer le profil', 'Save profile')}</button></div></section>
+    <section class="ac-sec"><h3>${L('Mot de passe', 'Password')}</h3>
+      <div class="ac-two"><label class="lg-f"><span>${L('Nouveau mot de passe', 'New password')}</span><input id="ac-pass" type="password" autocomplete="new-password" minlength="8"></label>
+      <label class="lg-f"><span>${L('Confirmer', 'Confirm')}</span><input id="ac-pass2" type="password" autocomplete="new-password" minlength="8"></label></div>
+      <div class="lg-acts"><button class="btn cy" data-lg="password">${L('Changer le mot de passe', 'Change password')}</button></div></section>
+    <section class="ac-sec"><h3>${L('Synchronisation', 'Sync')}</h3>
+      <p class="lg-sync ${st.err ? 'ko' : ''}">${st.err ? L(`Synchronisation impossible pour l'instant (${esc(st.err)}). Le jeu réessaiera tout seul.`, `Sync not possible right now (${esc(st.err)}). The game will try again on its own.`) : st.last ? L(`✓ Dernière synchronisation : ${loginTime(st.last)}`, `✓ Last sync: ${loginTime(st.last)}`) : L('Synchronisation en cours…', 'Syncing…')}</p>
+      <div class="lg-acts"><button class="btn cy" data-lg="sync">${L('Synchroniser maintenant', 'Sync now')}</button></div></section>
+    <section class="ac-sec"><h3>${L('Mes données', 'My data')}</h3>
+      <p class="lg-help">${L(`Ce qui est gardé et pourquoi : <a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Données personnelles</a>.`, `What is kept and why: <a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Personal data</a>.`)}</p>
+      <div class="lg-acts"><button class="btn cy" data-lg="export">${L('Télécharger mes données', 'Download my data')}</button><button class="btn" data-lg="out">${L('Se déconnecter', 'Sign out')}</button></div></section>
+    <section class="ac-sec ac-danger"><h3>${L('Supprimer mon compte', 'Delete my account')}</h3>
+      <p class="lg-help">${L('Votre compte, votre collection, vos decks et votre progression seront effacés définitivement du serveur et de cet appareil.', 'Your account, collection, decks and progress will be permanently erased from the server and this device.')}</p>
+      <div class="lg-acts"><button class="btn rd" data-lg="delete">${L('Supprimer mon compte', 'Delete my account')}</button></div></section>`;
+}
+async function profileLoad() {
+  const ses = cloudSession(); if (!ses) return;
+  try { const r = await cloudFetch(`/rest/v1/profiles?select=pseudo,avatar&user_id=eq.${ses.user_id}`); const p = r && r[0]; cloudSet({ profile: p ? { pseudo: p.pseudo, avatar: p.avatar } : {} }); if (p && p.pseudo) try { localStorage.setItem('cptcg-name', p.pseudo); } catch (e) {} renderLogin(); } catch (e) {}
+}
 // Connexion réussie (ou « Jouer » une fois connecté) : la musique peut démarrer, et seulement à ce moment-là.
 function musicGo() { MUSIC_OK = true; LG.music = true; try { if (MUSIC.on && MUSIC.tracks.length) MUSIC.kick(); } catch (x) {} }
 async function loginAct(a) {
@@ -7744,6 +7803,36 @@ async function loginAct(a) {
     cloudSet({ lastMail: m }); loginSay(L('Envoi…', 'Sending…'));
     try { await cloudRecover(m); LG.step = 'login'; LG.msg = L(`Si un compte existe pour ${m}, un e-mail vient de partir. Son lien ouvre le site du jeu pour choisir un nouveau mot de passe.`, `If an account exists for ${m}, an e-mail is on its way. Its link opens the game website to choose a new password.`); LG.bad = false; return renderLogin(); }
     catch (e) { return loginSay(authErr(e), true); }
+  }
+  if (a === 'profile') {
+    const p = val('ac-pseudo').trim(), av = LG.av !== undefined ? LG.av : (cloudState().profile || {}).avatar || null;
+    if (!/^[A-Za-z0-9À-ÖØ-öø-ÿ _.-]{3,20}$/.test(p)) return loginSay(L('Pseudo : 3 à 20 caractères (lettres, chiffres, espace, tiret, point ou tiret bas).', 'Nickname: 3 to 20 characters (letters, digits, space, dash, dot or underscore).'), true);
+    loginSay(L('Enregistrement…', 'Saving…'));
+    try { await cloudToken(); const r = await cloudFetch('/rest/v1/rpc/set_profile', { method: 'POST', body: { pseudo: p, avatar: av } }); cloudSet({ profile: { pseudo: r.pseudo, avatar: r.avatar } }); try { localStorage.setItem('cptcg-name', r.pseudo); } catch (e) {} LG.pseudo = LG.av = undefined; LG.msg = L('✓ Profil enregistré.', '✓ Profile saved.'); LG.bad = false; renderLogin(); renderCloud(); }
+    catch (e) { loginSay(/déjà pris/.test(e.message) ? L('Ce pseudo est déjà pris : choisissez-en un autre.', 'This nickname is already taken: choose another one.') : /invalide/.test(e.message) ? L('Pseudo refusé : 3 à 20 caractères simples.', 'Nickname refused: 3 to 20 plain characters.') : L(`Enregistrement impossible : ${e.message}`, `Could not save: ${e.message}`), true); }
+    return;
+  }
+  if (a === 'password') {
+    const p = val('ac-pass');
+    if (p.length < 8) return loginSay(L('Le mot de passe doit faire au moins 8 caractères.', 'The password must be at least 8 characters.'), true);
+    if (p !== val('ac-pass2')) return loginSay(L('Les deux mots de passe ne sont pas identiques.', 'The two passwords do not match.'), true);
+    loginSay(L('Enregistrement…', 'Saving…'));
+    try { await cloudToken(); await cloudFetch('/auth/v1/user', { method: 'PUT', body: { password: p } }); document.getElementById('ac-pass').value = document.getElementById('ac-pass2').value = ''; loginSay(L('✓ Mot de passe changé.', '✓ Password changed.')); }
+    catch (e) { loginSay(e.code === 'reauthentication_needed' ? L("Pour changer de mot de passe, déconnectez-vous puis utilisez « Mot de passe oublié » sur la page de connexion.", 'To change your password, sign out, then use "Forgot password" on the sign-in page.') : authErr(e), true); }
+    return;
+  }
+  if (a === 'export') { exportData(); return loginSay(L('✓ Fichier téléchargé (dossier Téléchargements).', '✓ File downloaded (Downloads folder).')); }
+  if (a === 'delete') {
+    const pf = cloudState().profile || {}, ses = cloudSession();
+    if (!confirm(L('Supprimer définitivement votre compte ? Votre collection, vos decks et votre progression seront effacés et ne pourront pas être récupérés.', 'Permanently delete your account? Your collection, decks and progress will be erased and cannot be recovered.'))) return;
+    const word = L('SUPPRIMER', 'DELETE');
+    if ((prompt(L(`Pour confirmer, tapez ${word} :`, `To confirm, type ${word}:`)) || '').trim().toUpperCase() !== word) return loginSay(L('Suppression annulée.', 'Deletion cancelled.'));
+    loginSay(L('Suppression…', 'Deleting…'));
+    try { await cloudToken(); await cloudFetch('/rest/v1/rpc/delete_account', { method: 'POST', body: {} }); }
+    catch (e) { return loginSay(L(`Suppression impossible : ${e.message}`, `Could not delete: ${e.message}`), true); }
+    try { for (const k of Object.keys(localStorage)) if (k.startsWith('cptcg-') && !['cptcg-lang', 'cptcg-music', 'cptcg-sound', 'cptcg-prefs'].includes(k)) localStorage.removeItem(k); } catch (e) {}
+    alert(L('Votre compte a été supprimé.', 'Your account has been deleted.'));
+    return location.reload();
   }
   else if (a === 'sync') { loginSay(L('Synchronisation…', 'Syncing…')); await cloudSync(true); LG.msg = ''; renderLogin(); }
   else if (a === 'out' && confirm(L('Se déconnecter ? Vos données restent sur cet appareil et dans votre compte.', 'Sign out? Your data stays on this device and in your account.'))) {
@@ -7786,7 +7875,11 @@ function renderCloud() {
 }
 if (!HEADLESS) {
   const lg = document.getElementById('login');
-  lg.addEventListener('click', e => { const b = e.target.closest('[data-lg]'); if (b) loginAct(b.dataset.lg); });
+  lg.addEventListener('click', e => {
+    const p = e.target.closest('[data-av]');
+    if (p) { LG.av = p.dataset.av; LG.pseudo = (document.getElementById('ac-pseudo') || {}).value; const y = lg.querySelector('.lg-box').scrollTop; renderLogin(); lg.querySelector('.lg-box').scrollTop = y; const n = lg.querySelector(`[data-av="${p.dataset.av}"]`); if (n) n.focus({ preventScroll: true }); return; }
+    const b = e.target.closest('[data-lg]'); if (b) loginAct(b.dataset.lg);
+  });
   lg.addEventListener('keydown', e => {
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (!LG.auto) closeLogin(); return; }
     if (e.key === 'Enter' && /^lg-(mail|pass2?)$/.test(e.target.id)) { e.preventDefault(); const b = lg.querySelector('[data-lg="signin"], [data-lg="signup"], [data-lg="recover"]'); if (b) b.click(); }

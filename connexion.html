@@ -45,6 +45,7 @@ input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.18)}
 .link:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .msg{margin:14px 0 0;padding:9px 11px;border-left:3px solid var(--cyan);background:#0f1420;font-size:15px}
 .msg:empty{display:none}.msg.ko{border-color:var(--red);color:#ffb3bb}.msg.ok{border-color:var(--green)}
+.legal{margin:2px 0 12px;color:var(--mut);font-size:14px}.legal a{color:var(--cyan)}
 .foot{margin:18px 2px 0;color:var(--mut);font-size:13.5px}
 .foot a{color:var(--mut)}
 .lang{all:unset;cursor:pointer;float:right;margin-top:-2px;font:600 12px 'Chakra Petch',sans-serif;color:var(--mut);letter-spacing:.08em}
@@ -108,7 +109,7 @@ function render() {
   document.getElementById('sub').textContent = L('Simulateur non officiel', 'Unofficial simulator');
   document.getElementById('lang').textContent = lang === 'en' ? 'FR' : 'EN';
   document.getElementById('lang').setAttribute('aria-label', lang === 'en' ? 'Français' : 'English');
-  document.getElementById('foot').textContent = L('Votre collection, vos decks et votre progression sont gardés sur le serveur : vous les retrouvez sur tous vos appareils.', 'Your collection, decks and progress are kept on the server: you find them on all your devices.');
+  document.getElementById('foot').innerHTML = L('Votre collection, vos decks et votre progression sont gardés sur le serveur : vous les retrouvez sur tous vos appareils.', 'Your collection, decks and progress are kept on the server: you find them on all your devices.') + ` <a href="donnees.html">${L('Données personnelles', 'Personal data')}</a>`;
   const mail = `<label><span>${L('Adresse e-mail', 'E-mail address')}</span><input id="mail" type="email" autocomplete="email" required value="${esc(state().lastMail || '')}" placeholder="${L('vous@exemple.fr', 'you@example.com')}"></label>`;
   const pass = (id, ac, lbl) => `<label><span>${lbl}</span><span class="field"><input id="${id}" type="password" autocomplete="${ac}" required minlength="${ac === 'new-password' ? 8 : 1}"><button class="eye" type="button" data-a="eye" aria-label="${L('Afficher le mot de passe', 'Show password')}">${L('Afficher', 'Show')}</button></span></label>`;
   const tabs = `<div class="tabs" role="tablist"><button role="tab" type="button" data-a="tab-login" aria-selected="${step === 'login'}">${L('Connexion', 'Sign in')}</button><button role="tab" type="button" data-a="tab-signup" aria-selected="${step === 'signup'}">${L('Créer un compte', 'Create an account')}</button></div>`;
@@ -121,6 +122,7 @@ function render() {
     <div class="links"><button class="link" type="button" data-a="tab-login">${L('Retour à la connexion', 'Back to sign in')}</button></div>`;
   else if (step === 'signup') h = `${tabs}<h2 id="t" class="sr">${L('Créer un compte', 'Create an account')}</h2>
     <form novalidate data-f="signup">${mail}${pass('pass', 'new-password', L('Mot de passe (8 caractères minimum)', 'Password (8 characters minimum)'))}${pass('pass2', 'new-password', L('Confirmer le mot de passe', 'Confirm the password'))}
+    <p class="legal">${L('En créant un compte, vous acceptez que vos données de jeu soient gardées comme expliqué dans <a href="donnees.html">Données personnelles</a>.', 'By creating an account, you agree that your game data is kept as explained in <a href="donnees.html">Personal data</a>.')}</p>
     <button class="go" type="submit">${L('Créer mon compte', 'Create my account')}</button></form>`;
   else h = `${tabs}<h2 id="t" class="sr">${L('Connexion', 'Sign in')}</h2>
     <form novalidate data-f="login">${mail}${pass('pass', 'current-password', L('Mot de passe', 'Password'))}<button class="go" type="submit">${L('Se connecter', 'Sign in')}</button></form>
