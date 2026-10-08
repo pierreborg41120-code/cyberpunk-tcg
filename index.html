@@ -472,6 +472,11 @@ body.calm .mp.playing .mp-eq i{animation:none;height:70%}
 .mm-item{position:relative}
 .mm-badge.dl{background:var(--cyan);color:#000;box-shadow:0 0 12px rgba(0,229,255,.5);font-size:11.5px;letter-spacing:.04em}
 .mm-badge.dl.done{background:var(--green);color:#000;box-shadow:none}
+.wk-top{margin:10px 0 4px;padding:10px 12px;background:#0b0d13;border:1px solid var(--line)}
+.wk-top b{display:block;margin-bottom:4px;font:600 14px 'Chakra Petch',sans-serif;color:#fff}
+.wk-top ol{list-style:none;margin:0;padding:0}.wk-top li{display:flex;gap:6px;padding:2px 0;color:#d6d9e4}
+.wk-top li span{width:22px;color:var(--mut)}.wk-top li em{margin-left:auto;font-style:normal;color:var(--ylw)}.wk-top li.me{color:#fff;font-weight:600}
+.wk-top p{margin:0;color:var(--mut)}
 .dchip{margin-left:10px;padding:2px 8px;font-size:12.5px;color:#000;background:var(--cyan);font-weight:600;white-space:nowrap}
 @media (max-width:820px){.dchip{display:block;margin:2px 0 0;width:max-content;max-width:100%;overflow:hidden;text-overflow:ellipsis}}
 .dlbox{max-width:520px}.dlbox h3 small{font-size:14px;color:var(--mut);font-weight:600;margin-left:6px}
@@ -955,7 +960,10 @@ body.online label:has(#speed),body.online label:has(#advice){display:none}
 #online h2{margin:0 0 10px;color:var(--cyan)}
 #online label{display:block;color:var(--mut);font-size:14px;margin:10px 0 4px}
 #online input,#online select{width:100%;background:var(--panel);color:var(--txt);border:1.5px solid var(--line);padding:8px;font-family:inherit;font-size:16px}
-#online .orow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+#online .orank{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:10px 0 2px;color:#fff;font-weight:600;cursor:pointer}
+.orank input{accent-color:var(--cyan)}.orank small{flex-basis:100%;color:var(--mut);font-weight:500;font-size:13px}
+.rk-box .up{color:#7dffb0}.rk-box .down{color:#ffb3bb}
+.orow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 #online .orow>*{flex:1}
 #online .code{font-family:'Chakra Petch';font-size:40px;letter-spacing:.2em;color:var(--ylw);text-align:center;margin:8px 0;user-select:all}
 #online .ostatus{margin-top:12px;min-height:22px;color:var(--mut)}
@@ -1058,6 +1066,9 @@ label.set-row{cursor:pointer}
 .sc-av{width:40px;height:40px;border-radius:50%;border:2px solid #2a3044;background:#141824 center 20%/cover;display:grid;place-items:center;font-size:18px}
 .sc-ps{font:600 17px 'Rajdhani',sans-serif;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sc-v{font:600 15px 'Chakra Petch',sans-serif;color:var(--ylw);text-align:right}
+.sc-pl{all:unset;cursor:pointer;text-align:left;font:600 17px 'Rajdhani',sans-serif;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-pl:hover{color:var(--cyan);text-decoration:underline}.sc-pl:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.sc-kinds{flex-wrap:wrap}
 .sc-me{margin:12px 0 0;color:#d6d9e4}
 .sc-note{margin:0 0 16px;padding:12px 14px;border-left:3px solid var(--cyan);background:#0f1420;color:#d6d9e4}
 .sc-note .btn{margin-top:8px}
@@ -1117,6 +1128,13 @@ label.set-row{cursor:pointer}
 .ad-chip button{all:unset;cursor:pointer;width:24px;height:24px;display:grid;place-items:center;color:var(--mut)}
 .ad-chip button:hover,.ad-chip button:focus-visible{color:#fff;background:var(--red)}
 .ad-tbl .btn{padding:4px 8px;font-size:11.5px}
+.ad-news{margin:6px 0 8px;color:#e6e8ef;white-space:pre-line}
+.ad-newsf{display:grid;gap:8px;margin-top:10px}
+.ad-newsf input,.ad-newsf textarea{padding:9px 12px;background:#05070c;border:1.5px solid #2a3044;color:#fff;font:500 16px 'Rajdhani',sans-serif;resize:vertical}
+.ad-newsf input:focus,.ad-newsf textarea:focus{outline:none;border-color:var(--cyan)}
+.ad-newsf .btn{justify-self:start}
+.ad-err{font:600 15px ui-monospace,monospace!important;color:#ffb3bb!important;word-break:break-word}
+.ad-stack{max-height:200px;overflow:auto;margin:6px 0;padding:8px;background:#05070c;border:1px solid var(--line);font-size:12.5px;color:#c9cdd8;white-space:pre-wrap}
 /* échanges de cartes */
 .tr-rules{margin:0 0 14px;color:var(--mut);font-size:14.5px}
 .tr-bal{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:12px 14px;margin:0 0 12px;background:#0b0d13;border:1px solid var(--line);box-shadow:0 8px 20px rgba(0,0,0,.45)}
@@ -1161,6 +1179,22 @@ label.set-row{cursor:pointer}
 #invite-toast p{margin:0 0 10px;display:flex;align-items:center;gap:10px;color:#fff;font-size:16px}
 #invite-toast .sc-av{flex:none}
 #invite-toast .row{display:flex;gap:8px}
+/* fiche d'un joueur */
+#pcard{position:fixed;inset:0;z-index:390;display:grid;place-items:center;padding:16px;background:rgba(4,5,9,.72);backdrop-filter:blur(3px)}
+#pcard[hidden]{display:none}
+.pc-box{width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:20px 22px 18px;background:#0b0d13;border:1px solid #2a3044;border-top:3px solid var(--cyan);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.pc-head{display:flex;gap:14px;align-items:center;margin:0 0 14px}
+.pc-head .sc-av{width:64px;height:64px;font-size:28px}
+.pc-head h2{margin:0;font:700 24px 'Chakra Petch',sans-serif;color:#fff}
+.pc-head p{margin:2px 0 0;color:var(--mut);font-size:14.5px}
+.pc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 14px}
+.pc-grid div{padding:8px 10px;background:#141824;border:1px solid var(--line)}
+.pc-grid b{display:block;font:700 19px 'Chakra Petch',sans-serif;color:#fff}
+.pc-grid span{font-size:13.5px;color:var(--mut)}
+.pc-acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.pc-acts .pc-rep{margin-right:auto;border-color:#5a2a33;color:#ffb3bb}
+.pc-msg{min-height:1.3em;margin:0 0 8px;color:var(--cyan);font-size:14.5px}.pc-msg.ko{color:#ffb3bb}
+@media (max-width:420px){.pc-grid{grid-template-columns:1fr}}
 /* fenêtres de confirmation du jeu (à la place de celles du navigateur) */
 #uidlg{position:fixed;inset:0;z-index:400;display:grid;place-items:center;padding:16px;background:rgba(4,5,9,.72);backdrop-filter:blur(3px)}
 #uidlg[hidden]{display:none}
@@ -1171,7 +1205,7 @@ label.set-row{cursor:pointer}
 @media (prefers-reduced-motion:reduce){.ud-box{animation:none}}
 .ud-box h2{margin:0 0 8px;font:700 20px 'Chakra Petch',sans-serif;color:var(--ylw)}
 .ud-box.danger h2{color:#ff8a95}
-.ud-box p{margin:0 0 16px;font-size:16.5px;line-height:1.45;color:#e6e8ef}
+.ud-box p{margin:0 0 16px;font-size:16.5px;line-height:1.45;color:#e6e8ef;white-space:pre-line}
 .ud-box input{box-sizing:border-box;width:100%;margin:0 0 16px;padding:10px 12px;background:#05070c;border:1.5px solid #2a3044;color:#fff;font:600 18px 'Chakra Petch',sans-serif;letter-spacing:.08em}
 .ud-box input:focus{outline:none;border-color:var(--cyan)}
 .ud-acts{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
@@ -1633,6 +1667,7 @@ body.compact #mentor{bottom:calc(var(--peek) + 12px)}
         <button class="mm-item on" data-panel="play" aria-current="true"><b data-t="m_play">Jouer contre l'IA</b><span data-t="m_play_d">Choisissez votre deck et votre adversaire</span></button>
         <button class="mm-item" id="b-camp"><b data-t="m_camp">Campagne Night City</b><span data-t="m_camp_d">6 quartiers à libérer, de Watson à la tour Arasaka</span></button>
         <button class="mm-item" id="b-daily"><b data-t="m_daily">Défi du jour</b><span data-t="m_daily_d">Une partie, une condition, un booster à gagner</span><i class="mm-badge dl" id="dl-badge"></i></button>
+        <button class="mm-item" id="b-week"><b data-t="m_week">Événement de la semaine</b><span data-t="m_week_d">Un défi, sept jours, un classement</span><i class="mm-badge" id="wk-badge" hidden></i></button>
         <button class="mm-item" id="b-tuto"><b data-t="m_tuto">Tutoriel</b><span data-t="m_tuto_d">Première partie : visite guidée puis partie commentée</span></button>
         <button class="mm-item" id="b-online"><b data-t="m_online">Jouer en ligne</b><span data-t="m_online_d">Affrontez un ami avec un code de partie</span></button>
         <button class="mm-item" id="b-learn"><b data-t="m_learn">Apprendre un deck</b><span data-t="m_learn_d">Partie commentée : le coach te dit quoi jouer et pourquoi</span></button>
@@ -1712,6 +1747,7 @@ body.compact #mentor{bottom:calc(var(--peek) + 12px)}
 <div id="social"></div>
 <div id="invite-toast" role="status" aria-live="polite" hidden></div>
 <div id="uidlg" hidden></div>
+<div id="pcard" hidden></div>
 <div id="login"></div>
 <div id="tabblock" role="alertdialog" aria-modal="true" aria-labelledby="tb-t" hidden></div>
 <div id="online"></div>
@@ -3930,8 +3966,9 @@ function newGame(deckKey, opts = {}) {
   G.campaign = opts.campaign ?? null;
   G.campMode = opts.campMode || null;
   G.side = opts.side || null;   // mission secondaire de la campagne : { mode, k }
+  G.week = opts.week || null;   // événement de la semaine : identifiant de la semaine (2026-W41)
   if (!HEADLESS && !opts.bothAI && !opts.sandbox && !opts.tutorial) applyFoils(G.players[0]);
-  if (!opts.online && !opts.tutorial && !opts.sandbox && !opts.bothAI) G.replay = { deckKey, opts: { aiDeck: opts.aiDeck, level: opts.level, learn: opts.learn, daily: opts.daily, campaign: opts.campaign, campMode: opts.campMode, side: opts.side } };
+  if (!opts.online && !opts.tutorial && !opts.sandbox && !opts.bothAI) G.replay = { deckKey, opts: { aiDeck: opts.aiDeck, level: opts.level, learn: opts.learn, daily: opts.daily, campaign: opts.campaign, campMode: opts.campMode, side: opts.side, week: opts.week } };
   if (opts.learn) { G.learn = { key: typeof deckKey === 'string' && LEARN_DECKS[deckKey] ? deckKey : null, deck: deckKey }; G.advice = false; }
   G.gameId = Date.now().toString(36) + rnd(1e6).toString(36);
   // Le serveur note le début de la partie : sans ça (ou si elle dure moins de 45 s), elle ne rapporte rien.
@@ -4731,7 +4768,7 @@ function render() {
   const me = G.players[VIEW], ai = G.players[1 - VIEW];
   const cur = G.players[G.current];
   const phaseTxt = { setup: L('Mise en place', 'Setup'), start: 'Start Phase', main: 'Main Phase', end: L('Fin du tour', 'End of turn') }[G.phase];
-  document.getElementById('turninfo').innerHTML = `${L('Tour', 'Turn')} <b>${cur.turns}</b> · ${cur.idx === VIEW ? `<b>${cur.name}</b>` : `<b style="color:var(--red)">${cur.name}</b>`} · ${phaseTxt} ${G.overtime ? '<span class="ot">OVERTIME</span>' : ''}${G.daily ? ` <span class="dchip" title="${escAttr(L('Défi du jour', 'Daily challenge'))}">${L('Défi :', 'Challenge:')} ${esc(dailyText(dailyFor(G.daily)))}</span>` : ''}${G.side ? ` <span class="dchip" title="${escAttr(L('Mission secondaire', 'Side mission'))}">${L('Mission :', 'Mission:')} ${esc(sideText(G.side.k))}</span>` : ''}`;
+  document.getElementById('turninfo').innerHTML = `${L('Tour', 'Turn')} <b>${cur.turns}</b> · ${cur.idx === VIEW ? `<b>${cur.name}</b>` : `<b style="color:var(--red)">${cur.name}</b>`} · ${phaseTxt} ${G.overtime ? '<span class="ot">OVERTIME</span>' : ''}${G.daily ? ` <span class="dchip" title="${escAttr(L('Défi du jour', 'Daily challenge'))}">${L('Défi :', 'Challenge:')} ${esc(dailyText(dailyFor(G.daily)))}</span>` : ''}${G.week ? ` <span class="dchip" title="${escAttr(L('Événement de la semaine', 'Event of the week'))}">${L('Événement :', 'Event:')} ${esc(dailyText(weekFor(G.week)))}</span>` : ''}${G.side ? ` <span class="dchip" title="${escAttr(L('Mission secondaire', 'Side mission'))}">${L('Mission :', 'Mission:')} ${esc(sideText(G.side.k))}</span>` : ''}`;
   let status = `<span class="ph">…</span>`;
   if (G.over) status = `<span class="ph">${L('PARTIE TERMINÉE', 'GAME OVER')}</span> ${G.reason}`;
   else if (humanTurn()) status = L(`<span class="ph">À VOUS</span> Cliquez une carte de votre main pour la jouer/vendre${me.sold ? ' (vente déjà faite)' : ''}, une Unité <span style="color:var(--cyan)">en surbrillance</span> pour attaquer, une Légende face visible pour GO SOLO ou utiliser sa capacité ÉPUISER.`,
@@ -4785,20 +4822,21 @@ function render() {
   autosave();
   if (G.over && G.winner && !end.classList.contains('on') && !G.endShown) {
     G.endShown = true;
-    const rw = collReward(), dr = dailyResult(), cr = campResult(), sr = sideResult();
-    G.sideOk = !!(sr && sr.ok);
+    const rw = collReward(), dr = dailyResult(), cr = campResult(), sr = sideResult(), wr = weekResult();
+    G.sideOk = !!(sr && sr.ok); G.weekOk = !!(wr && wr.ok);
     G.gainShown = true;
     dailyBadge();
     const win = G.winner.idx === VIEW;
     end.innerHTML = `<div class="box"><h1 class="${win ? 'win' : 'lose'}">${win ? L('VICTOIRE', 'VICTORY') : L('DÉFAITE', 'DEFEAT')}</h1><p style="font-size:18px">${G.reason}</p>
       <p style="color:var(--mut)">Gigs : ${me.name} ${me.gigs.length} — ${ai.name} ${ai.gigs.length}</p>
-      ${campHTML(cr)}${dailyHTML(dr)}${sideEndHTML(sr)}${gainBox(rw)}<div class="endbtns">${cr && cr.win ? `<button class="btn solid big" onclick="openCamp()">${L('Continuer la campagne', 'Continue the campaign')}</button>` : sr ? (sr.ok ? `<button class="btn solid big" onclick="openCamp()">${L('Retour à la campagne', 'Back to the campaign')}</button>` : `<button class="btn solid big" onclick="rematch()">${L('Retenter la mission', 'Retry the mission')}</button>`) : cr ? `<button class="btn solid big" onclick="rematch()">${L('Retenter', 'Try again')}</button><button class="btn cy big" onclick="openCamp()">${L('Campagne', 'Campaign')}</button>`
+      ${campHTML(cr)}${dailyHTML(dr)}${sideEndHTML(sr)}${weekEndHTML(wr)}${rankedBox()}${gainBox(rw)}<div class="endbtns">${cr && cr.win ? `<button class="btn solid big" onclick="openCamp()">${L('Continuer la campagne', 'Continue the campaign')}</button>` : sr ? (sr.ok ? `<button class="btn solid big" onclick="openCamp()">${L('Retour à la campagne', 'Back to the campaign')}</button>` : `<button class="btn solid big" onclick="rematch()">${L('Retenter la mission', 'Retry the mission')}</button>`) : cr ? `<button class="btn solid big" onclick="rematch()">${L('Retenter', 'Try again')}</button><button class="btn cy big" onclick="openCamp()">${L('Campagne', 'Campaign')}</button>`
         : G.tutorial ? `<button class="btn solid big" onclick="showStart()">${L('Jouer contre l\'IA', 'Play the AI')}</button>`
-        : G.replay ? `<button class="btn solid big" onclick="rematch()">${G.daily && dr && !dr.ok ? L('Retenter le défi', 'Retry the challenge') : L('Revanche', 'Rematch')}</button>` : ''}
+        : G.replay ? `<button class="btn solid big" onclick="rematch()">${G.daily && dr && !dr.ok ? L('Retenter le défi', 'Retry the challenge') : G.week ? L("Rejouer l'événement", 'Play the event again') : L('Revanche', 'Rematch')}</button>` : ''}
       <button class="btn big" onclick="showStart()">${L('Menu', 'Menu')}</button><button class="btn cy big" onclick="document.getElementById('end').classList.remove('on')">${L('Voir le plateau', 'View the board')}</button>${G.tutorial ? '' : `<button class="btn cy big" onclick="document.getElementById('end').classList.remove('on');openStats()">${L('Statistiques', 'Statistics')}</button>`}</div></div>`;
     if (G.tutorial) setTuto('done');
     end.classList.add('on');
     claimGame(rw, dr);
+    if (G.online && NET.ranked) rankedFinish(win);
     SFX.play(win ? 'win' : 'lose');
   }
 }
@@ -5164,7 +5202,7 @@ const STATIC = {
   s_compact: ["Plateau adapté à l'écran", 'Fit the board to the screen'], s_compact_d: ['Tout le plateau tient sans défiler, la main reste en bas', 'The whole board fits without scrolling, your hand stays at the bottom'],
   s_calm: ['Animations réduites', 'Reduced animations'], s_calm_d: ['Pour les ordinateurs lents ou si les effets gênent', 'For slower computers, or if the effects bother you'], s_lang: ['Langue', 'Language'],
   m_resume: ['Reprendre la partie', 'Resume game'], m_learn: ['Apprendre un deck', 'Learn a deck'], m_learn_d: ['Partie commentée : le coach te dit quoi jouer et pourquoi', 'Coached game: the coach tells you what to play and why'], m_install: ["Installer l'application", 'Install the app'], m_install_d: ["Sur l'écran d'accueil, jouable sans connexion", 'On your home screen, playable offline'], m_resume_on: ['Reprendre la partie en ligne', 'Resume the online game'], m_settings_d: ['Son, musique, vitesse, taille du plateau', 'Sound, music, speed, board size'], hint: ["Survolez une carte pour l'afficher en grand.", 'Hover a card to see it full size.'],
-  tagline: ['Devenez une Légende de Night City.', 'Become a Night City Legend.'], un_a: ['Simulateur du jeu TCG Cyberpunk', 'Cyberpunk TCG game simulator'], un_b: ['non officiel', 'unofficial'], cur_t: ['Partie en cours', 'Game in progress'], cards_l: ['Vos cartes', 'Your cards'], s_tz: ['Taille du texte', 'Text size'], s_tz_d: ['Journal, fiches de carte, aides et fenêtres', 'Log, card sheets, help and windows'], s_cb: ['Mode daltonien', 'Colour-blind mode'], s_cb_d: ['Un symbole par couleur sur les cartes : ▲ rouge, ● vert, ■ bleu, ◆ jaune', 'One symbol per colour on cards: ▲ red, ● green, ■ blue, ◆ yellow'], s_keys: ['Raccourcis clavier', 'Keyboard shortcuts'], s_keys_d: ['Jouer sans la souris', 'Play without the mouse'], s_keys_b: ['Voir', 'Show'], m_daily: ['Défi du jour', 'Daily challenge'], m_camp: ['Campagne Night City', 'Night City campaign'], m_camp_d: ['6 quartiers à libérer, de Watson à la tour Arasaka', '6 districts to free, from Watson to Arasaka Tower'], m_daily_d: ['Une partie, une condition, un booster à gagner', 'One game, one condition, one booster to win'], cur_on_t: ['Partie en ligne en cours', 'Online game in progress'],
+  tagline: ['Devenez une Légende de Night City.', 'Become a Night City Legend.'], un_a: ['Simulateur du jeu TCG Cyberpunk', 'Cyberpunk TCG game simulator'], un_b: ['non officiel', 'unofficial'], cur_t: ['Partie en cours', 'Game in progress'], cards_l: ['Vos cartes', 'Your cards'], s_tz: ['Taille du texte', 'Text size'], s_tz_d: ['Journal, fiches de carte, aides et fenêtres', 'Log, card sheets, help and windows'], s_cb: ['Mode daltonien', 'Colour-blind mode'], s_cb_d: ['Un symbole par couleur sur les cartes : ▲ rouge, ● vert, ■ bleu, ◆ jaune', 'One symbol per colour on cards: ▲ red, ● green, ■ blue, ◆ yellow'], s_keys: ['Raccourcis clavier', 'Keyboard shortcuts'], s_keys_d: ['Jouer sans la souris', 'Play without the mouse'], s_keys_b: ['Voir', 'Show'], m_daily: ['Défi du jour', 'Daily challenge'], m_camp: ['Campagne Night City', 'Night City campaign'], m_camp_d: ['6 quartiers à libérer, de Watson à la tour Arasaka', '6 districts to free, from Watson to Arasaka Tower'], m_daily_d: ['Une partie, une condition, un booster à gagner', 'One game, one condition, one booster to win'], m_week: ['Événement de la semaine', 'Event of the week'], m_week_d: ['Un défi, sept jours, un classement', 'One challenge, seven days, one leaderboard'], cur_on_t: ['Partie en ligne en cours', 'Online game in progress'],
   cur_resume: ['Reprendre', 'Resume'], cur_abandon: ['Abandonner', 'Abandon'], mh_play: ['Jouer', 'Play'], mh_coll: ['Collection', 'Collection'], m_install_s: ['Installer', 'Install'],
   s_tuto_d: ['Visite guidée du plateau puis partie commentée', 'Guided tour of the board, then a commented game'], s_tuto_b: ['Revoir', 'Replay'], s_open: ['Ouvrir', 'Open'], m_packs: ['Boosters et collection', 'Boosters and collection'], m_packs_d: ['Ouvrez vos boosters, complétez les 150 cartes', 'Open your boosters, complete all 150 cards'],
   tuto: ['▶ Tutoriel — apprendre à jouer', '▶ Tutorial — learn to play'],
@@ -6199,7 +6237,7 @@ function autosave() {
 function writeSave(kind = 'solo') {
   if (TAB.lock && !TAB.held) return;
   const s = { v: 1, t: Date.now(), uid: UID, gameId: G.gameId, players: G.players, current: G.current, first: G.first, round: G.round, overtime: G.overtime,
-    tf: G.tf, log: G.log.slice(0, 200), seen: [...G.seen], learn: G.learn ? { key: G.learn.key, deck: G.learn.deck } : null, daily: G.daily || null, campaign: G.campaign ?? null, campMode: G.campMode || null, side: G.side || null };
+    tf: G.tf, log: G.log.slice(0, 200), seen: [...G.seen], learn: G.learn ? { key: G.learn.key, deck: G.learn.deck } : null, daily: G.daily || null, campaign: G.campaign ?? null, campMode: G.campMode || null, side: G.side || null, week: G.week || null };
   if (kind === 'online') s.net = { code: NET.code, token: NET.token };
   try { localStorage.setItem(kind === 'online' ? SAVE_KEY_ON : SAVE_KEY, JSON.stringify(s, (k, v) => k === 'c' || typeof v === 'function' ? undefined : v)); } catch (e) {}
 }
@@ -6265,7 +6303,7 @@ function resumeGame() {
   document.getElementById('start').style.display = 'none';
   G = { players: s.players, log: s.log || [], current: s.current, first: s.first, round: s.round || 0, overtime: !!s.overtime, over: false, busy: false, attack: null,
     phase: 'main', tf: s.tf || {}, radio: [], speed: +document.getElementById('speed').value, endTurnResolve: null, onEnd: null,
-    tutorial: false, advice: s.learn ? false : document.getElementById('advice').checked, tip: null, seen: new Set(s.seen || []), sandbox: false, gameId: s.gameId, learn: s.learn || null, daily: s.daily || null, campMode: s.campMode || null, campaign: s.campaign ?? null, side: s.side || null };
+    tutorial: false, advice: s.learn ? false : document.getElementById('advice').checked, tip: null, seen: new Set(s.seen || []), sandbox: false, gameId: s.gameId, learn: s.learn || null, daily: s.daily || null, campMode: s.campMode || null, campaign: s.campaign ?? null, side: s.side || null, week: s.week || null };
   for (const p of G.players) p.payPlan = null;
   UID = Math.max(UID, s.uid || 0);
   VIEW = 0;
@@ -6845,6 +6883,7 @@ function gainRowsHTML(r) {
   for (const x of r.rows || []) {
     if (x.k === 'game') rows.push([x.online ? (x.won ? L('Victoire en ligne', 'Online win') : L('Partie en ligne jouée', 'Online game played')) : L(`Victoire contre l'IA (${levelName(x.level || 'medium')})`, `Win against the AI (${levelName(x.level || 'medium')})`), x.n]);
     else if (x.k === 'camp') { const d = CAMP[Math.floor(x.fight / 2)]; rows.push([x.foil ? L(`Fin de la campagne (et ${CARDS[x.foil].name} en Brillante)`, `Campaign complete (plus a Foil ${CARDS[x.foil].name})`) : x.boss ? L(`Campagne : chef vaincu (${CARDS[d.boss].name})`, `Campaign: boss beaten (${CARDS[d.boss].name})`) : L(`Campagne : lieutenant ${d.gang} vaincu`, `Campaign: ${d.gang} lieutenant beaten`), x.n]); }
+    else if (x.k === 'week') rows.push([L(`Événement de la semaine : ${x.pts}${x.pts === 1 ? 'er' : 'e'} point${x.n ? '' : ' (les boosters arrivent au 1er, 5e et 10e point)'}`, `Event of the week: point #${x.pts}${x.n ? '' : ' (boosters come at the 1st, 5th and 10th point)'}`), x.n]);
     else if (x.k === 'side') rows.push([L(`Mission secondaire : ${CAMP[x.d].name}`, `Side mission: ${CAMP[x.d].name}`), x.n]);
     else if (x.k === 'daily') rows.push([L(`Défi du jour réussi${x.n > 1 ? ' (bonus de série)' : ''}`, `Daily challenge completed${x.n > 1 ? ' (streak bonus)' : ''}`), x.n]);
     else if (x.k === 'ach') { const a = ACH.find(y => y.id === x.id); rows.push([a ? L(`Succès « ${a.fr[0]} »`, `Achievement "${a.en[0]}"`) : L('Succès', 'Achievement'), x.n]); }
@@ -6867,6 +6906,7 @@ async function claimGame(rw, dr) {
   if (G.campaign != null && rw.win && (G.campMode === 'story' || !G.campMode)) p.camp = { mode: G.campMode === 'story' ? 'story' : 'classic', fight: G.campaign };
   if (G.daily && dr && dr.ok) p.daily = { date: G.daily, ok: true };
   if (G.side && G.sideOk) p.side = { mode: G.side.mode, k: G.side.k };
+  if (G.week && G.weekOk) p.week = { wk: G.week, ok: true };
   const box = () => document.getElementById('gain-box');
   try { const r = await srv('claim_game', { p }); if (box()) box().outerHTML = gainRowsHTML(r); }
   catch (e) { claimLater(p); if (box()) box().querySelector('.gain-wait').textContent = L("Serveur injoignable : vos récompenses seront ajoutées dès qu'il répondra.", 'Server unreachable: your rewards will be added as soon as it responds.'); }
@@ -7320,6 +7360,81 @@ function dailyHTML(r) {
   return `<p class="pk-rew dl-res">✓ ${L('Défi du jour réussi', 'Daily challenge completed')} · ${L(`série de ${r.streak} jour${r.streak > 1 ? 's' : ''}`, `${r.streak}-day streak`)}</p>`;
 }
 const deckLabel = k => DECKS[k] ? DECKS[k].name : k;
+/* ---------- événement de la semaine : même défi pour tous du lundi au dimanche (semaine ISO, heure universelle) ----------
+   Chaque victoire qui respecte la condition rapporte 1 point (10 par jour au plus) ; classement de la semaine ;
+   2 boosters au 1er point, 1 de plus au 5e et au 10e. Le serveur compte les points. */
+function wkId(d = new Date()) {
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())), day = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - day);
+  const y = t.getUTCFullYear(), w = Math.ceil(((t - Date.UTC(y, 0, 1)) / 864e5 + 1) / 7);
+  return `${y}-W${String(w).padStart(2, '0')}`;
+}
+function wkEnd(d = new Date()) { const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); t.setUTCDate(t.getUTCDate() + (8 - (t.getUTCDay() || 7))); return t; }
+function weekFor(wk) {
+  let h = 2166136261; for (const ch of 'semaine:' + wk) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  const r = () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+  const decks = ['arasaka', 'mercs', ...REC_DECKS], me = decks[Math.floor(r() * decks.length)], others = decks.filter(k => k !== me), op = others[Math.floor(r() * others.length)];
+  const conds = DAILY_CONDS.filter(c => c.id !== 'win'), cond = conds[Math.floor(r() * conds.length)];
+  return { date: wk, wk, me, op, level: r() < 0.5 ? 'hard' : 'expert', cond: cond.id };
+}
+const weekPts = () => { const w = collLoad().week; return w && w.wk === wkId() ? w.pts | 0 : 0; };
+function weekLeft() {
+  const ms = wkEnd() - Date.now(), d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5);
+  return d ? L(`encore ${d} j ${h} h`, `${d} d ${h} h left`) : L(`encore ${h} h ${Math.floor(ms % 36e5 / 6e4)} min`, `${h} h ${Math.floor(ms % 36e5 / 6e4)} min left`);
+}
+function weekBadge() {
+  if (HEADLESS) return;
+  const b = document.getElementById('wk-badge'); if (!b) return;
+  const n = weekPts(); b.hidden = false; b.textContent = n ? L(`${n} pt${n > 1 ? 's' : ''}`, `${n} pt${n > 1 ? 's' : ''}`) : L('Nouveau', 'New');
+  b.classList.toggle('dl', !n);
+}
+function weekStart() {
+  const ch = weekFor(wkId());
+  document.getElementById('modal').classList.remove('on');
+  netClose();
+  document.getElementById('start').style.display = 'none';
+  newGame(ch.me, { aiDeck: ch.op, level: ch.level, week: ch.wk });
+}
+function weekResult() {
+  if (HEADLESS || !G || !G.week || !G.over || !G.winner) return null;
+  const ch = weekFor(G.week), c = dailyCond(ch), win = G.winner.idx === VIEW;
+  return { ok: win && G.week === wkId() && c.ok(G.players[VIEW], G.players[1 - VIEW], c.n), win, ch, late: G.week !== wkId() };
+}
+function weekEndHTML(r) {
+  if (!r) return '';
+  if (r.late) return `<p class="pk-rew none">${L("L'événement de cette semaine est terminé : un nouveau a commencé.", "This week's event is over: a new one has started.")}</p>`;
+  if (!r.ok) return `<p class="pk-rew none">${L(`Événement non réussi : ${esc(dailyText(r.ch))} Retentez autant de fois que vous voulez cette semaine.`, `Event not completed: ${esc(dailyText(r.ch))} Try again as often as you like this week.`)}</p>`;
+  return `<p class="pk-rew">✓ ${L('Événement réussi : +1 point au classement de la semaine.', 'Event completed: +1 point on the weekly leaderboard.')}</p>`;
+}
+async function openWeek() {
+  const ch = weekFor(wkId()), pts = weekPts(), m = document.getElementById('modal');
+  const end = new Date(wkEnd() - 1).toLocaleDateString(LANG === 'en' ? 'en-GB' : 'fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const draw = top => {
+    m.innerHTML = `<div class="mbox dlbox wkbox" role="dialog" aria-modal="true" aria-labelledby="wk-t">
+      <h3 id="wk-t">${L('Événement de la semaine', 'Event of the week')} <small>${L(`jusqu'au ${esc(end)} · ${weekLeft()}`, `until ${esc(end)} · ${weekLeft()}`)}</small></h3>
+      <div class="dl-cond">${esc(dailyText(ch))}</div>
+      <dl class="dl-meta"><dt>${L('Votre deck', 'Your deck')}</dt><dd>${esc(deckLabel(ch.me))}</dd>
+        <dt>${L('Adversaire', 'Opponent')}</dt><dd>${esc(deckLabel(ch.op))} · ${LVL_NAME()[ch.level]}</dd>
+        <dt>${L('Points', 'Points')}</dt><dd>${L('1 par victoire réussie, 10 par jour au plus', '1 per successful win, 10 per day at most')}</dd>
+        <dt>${L('Récompenses', 'Rewards')}</dt><dd>${L('2 boosters au 1er point, 1 au 5e, 1 au 10e', '2 boosters at the 1st point, 1 at the 5th, 1 at the 10th')}</dd>
+        <dt>${L('Vous', 'You')}</dt><dd><b>${L(`${pts} point${pts > 1 ? 's' : ''}`, `${pts} point${pts > 1 ? 's' : ''}`)}</b>${top && top.me ? ` · ${L(`${top.me.rank}e`, `#${top.me.rank}`)}` : ''}</dd></dl>
+      <div class="wk-top"><b>${L('En tête cette semaine', 'Leading this week')}</b>${!top ? `<p>${L('Chargement…', 'Loading…')}</p>` : top.rows.length ? `<ol>${top.rows.slice(0, 5).map(r => `<li class="${r.me ? 'me' : ''}"><span>${r.rank}.</span> ${esc(r.pseudo)} <em>${r.value} pt${r.value > 1 ? 's' : ''}</em></li>`).join('')}</ol>` : `<p>${L('Personne encore : prenez la tête !', 'Nobody yet: take the lead!')}</p>`}</div>
+      <div class="opts"><button class="opt" data-wk="go">${L('Jouer', 'Play')}</button><button class="opt plain" data-wk="rank">${L('Classement complet', 'Full leaderboard')}</button><button class="opt plain cancel" data-wk="x">${L('Fermer', 'Close')}</button></div></div>`;
+  };
+  draw(null); m.classList.add('on');
+  m.onclick = e => {
+    const b = e.target.closest('[data-wk]');
+    if (!b && e.target !== m) return;
+    m.onclick = null;
+    if (b && b.dataset.wk === 'go') return weekStart();
+    m.classList.remove('on'); m.innerHTML = '';
+    if (b && b.dataset.wk === 'rank') { SOC.kind = 'week'; return openSocial('rank'); }
+    document.getElementById('b-week').focus();
+  };
+  m.querySelector('[data-wk="go"]').focus();
+  try { const top = await socRpc('leaderboard', { kind: 'week' }); if (m.querySelector('.wkbox')) { draw(top); m.querySelector('[data-wk="go"]').focus(); } } catch (e) {}
+}
+if (!HEADLESS) { document.getElementById('b-week').onclick = () => openWeek(); weekBadge(); }
 function openDaily() {
   const ch = dailyFor(today()), d = dailyLoad(), done = !!d.done[ch.date];
   const streak = d.last === today() || d.last === dayShift(today(), -1) ? d.streak : 0;
@@ -7825,7 +7940,8 @@ function srvErr(e) { return L(`Action refusée ou serveur injoignable (${e.messa
 // Ce que le serveur renvoie devient la collection affichée ; ses succès, sa campagne et son défi du jour font foi.
 function collApply(sv, quiet) {
   collSave({ v: 1, started: true, cards: sv.cards || {}, foil: sv.foil || {}, wish: sv.wish || {}, packs: sv.packs | 0, opened: sv.opened | 0, scrap: sv.scrap | 0,
-    log: sv.log || [], gift: sv.gift || '', dayPacks: sv.day_packs | 0, dayCap: sv.day_cap | 0, blocked: !!sv.blocked, side: (sv.camp && sv.camp.side) || {} });
+    log: sv.log || [], gift: sv.gift || '', dayPacks: sv.day_packs | 0, dayCap: sv.day_cap | 0, blocked: !!sv.blocked, side: (sv.camp && sv.camp.side) || {}, week: sv.week || null });
+  weekBadge();
   const had = loadAch(), fresh = Object.keys(sv.ach || {}).filter(id => !had[id] && ACH.some(a => a.id === id));
   for (const id of Object.keys(sv.ach || {})) achMark(id, quiet);
   if (!quiet && fresh.length) PK.bonus = [...(PK.bonus || []), ...fresh];
@@ -8085,11 +8201,13 @@ async function socRpc(fn, args = {}) {
 }
 const socAv = id => id && IMGS[id] && IMGS[id].art ? `<span class="sc-av art-${id}" aria-hidden="true"></span>` : '<span class="sc-av" aria-hidden="true">👤</span>';
 const hasPseudo = () => !!((cloudState().profile || {}).pseudo);
-const RANK_KINDS = () => [['story', L('Mode Histoire', 'Story mode')], ['coll', L('Collection', 'Collection')], ['expert', L('Victoires Expert', 'Expert wins')], ['daily', L('Défi du jour', 'Daily challenge')]];
+const RANK_KINDS = () => [['story', L('Mode Histoire', 'Story mode')], ['coll', L('Collection', 'Collection')], ['expert', L('Victoires Expert', 'Expert wins')], ['daily', L('Défi du jour', 'Daily challenge')], ['week', L('Événement', 'Event')], ['ranked', L('En ligne classé', 'Ranked online')]];
 function rankVal(k, v) {
   if (k === 'story') return v >= 12 ? L('Campagne terminée ★', 'Campaign complete ★') : L(`${v}/12 combats`, `${v}/12 fights`);
   if (k === 'coll') return L(`${v}/150 cartes`, `${v}/150 cards`);
   if (k === 'expert') return L(`${v} victoire${v > 1 ? 's' : ''}`, `${v} win${v > 1 ? 's' : ''}`);
+  if (k === 'week') return L(`${v} point${v > 1 ? 's' : ''}`, `${v} point${v > 1 ? 's' : ''}`);
+  if (k === 'ranked') return L(`${v.toLocaleString('fr-FR')} pts`, `${v.toLocaleString('en-GB')} pts`);
   return L(`${v} jour${v > 1 ? 's' : ''} de suite`, `${v}-day streak`);
 }
 function openSocial(tab) {
@@ -8127,12 +8245,13 @@ function renderSocial() {
     body = `<div class="seg sc-kinds" role="radiogroup" aria-label="${L('Classement', 'Leaderboard')}">${RANK_KINDS().map(([k, t]) => `<button role="radio" data-kind="${k}" aria-checked="${SOC.kind === k}" tabindex="${SOC.kind === k ? 0 : -1}">${t}</button>`).join('')}</div>
       ${d && !d.profile ? noPseudo : ''}
       ${!d ? `<p class="sc-empty">${L('Chargement…', 'Loading…')}</p>` : !d.rows.length ? `<p class="sc-empty">${L("Personne n'est encore classé ici. À vous de jouer !", 'Nobody is ranked here yet. Your move!')}</p>`
-        : `<ol class="sc-list">${d.rows.map(r => `<li class="${r.me ? 'me' : ''}"><b class="sc-rk ${r.rank <= 3 ? 'r' + r.rank : ''}">${r.rank}</b>${socAv(r.avatar)}<span class="sc-ps">${esc(r.pseudo)}${r.me ? L(' (vous)', ' (you)') : ''}</span><span class="sc-v">${rankVal(SOC.kind, r.value)}</span></li>`).join('')}</ol>`}
+        : `<ol class="sc-list">${d.rows.map(r => `<li class="${r.me ? 'me' : ''}"><b class="sc-rk ${r.rank <= 3 ? 'r' + r.rank : ''}">${r.rank}</b>${socAv(r.avatar)}<button class="sc-ps sc-pl" data-pc="${escAttr(r.pseudo)}">${esc(r.pseudo)}${r.me ? L(' (vous)', ' (you)') : ''}</button><span class="sc-v">${rankVal(SOC.kind, r.value)}</span></li>`).join('')}</ol>`}
+      ${SOC.kind === 'week' ? `<p class="sc-me">${L(`Semaine en cours, ${weekLeft()}. Les points repartent de zéro chaque lundi.`, `Current week, ${weekLeft()}. Points reset every Monday.`)}</p>` : SOC.kind === 'ranked' ? `<p class="sc-me">${L('Parties en ligne classées entre joueurs : tout le monde part de 1 000 points ; on en gagne plus en battant un joueur mieux classé.', 'Ranked online games between players: everyone starts at 1,000 points; beating a higher-ranked player earns more.')}</p>` : ''}
       ${d && d.me && !d.rows.some(r => r.me) ? `<p class="sc-me">${L(`Votre place : <b>${d.me.rank}e</b>`, `Your rank: <b>#${d.me.rank}</b>`)} · ${rankVal(SOC.kind, d.me.value)}</p>` : ''}`;
   } else if (SOC.tab === 'friends') {
     const fl = SOC.friends || [], inc = fl.filter(f => f.status === 'incoming'), fr = fl.filter(f => f.status === 'friend'), out = fl.filter(f => f.status === 'outgoing');
     for (const f of fl) f.live = friendOnline(f);
-    const row = (f, acts) => `<li>${socAv(f.avatar)}<span class="sc-ps">${esc(f.pseudo)} ${f.status === 'friend' ? `<span class="sc-st ${f.live ? 'on' : ''}"><i></i>${f.live ? L('En ligne', 'Online') : L('Hors ligne', 'Offline')}</span>` : ''}</span><span class="sc-acts">${acts}</span></li>`;
+    const row = (f, acts) => `<li>${socAv(f.avatar)}<span class="sc-ps"><button class="sc-pl" data-pc="${escAttr(f.pseudo)}">${esc(f.pseudo)}</button> ${f.status === 'friend' ? `<span class="sc-st ${f.live ? 'on' : ''}"><i></i>${f.live ? L('En ligne', 'Online') : L('Hors ligne', 'Offline')}</span>` : ''}</span><span class="sc-acts">${acts}</span></li>`;
     body = !hasPseudo() ? noPseudo : `<div class="sc-add"><input id="sc-add" maxlength="20" placeholder="${L("Pseudo d'un ami", "A friend's nickname")}" aria-label="${L("Pseudo d'un ami", "A friend's nickname")}"><button class="btn solid" data-soc="add">${L('Ajouter', 'Add')}</button></div>
       <p class="sc-msg ${SOC.bad ? 'ko' : ''}" role="status">${esc(SOC.msg)}</p>
       ${inc.length ? `<h3 class="sc-h">${L('Demandes reçues', 'Requests received')}</h3><ul class="sc-list sc-fr">${inc.map(f => row(f, `<button class="btn solid" data-soc="accept" data-id="${f.id}">${L('Accepter', 'Accept')}</button><button class="btn" data-soc="refuse" data-id="${f.id}">${L('Refuser', 'Decline')}</button>`)).join('')}</ul>` : ''}
@@ -8149,6 +8268,133 @@ function renderSocial() {
   for (const [k, t] of keep) { const x = el.querySelector(`[data-keep="${k}"]`); if (x) x.scrollTop = t; }
   el.scrollTop = y;
 }
+/* ---------- parties en ligne classées ----------
+   Au début, chaque joueur annonce la partie au serveur ; à la fin, chacun envoie son résultat. Les points (départ à 1 000)
+   ne changent que si les deux résultats concordent, ou qu'un joueur annonce sa défaite (abandon), et que la partie a duré 2 minutes. */
+async function rankedStart() {
+  const mid = NET.mid, opp = NET.opp;
+  try {
+    const r = await socRpc('ranked_start', { mid, other: opp });
+    if (!r.ranked) NET.ranked = false;
+    // le journal de la partie en cours (l'hôte le transmet à l'invité)
+    if (G && G.online && !G.over && !G.isGuest) { log(null, r.ranked ? L('Partie classée : le résultat comptera pour le classement en ligne.', 'Ranked game: the result will count for the online leaderboard.') : L('Partie non classée : 5 parties classées par jour au plus contre le même adversaire.', 'Unranked game: at most 5 ranked games per day against the same opponent.')); render(); }
+  } catch (e) { NET.ranked = false; }
+}
+const rankedBox = () => G && G.online && NET.ranked ? `<div class="gain rk-box" id="rk-box"><b class="gain-t">${L('Partie classée', 'Ranked game')}</b><p class="gain-wait">${L('Envoi du résultat…', 'Sending the result…')}</p></div>` : '';
+async function rankedFinish(won) {
+  const mid = NET.mid; NET.ranked = false; if (!mid) return;
+  const say = h => { const b = document.querySelector('#rk-box .gain-wait'); if (b) b.innerHTML = h; };
+  const show = r => {
+    if (r.status === 'done') say(L(`<b class="${r.delta >= 0 ? 'up' : 'down'}">${r.delta >= 0 ? '+' : ''}${r.delta} points</b> → ${r.rating.toLocaleString('fr-FR')} points (${r.games} partie${r.games > 1 ? 's' : ''} classée${r.games > 1 ? 's' : ''})`, `<b class="${r.delta >= 0 ? 'up' : 'down'}">${r.delta >= 0 ? '+' : ''}${r.delta} points</b> → ${r.rating.toLocaleString('en-GB')} points (${r.games} ranked game${r.games > 1 ? 's' : ''})`));
+    else if (r.status === 'disputed') say(L('Les deux joueurs annoncent un résultat différent : la partie ne compte pas.', 'The two players report different results: the game does not count.'));
+    else if (r.status === 'refused') say(L('Partie trop courte (moins de 2 minutes) ou mal annoncée : elle ne compte pas.', 'Game too short (under 2 minutes) or not announced properly: it does not count.'));
+    return r.status !== 'waiting';
+  };
+  try {
+    if (show(await socRpc('ranked_report', { mid, won }))) return;
+    say(L("En attente du résultat de votre adversaire…", "Waiting for your opponent's result…"));
+    for (let k = 0; k < 15; k++) { await new Promise(r => setTimeout(r, 3000)); if (show(await socRpc('ranked_result', { mid }))) return; }
+    say(L("Votre adversaire n'a pas encore envoyé son résultat : le classement sera mis à jour dès qu'il le fera.", "Your opponent has not sent their result yet: the leaderboard will update as soon as they do."));
+  } catch (e) { say(L(`Résultat non envoyé (${esc(e.message)}).`, `Result not sent (${esc(e.message)}).`)); }
+}
+
+/* ---------- erreurs du jeu : envoyées au tableau de bord de l'organisateur (une fois chacune par session) ---------- */
+const ERRS = { seen: new Set(), n: 0 };
+function errScreen() {
+  if (typeof G !== 'undefined' && G && !G.over && document.getElementById('start').style.display === 'none') return `partie${G.online ? ' en ligne' : G.campaign != null ? ' de campagne' : ''}, tour ${(G.players[0] || {}).turns || '?'}`;
+  const o = ['builder', 'packs', 'camp', 'social', 'online', 'login', 'end', 'settings'].find(id => { const e = document.getElementById(id); return e && e.classList.contains('on'); });
+  return o || 'menu';
+}
+function errReport(msg, stack) {
+  if (HEADLESS || ERRS.n >= 15) return;
+  msg = String(msg || '').slice(0, 300); stack = String(stack || '');
+  if (!msg || /^Script error\.?$|ResizeObserver loop|GameOver/.test(msg) || /extension:\/\//.test(stack) || ERRS.seen.has(msg)) return;
+  ERRS.seen.add(msg); ERRS.n++;
+  if (!cloudSession()) return;
+  socRpc('report_error', { msg, stack: stack.slice(0, 2000), screen: errScreen(), ua: navigator.userAgent.slice(0, 200) }).catch(() => {});
+}
+if (!HEADLESS) {
+  addEventListener('error', e => errReport(e.message, (e.error && e.error.stack) || `${e.filename}:${e.lineno}:${e.colno}`));
+  addEventListener('unhandledrejection', e => { const r = e.reason; if (r && (r.name === 'AbortError' || r.status || /fetch|network|load failed|connect|plus connecté|signed in/i.test(r.message || ''))) return; errReport((r && r.message) || String(r), r && r.stack); });
+}
+
+/* ---------- annonces de l'organisateur : affichées une fois à l'accueil ---------- */
+const NEWS = { id: null, pending: null };
+async function newsCheck(id) {
+  let seen = null; try { seen = localStorage.getItem('cptcg-annonce'); } catch (e) {}
+  if (!id || String(id) === seen || NEWS.pending) return;
+  try { NEWS.pending = await socRpc('news_get'); } catch (e) { return; }
+  newsShow();
+}
+async function newsShow() {
+  const n = NEWS.pending; if (!n) return;
+  const busy = (G && !G.over && document.getElementById('start').style.display === 'none') || document.getElementById('login').classList.contains('on') || !document.getElementById('uidlg').hidden || document.getElementById('modal').classList.contains('on');
+  if (busy) return setTimeout(newsShow, 5000);
+  NEWS.pending = null;
+  try { localStorage.setItem('cptcg-annonce', String(n.id)); } catch (e) {}
+  await uiAlert(n.body, { title: '📣 ' + n.title, ok: L('Compris', 'Got it') });
+}
+
+/* ---------- fiche d'un joueur : statistiques publiques, ajouter en ami, échanger, signaler ---------- */
+let PC = null;
+async function playerCard(pseudo) {
+  const el = document.getElementById('pcard'), back = document.activeElement;
+  PC = { pseudo, back, data: null, msg: '', bad: false };
+  el.hidden = false; el.innerHTML = `<div class="pc-box" role="dialog" aria-modal="true" aria-label="${escAttr(pseudo)}"><p>${L('Chargement…', 'Loading…')}</p></div>`;
+  try { PC.data = await socRpc('player_card', { pseudo }); } catch (e) { PC.msg = L(`Fiche introuvable (${e.message}).`, `Profile not found (${e.message}).`); PC.bad = true; }
+  renderPCard();
+}
+function renderPCard() {
+  const el = document.getElementById('pcard'); if (!PC || el.hidden) return;
+  const p = PC.data, stat = (v, t) => `<div><b>${v}</b><span>${t}</span></div>`;
+  if (!p) { el.innerHTML = `<div class="pc-box" role="dialog" aria-modal="true" aria-label="${escAttr(PC.pseudo)}"><p class="pc-msg ko">${esc(PC.msg)}</p><div class="pc-acts"><button class="btn solid" data-pcx="close">${L('Fermer', 'Close')}</button></div></div>`; el.querySelector('[data-pcx]').focus(); return; }
+  const fr = p.friend === 'friend' ? `<span class="sc-st">✓ ${L('Ami', 'Friend')}</span><button class="btn" data-pcx="trade">${L('Échanger', 'Trade')}</button>`
+    : p.friend === 'outgoing' ? `<span class="sc-st">${L('Demande envoyée', 'Request sent')}</span>`
+    : p.friend === 'incoming' ? `<button class="btn solid" data-pcx="accept">${L('Accepter sa demande', 'Accept the request')}</button>`
+    : `<button class="btn solid" data-pcx="add">${L('Ajouter en ami', 'Add as friend')}</button>`;
+  el.innerHTML = `<div class="pc-box" role="dialog" aria-modal="true" aria-labelledby="pc-t">
+    <div class="pc-head">${socAv(p.avatar)}<div><h2 id="pc-t">${esc(p.pseudo)}${p.me ? L(' (vous)', ' (you)') : ''}</h2><p>${L(`Joueur depuis le ${fmtDay(p.since)}`, `Playing since ${fmtDay(p.since)}`)} · <span class="sc-st ${p.online ? 'on' : ''}"><i></i>${p.online ? L('En ligne', 'Online') : L('Hors ligne', 'Offline')}</span></p></div></div>
+    <div class="pc-grid">
+      ${stat(p.games, L(`parties récompensées, ${Math.round(100 * p.wins / Math.max(1, p.games))} % de victoires`, `rewarded games, ${Math.round(100 * p.wins / Math.max(1, p.games))}% wins`))}
+      ${stat(p.rating != null ? p.rating.toLocaleString(LANG === 'en' ? 'en-GB' : 'fr-FR') : '—', p.rating != null ? L(`points en ligne classé (${p.rgames} parties, ${p.rwins} victoires)`, `ranked online points (${p.rgames} games, ${p.rwins} wins)`) : L('pas encore de partie classée', 'no ranked game yet'))}
+      ${stat(`${p.cards}/150`, L(`cartes, dont ${p.foils} Brillante${p.foils > 1 ? 's' : ''}`, `cards, ${p.foils} Foil${p.foils > 1 ? 's' : ''}`))}
+      ${stat(`${p.ach}/${p.ach_total}`, L('succès', 'achievements'))}
+      ${stat(p.story >= 12 ? '★ 12/12' : `${p.story}/12`, L('combats du mode Histoire', 'story mode fights'))}
+      ${stat(p.expert, L('victoires contre l\'IA Expert', 'wins against the Expert AI'))}
+      ${stat(p.daily, L('jours de suite au défi du jour (record)', 'daily challenge streak (best)'))}
+      ${stat(p.week, L('points à l\'événement de la semaine', 'points in the event of the week'))}
+    </div>
+    <p class="pc-msg ${PC.bad ? 'ko' : ''}" role="status">${esc(PC.msg)}</p>
+    <div class="pc-acts">${p.me ? '' : `<button class="btn pc-rep" data-pcx="report">${L('Signaler', 'Report')}</button>${hasPseudo() ? fr : ''}`}<button class="btn" data-pcx="close">${L('Fermer', 'Close')}</button></div></div>`;
+  (el.querySelector('.pc-acts .solid') || el.querySelector('[data-pcx="close"]')).focus({ preventScroll: true });
+}
+function closePCard() { const el = document.getElementById('pcard'); el.hidden = true; el.innerHTML = ''; const b = PC && PC.back; PC = null; if (b && b.isConnected) b.focus({ preventScroll: true }); }
+async function pcAct(a) {
+  const p = PC && PC.data; if (a === 'close' || !p) return closePCard();
+  try {
+    if (a === 'add') { const r = await socRpc('friend_request', { pseudo: p.pseudo }); p.friend = r.status === 'friend' ? 'friend' : 'outgoing'; PC.msg = r.status === 'friend' ? L(`✓ ${p.pseudo} et vous êtes maintenant amis.`, `✓ You and ${p.pseudo} are now friends.`) : L(`✓ Demande envoyée à ${p.pseudo}.`, `✓ Request sent to ${p.pseudo}.`); PC.bad = false; }
+    else if (a === 'accept') { await socRpc('friend_respond', { other: p.id, accept: true }); p.friend = 'friend'; PC.msg = L(`✓ ${p.pseudo} et vous êtes maintenant amis.`, `✓ You and ${p.pseudo} are now friends.`); PC.bad = false; presenceTick(); }
+    else if (a === 'trade') { closePCard(); return socAct('trade', { dataset: { id: p.id } }, { id: p.id, pseudo: p.pseudo }); }
+    else if (a === 'report') {
+      const why = await uiPrompt(L(`Pourquoi signaler ${p.pseudo} ? (pseudo déplacé, triche, comportement…) L'organisateur lira votre message ; ${p.pseudo} ne saura pas qui l'a signalé.`, `Why report ${p.pseudo}? (offensive nickname, cheating, behaviour…) The organiser will read your message; ${p.pseudo} will not know who reported them.`), { ok: L('Envoyer le signalement', 'Send the report'), title: L('Signaler un joueur', 'Report a player') });
+      if (why == null) return;
+      if (why.trim().length < 3) { PC.msg = L('Écrivez en quelques mots ce qui ne va pas.', 'Write a few words about what is wrong.'); PC.bad = true; return renderPCard(); }
+      const r = await socRpc('report_player', { pseudo: p.pseudo, reason: why.trim() });
+      PC.msg = r.status === 'already' ? L(`Vous avez déjà signalé ${p.pseudo} : l'organisateur va regarder.`, `You already reported ${p.pseudo}: the organiser will look into it.`) : L('✓ Signalement envoyé à l\'organisateur. Merci.', '✓ Report sent to the organiser. Thank you.'); PC.bad = false;
+    }
+  } catch (e) { PC.msg = /trop de/.test(e.message) ? L('Trop de signalements aujourd\'hui : réessayez demain.', 'Too many reports today: try again tomorrow.') : L(`Impossible : ${e.message}`, `Not possible: ${e.message}`); PC.bad = true; }
+  renderPCard();
+}
+if (!HEADLESS) {
+  const el = document.getElementById('pcard');
+  el.addEventListener('click', e => { const b = e.target.closest('[data-pcx]'); if (b) return pcAct(b.dataset.pcx); if (e.target === el) closePCard(); });
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closePCard(); }
+    else if (e.key === 'Tab') { const f = [...el.querySelectorAll('button')]; const i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } }
+  });
+  document.addEventListener('click', e => { const b = e.target.closest('[data-pc]'); if (b) { e.preventDefault(); playerCard(b.dataset.pc); } });
+}
+
 /* ---------- échanges de cartes entre amis ----------
    Des exemplaires normaux (pas les Brillantes) ; au plus 10 cartes et 3 exemplaires d'une carte de chaque côté ;
    chaque côté doit valoir au moins la moitié de l'autre (valeur de fabrication). Le serveur vérifie tout au moment de l'échange. */
@@ -8272,6 +8518,17 @@ function adminHTML(a) {
   return `<div class="ad-tiles">${tile(a.players, L('joueurs inscrits', 'registered players'))}${tile(a.profiles, L('avec un pseudo', 'with a nickname'))}${tile(a.online, L('en ligne maintenant', 'online now'))}${tile(a.games_total, L('parties récompensées', 'rewarded games'))}${tile(a.opened_total, L('boosters ouverts', 'boosters opened'))}</div>
     <div class="ad-charts">${adBars(L('Inscriptions', 'Sign-ups'), a.days, 'signups', L('inscription(s)', 'sign-up(s)'))}${adBars(L('Joueurs actifs', 'Active players'), a.days, 'active', L('joueur(s)', 'player(s)'))}
       ${adBars(L('Parties récompensées', 'Rewarded games'), a.days, 'games', L('partie(s)', 'game(s)'))}${adBars(L('Boosters gagnés', 'Boosters earned'), a.days, 'packs', L('booster(s)', 'booster(s)'))}</div>
+    <section class="ad-sec"><h3>${L('Annonce aux joueurs', 'Announcement to players')}</h3><p>${L("Elle s'affiche une fois chez chaque joueur, à l'accueil (dans les 30 secondes pour ceux qui jouent déjà). Une nouvelle annonce remplace la précédente.", 'It shows once to each player, on the home screen (within 30 seconds for those already playing). A new announcement replaces the previous one.')}</p>
+      ${a.news ? `<div class="ad-pl"><div class="ad-pl-h"><b>📣 ${esc(a.news.title)}</b><span>${L('publiée le', 'published')} ${loginTime(new Date(a.news.at).getTime())}</span></div><p class="ad-news">${esc(a.news.body)}</p><div class="sc-acts"><button class="btn" data-ad="news-stop">${L("Retirer l'annonce", 'Remove the announcement')}</button></div></div>` : `<p class="sc-empty">${L('Aucune annonce en cours.', 'No current announcement.')}</p>`}
+      <div class="ad-newsf"><input id="ad-nt" maxlength="80" placeholder="${escAttr(L('Titre', 'Title'))}" aria-label="${escAttr(L("Titre de l'annonce", 'Announcement title'))}"><textarea id="ad-nb" maxlength="1500" rows="3" placeholder="${escAttr(L('Message', 'Message'))}" aria-label="${escAttr(L("Message de l'annonce", 'Announcement message'))}"></textarea><button class="btn solid" data-ad="news-post">${L("Publier l'annonce", 'Publish the announcement')}</button></div></section>
+    <section class="ad-sec"><h3>${L('Signalements', 'Reports')} ${(a.reports || []).length ? `(${a.reports.length})` : ''}</h3>
+      ${(a.reports || []).length ? `<ul class="ad-pls">${a.reports.map(r => `<li class="ad-pl"><div class="ad-pl-h"><b>${esc(r.target.pseudo || '—')}</b><span>${esc(r.target.email || '')}</span><span>${L('signalé par', 'reported by')} ${esc(r.from || '—')} · ${loginTime(new Date(r.at).getTime())}</span>${r.target.blocked ? `<span class="ad-tag">${L('Bloqué', 'Blocked')}</span>` : ''}</div>
+        <p class="ad-news">« ${esc(r.reason)} »</p><div class="sc-acts"><button class="btn" data-ad="manage" data-q="${escAttr(r.target.email || '')}">${L('Gérer ce compte', 'Manage this account')}</button><button class="btn" data-ad="rep-close" data-id="${r.id}">${L('Traité', 'Handled')}</button></div></li>`).join('')}</ul>` : `<p class="sc-empty">${L('Aucun signalement en attente.', 'No pending report.')}</p>`}</section>
+    <section class="ad-sec"><h3>${L('Erreurs chez les joueurs (7 jours)', 'Errors on players\' devices (7 days)')}</h3><p>${L("Le jeu envoie ici chaque erreur qu'il rencontre. Copiez le message et le détail pour me les montrer, puis marquez-la comme réglée une fois corrigée.", 'The game sends here every error it hits. Copy the message and details to show them to me, then mark it fixed once corrected.')}</p>
+      ${(a.errors || []).length ? `<ul class="ad-pls">${a.errors.map(x => `<li class="ad-pl"><div class="ad-pl-h"><b class="ad-err">${esc(x.msg)}</b></div>
+        <div class="ad-pl-s">${L(`${x.n} fois · ${x.players} joueur${x.players > 1 ? 's' : ''} · dernière le ${loginTime(new Date(x.last).getTime())} · écran : ${esc(x.screen || '?')} · ${esc(uaShort(x.ua))}`, `${x.n} times · ${x.players} player${x.players > 1 ? 's' : ''} · last ${loginTime(new Date(x.last).getTime())} · screen: ${esc(x.screen || '?')} · ${esc(uaShort(x.ua))}`)}</div>
+        ${x.stack ? `<details><summary>${L('Détail technique', 'Technical details')}</summary><pre class="ad-stack">${esc(x.stack)}</pre></details>` : ''}
+        <div class="sc-acts"><button class="btn" data-ad="err-clear" data-m="${escAttr(x.msg)}">${L('Marquer comme réglée', 'Mark as fixed')}</button></div></li>`).join('')}</ul>` : `<p class="sc-empty">${L('Aucune erreur : tout va bien.', 'No error: all good.')}</p>`}</section>
     <section class="ad-sec" id="ad-manage"><h3>${L('Gérer un compte', 'Manage an account')}</h3><p>${L('Cherchez un joueur par son pseudo ou son e-mail, puis renommez-le, remettez sa collection à zéro ou bloquez-le.', 'Find a player by nickname or e-mail, then rename them, reset their collection or block them.')}</p>
       <div class="ad-find"><input id="ad-q" type="search" value="${escAttr(SOC.adQ)}" placeholder="${escAttr(L('Pseudo ou e-mail', 'Nickname or e-mail'))}" aria-label="${escAttr(L('Pseudo ou e-mail', 'Nickname or e-mail'))}"><button class="btn solid" data-ad="find">${L('Chercher', 'Search')}</button></div>
       <p class="sc-msg ${SOC.bad ? 'ko' : ''}" role="status">${esc(SOC.msg)}</p>
@@ -8285,6 +8542,12 @@ function adminHTML(a) {
       <div class="ad-wadd"><input id="ad-w" maxlength="30" placeholder="${escAttr(L('Nouveau mot', 'New word'))}" aria-label="${escAttr(L('Nouveau mot interdit', 'New forbidden word'))}"><button class="btn solid" data-ad="word-add">${L('Ajouter', 'Add')}</button></div>
       <div class="ad-chips">${w.words.map(x => `<span class="ad-chip">${esc(x)}<button data-ad="word-del" data-w="${escAttr(x)}" aria-label="${escAttr(L(`Retirer ${x}`, `Remove ${x}`))}">×</button></span>`).join('')}</div></section>
     <section class="ad-sec"><h3>${L('Journal de vos actions', 'Log of your actions')}</h3>${(a.log || []).length ? `<table class="ad-tbl"><tbody>${a.log.map(x => `<tr><td>${loginTime(new Date(x.at).getTime())}</td><td>${logTxt(x)}</td><td>${esc(x.pseudo || x.email || L('compte supprimé', 'deleted account'))}</td><td>${esc(x.detail || '')}</td></tr>`).join('')}</tbody></table>` : `<p class="sc-empty">${L('Aucune action pour l\'instant.', 'No action yet.')}</p>`}</section>`;
+}
+function uaShort(ua) {
+  ua = ua || '';
+  const b = /Edg\/(\d+)/.exec(ua) ? 'Edge ' + /Edg\/(\d+)/.exec(ua)[1] : /Firefox\/(\d+)/.exec(ua) ? 'Firefox ' + /Firefox\/(\d+)/.exec(ua)[1] : /Chrome\/(\d+)/.exec(ua) ? 'Chrome ' + /Chrome\/(\d+)/.exec(ua)[1] : /Version\/(\d+).*Safari/.exec(ua) ? 'Safari ' + /Version\/(\d+)/.exec(ua)[1] : L('navigateur inconnu', 'unknown browser');
+  const o = /Android/.test(ua) ? 'Android' : /iPhone|iPad/.test(ua) ? 'iPhone/iPad' : /Windows/.test(ua) ? 'Windows' : /Mac OS/.test(ua) ? 'Mac' : /Linux/.test(ua) ? 'Linux' : '';
+  return o ? `${b}, ${o}` : b;
 }
 function adPlayer(p) {
   const seen = p.seen ? loginTime(new Date(p.seen).getTime()) : L('jamais', 'never');
@@ -8320,6 +8583,15 @@ async function adAct(a, b) {
       const r = await socRpc('admin_rename', { target: id, pseudo: p.trim() });
       return done(r, L(`✓ ${who} s'appelle maintenant ${r.pseudo}.`, `✓ ${who} is now called ${r.pseudo}.`));
     }
+    if (a === 'news-post') {
+      const t = (document.getElementById('ad-nt').value || '').trim(), m = (document.getElementById('ad-nb').value || '').trim();
+      if (!t || m.length < 3) { SOC.msg = L('Donnez un titre et un message.', 'Give a title and a message.'); SOC.bad = true; renderSocial(); document.getElementById('ad-nt').focus(); return; }
+      if (!await uiConfirm(L(`Publier « ${t} » ? L'annonce s'affichera une fois chez tous les joueurs.`, `Publish "${t}"? The announcement will show once to every player.`), { ok: L('Publier', 'Publish') })) return;
+      await socRpc('admin_news', { title: t, body: m }); return done(null, L('✓ Annonce publiée.', '✓ Announcement published.'));
+    }
+    if (a === 'news-stop') { await socRpc('admin_news', { title: '', body: '' }); return done(null, L('✓ Annonce retirée.', '✓ Announcement removed.')); }
+    if (a === 'rep-close') { await socRpc('admin_report_close', { id: +b.dataset.id }); return done(null, L('✓ Signalement traité.', '✓ Report handled.')); }
+    if (a === 'err-clear') { await socRpc('admin_errors_clear', { msg: b.dataset.m }); return done(null, ''); }
     if (a === 'word-add' || a === 'word-del') {
       const word = a === 'word-add' ? (document.getElementById('ad-w').value || '').trim() : b.dataset.w;
       if (!word) return;
@@ -8333,8 +8605,8 @@ async function adAct(a, b) {
   }
 }
 // ---------- amis : actions ----------
-async function socAct(a, b) {
-  const id = b && b.dataset.id, f = (SOC.friends || []).find(x => x.id === id);
+async function socAct(a, b, given) {
+  const id = b && b.dataset.id, f = given || (SOC.friends || []).find(x => x.id === id);
   try {
     if (a === 'add') {
       const p = (document.getElementById('sc-add').value || '').trim();
@@ -8346,7 +8618,7 @@ async function socAct(a, b) {
     if (a === 'accept' || a === 'refuse') { await socRpc('friend_respond', { other: id, accept: a === 'accept' }); SOC.msg = a === 'accept' ? L(`✓ ${f.pseudo} et vous êtes maintenant amis.`, `✓ You and ${f.pseudo} are now friends.`) : ''; await socLoad(); presenceTick(); return; }
     if (a === 'remove') { if (f.status === 'friend' && !await uiConfirm(L(`Retirer ${f.pseudo} de vos amis ?`, `Remove ${f.pseudo} from your friends?`), { ok: L('Retirer', 'Remove'), danger: true })) return; await socRpc('friend_remove', { other: id }); SOC.msg = ''; await socLoad(); return; }
     if (a === 'invite') return inviteFriend(f);
-    if (a === 'trade') { SOC.tab = 'trades'; SOC.tr = { other: f.id, pseudo: f.pseudo, give: {}, want: {}, view: null, q: '', dup: false, miss: false }; SOC.msg = ''; renderSocial(); await socLoad(); const n = document.getElementById('tr-q'); if (n) n.focus({ preventScroll: true }); return; }
+    if (a === 'trade') { if (!document.getElementById('social').classList.contains('on')) openSocial('trades'); SOC.tab = 'trades'; SOC.tr = { other: f.id, pseudo: f.pseudo, give: {}, want: {}, view: null, q: '', dup: false, miss: false }; SOC.msg = ''; renderSocial(); await socLoad(); const n = document.getElementById('tr-q'); if (n) n.focus({ preventScroll: true }); return; }
   } catch (e) {
     socSay(/introuvable/.test(e.message) ? L("Aucun joueur n'a ce pseudo.", 'No player has this nickname.') : /vous/.test(e.message) ? L("C'est votre propre pseudo.", 'That is your own nickname.') : L(`Impossible : ${e.message}`, `Not possible: ${e.message}`), true);
   }
@@ -8365,7 +8637,7 @@ async function inviteFriend(f) {
 // ---------- présence et invitations reçues (toutes les 30 s) ----------
 async function presenceTick() {
   if (!cloudSession() || (TAB.lock && !TAB.held) || !navigator.onLine) return;
-  try { const r = await socRpc('presence'); SOC.invites = r.invites || []; SOC.requests = +r.requests || 0; SOC.tradesIn = +r.trades || 0; } catch (e) { return; }
+  try { const r = await socRpc('presence'); SOC.invites = r.invites || []; SOC.requests = +r.requests || 0; SOC.tradesIn = +r.trades || 0; newsCheck(r.news); } catch (e) { return; }
   const n = SOC.requests + SOC.invites.length + SOC.tradesIn, bd = document.getElementById('fr-badge');
   bd.hidden = !n; bd.textContent = n;
   renderInvites();
@@ -8697,6 +8969,7 @@ function abandonCurrent() {
   if (!G || G.over) return showStart();
   const me = G.players[VIEW], op = G.players[1 - VIEW];
   G.winner = op; G.reason = L('Abandon', 'Abandoned'); G.over = true; G.endShown = true;
+  if (G.online && NET.ranked) rankedFinish(false);
   if (!G.tutorial && !G.sandbox) recordGame();
   clearSave();
   netClose();
@@ -9127,7 +9400,10 @@ function hostRecv(d) {
     const deck = d.deck, err = deck && deck.legends && DECKS[Object.keys(DECKS).find(k => DECKS[k].name === deck.name)] ? [] : validateDeck(deck || { legends: [], list: {} });
     if (err.length) { netSend({ t: 'reject', why: err[0] }); onlineStatus(L(`Le deck de ${d.name} n'est pas valide : ${err[0]}`, `${d.name}'s deck is invalid: ${err[0]}`), true); return; }
     NET.token = Array.from({ length: 16 }, () => 'abcdefghijkmnpqrstuvwxyz23456789'[rnd(32)]).join('');
-    netSend({ t: 'start', lang: LANG, token: NET.token });
+    // partie classée : les deux joueurs ont un compte avec pseudo et l'hôte l'a demandé ; le jeton secret sert d'identifiant
+    NET.ranked = !!(NET.wantRanked && hasPseudo() && d.uid && d.pseudo && cloudSession() && d.uid !== cloudSession().user_id); NET.mid = NET.token; NET.opp = d.uid || null;
+    netSend({ t: 'start', lang: LANG, token: NET.token, ranked: NET.ranked, uid: (cloudSession() || {}).user_id || null });
+    if (NET.ranked) rankedStart();
     closeOnline();
     document.getElementById('start').style.display = 'none';
     newGame(NET.myDeck, { online: true, guestDeck: deck, names: [NET.myName, String(d.name || L('Invité', 'Guest')).slice(0, 20)] });
@@ -9166,6 +9442,7 @@ function guestRecv(d) {
     NET.retrying = false; clearTimeout(NET.retryTimer);
     try { localStorage.setItem('cptcg-rejoin', JSON.stringify({ code: NET.code, token: d.token, t: Date.now() })); } catch (e) {}
     NET.token = d.token;
+    if (!d.resume) { NET.ranked = !!(d.ranked && d.uid); NET.mid = d.token; NET.opp = d.uid || null; if (NET.ranked) rankedStart(); }
     if (d.resume && G) { G.netDown = false; render(); }
     if (LANG !== d.lang) setLang(d.lang);
     closeOnline();
@@ -9230,7 +9507,7 @@ function guestRetry(t0) {
   NET.retrying = true;
   const go = () => {
     const conn = NET.peer.connect('cptcg-' + NET.code, { reliable: true });
-    conn.on('open', () => { NET.conn = conn; netHeartbeat(conn); conn.send({ t: 'hello', name: NET.myName, deck: NET.myDeck, token: NET.token }); });
+    conn.on('open', () => { NET.conn = conn; netHeartbeat(conn); conn.send({ t: 'hello', name: NET.myName, deck: NET.myDeck, token: NET.token, uid: (cloudSession() || {}).user_id || null, pseudo: hasPseudo() }); });
     conn.on('data', guestRecv);
     conn.on('close', () => { if (NET.conn === conn) netLost(); });
     conn.on('error', () => {});
@@ -9317,6 +9594,7 @@ function openOnline() {
   el.innerHTML = `<div class="obox"><h2>${L('🌐 Partie en ligne', '🌐 Online game')}</h2>
     <label>${L('Votre pseudo', 'Your nickname')}</label><input id="o-name" maxlength="20" value="${escAttr(name)}" placeholder="${L('Joueur', 'Player')}">
     <label>${L('Votre deck', 'Your deck')}</label><select id="o-deck">${onlineDeckOptions().map(([v, t]) => `<option value="${escAttr(v)}">${esc(t)}</option>`).join('')}</select>
+    <label class="orank"><input type="checkbox" id="o-ranked" ${hasPseudo() ? 'checked' : 'disabled'}> ${L('Partie classée', 'Ranked game')} <small>${hasPseudo() ? L('le résultat compte pour le classement en ligne si votre adversaire a aussi un pseudo', 'the result counts for the online leaderboard if your opponent also has a nickname') : L('choisissez un pseudo dans Mon compte pour jouer des parties classées', 'choose a nickname in My account to play ranked games')}</small></label>
     <div class="orow"><button class="btn big" id="o-host">${L('Créer une partie', 'Create a game')}</button></div>
     <div class="sep">${L('— ou rejoindre une partie avec son code —', '— or join a game with its code —')}</div>
     <div class="orow"><input id="o-code" maxlength="8" placeholder="${L('CODE', 'CODE')}" value="${escAttr(lastCode())}" style="text-transform:uppercase;letter-spacing:.15em"><button class="btn cy big" id="o-join">${L('Rejoindre', 'Join')}</button></div>
@@ -9339,6 +9617,7 @@ async function onlineGo(mode) {
   const dv = document.getElementById('o-deck').value;
   const deck = dv.startsWith('base:') ? DECKS[dv.slice(5)] : getDeck(dv);
   NET.myName = name.slice(0, 20); NET.myDeck = { name: deck.name, legends: [...deck.legends], list: { ...deck.list } };
+  const rk = document.getElementById('o-ranked'); NET.wantRanked = !!(rk && rk.checked); NET.ranked = false; NET.mid = null;
   netClose();
   onlineStatus(L('Connexion…', 'Connecting…'));
   try { await loadPeerJS(); } catch (e) { onlineStatus(e.message, true); return; }
@@ -9355,7 +9634,7 @@ async function onlineGo(mode) {
     peer.on('error', peerError);
     peer.on('open', () => {
       const conn = NET.conn = peer.connect('cptcg-' + code, { reliable: true });
-      conn.on('open', () => { onlineStatus(L("Connecté ! En attente du lancement par l'hôte…", 'Connected! Waiting for the host to start…')); netHeartbeat(conn); conn.send({ t: 'hello', name: NET.myName, deck: NET.myDeck, token: NET.token }); });
+      conn.on('open', () => { onlineStatus(L("Connecté ! En attente du lancement par l'hôte…", 'Connected! Waiting for the host to start…')); netHeartbeat(conn); conn.send({ t: 'hello', name: NET.myName, deck: NET.myDeck, token: NET.token, uid: (cloudSession() || {}).user_id || null, pseudo: hasPseudo() }); });
       conn.on('data', guestRecv);
       conn.on('close', () => { if (NET.conn === conn) netLost(); });
       conn.on('error', () => { if (NET.conn === conn) netLost(); });
