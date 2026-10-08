@@ -6419,7 +6419,7 @@ if (!HEADLESS && /^https?:$/.test(location.protocol)) {
 /* ---------- mes données : export / import en un fichier ----------
    Tout ce que le jeu garde dans le navigateur (clés cptcg-…). À l'import, les decks et les statistiques
    sont fusionnés, une partie sauvegardée remplace l'actuelle si elle est plus récente ; vos réglages ne changent pas. */
-const DATA_KEEP_LOCAL = ['cptcg-cloud', 'cptcg-coll', 'cptcg-claims', 'cptcg-welcomed', 'cptcg-backup', 'cptcg-prefs', 'cptcg-music', 'cptcg-sound', 'cptcg-lang', 'cptcg-tab', 'cptcg-level', 'cptcg-rejoin'];
+const DATA_KEEP_LOCAL = ['cptcg-cloud', 'cptcg-coll', 'cptcg-claims', 'cptcg-welcomed', 'cptcg-backup', 'cptcg-prefs', 'cptcg-music', 'cptcg-sound', 'cptcg-lang', 'cptcg-tab', 'cptcg-level', 'cptcg-rejoin', 'cptcg-push-ask'];   // cptcg-push-ask : propre à chaque appareil
 function exportData() {
   const data = {};
   try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith('cptcg-') && k !== CLOUD_KEY) data[k] = localStorage.getItem(k); } } catch (e) {}
@@ -8349,7 +8349,26 @@ async function pushOff(quiet) {
   if (!quiet) PUSH.state = 'off';
 }
 // Après « Jouer » : l'appareil déjà abonné est rattaché au compte connecté (et à sa langue).
-async function pushResume() { if (await pushRefresh() === 'on' && PUSH.sub) pushSave(PUSH.sub).catch(() => {}); }
+async function pushResume() { if (await pushRefresh() === 'on' && PUSH.sub) pushSave(PUSH.sub).catch(() => {}); else pushInvite(); }
+// Application installée, notifications jamais demandées : on propose de les activer (le navigateur exige un toucher du joueur).
+// « Plus tard » : une seule nouvelle proposition, une semaine après ; un refus du navigateur n'est jamais redemandé.
+function pushInvite() {
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (!standalone || PUSH.state !== 'off' || !pushOk() || Notification.permission === 'denied') return;
+  let a = { n: 0, t: 0 }; try { a = JSON.parse(localStorage.getItem('cptcg-push-ask') || 'null') || a; } catch (e) {}
+  if (a.n >= 2 || (a.n === 1 && Date.now() - a.t < 7 * 864e5)) return;
+  const ask = async () => {
+    const busy = (G && !G.over && document.getElementById('start').style.display === 'none') || document.getElementById('login').classList.contains('on') || !document.getElementById('uidlg').hidden || document.getElementById('modal').classList.contains('on') || NEWS.pending;
+    if (busy) return setTimeout(ask, 5000);
+    try { localStorage.setItem('cptcg-push-ask', JSON.stringify({ n: a.n + 1, t: Date.now() })); } catch (e) {}
+    const yes = await uiConfirm(L("Recevoir les invitations à jouer, les demandes d'ami, les échanges et les annonces même quand le jeu est fermé ?\n\nVous pourrez changer d'avis à tout moment dans Mon compte → Notifications.", 'Get game invitations, friend requests, trades and announcements even when the game is closed?\n\nYou can change your mind at any time in My account → Notifications.'), { title: L('Activer les notifications', 'Turn on notifications'), ok: L('Activer', 'Turn on'), cancel: L('Plus tard', 'Later') });
+    if (!yes) return;
+    try { localStorage.setItem('cptcg-push-ask', JSON.stringify({ n: 2, t: Date.now() })); } catch (e) {}
+    await pushToggle();
+    if (PUSH.state === 'on') uiAlert(L('✓ Notifications activées sur cet appareil.', '✓ Notifications turned on for this device.'));
+  };
+  setTimeout(ask, 2500);
+}
 async function pushTest() {
   try { const reg = await swReady(); await reg.showNotification('Cyberpunk TCG', { body: L('Les notifications fonctionnent sur cet appareil.', 'Notifications work on this device.'), icon: 'icons/icon-192.png', tag: 'essai' }); }
   catch (e) { PUSH.state = 'error'; PUSH.err = e.message; renderLogin(); }
