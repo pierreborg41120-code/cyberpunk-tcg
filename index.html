@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script>
+// Site : sans compte connecté, on passe d'abord par la page de connexion (bien plus légère que le jeu).
+(function () { try { if (/^https?:$/.test(location.protocol) && !/access_token=/.test(location.hash) && !(JSON.parse(localStorage.getItem('cptcg-cloud') || '{}') || {}).session) location.replace('connexion.html'); } catch (e) {} })();
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
@@ -1036,6 +1040,10 @@ label.set-row{cursor:pointer}
 .lg-msg{margin:12px 0 0;font-size:14.5px;color:var(--cyan)}.lg-msg:empty{display:none}.lg-msg.ko{color:#ffb3bb}
 #data-import{display:none!important}
 body:has(#login.on) #autoplay{display:none}
+.lg-links{display:flex;flex-wrap:wrap;gap:6px 18px;margin:14px 0 0}
+.lg-f .lg-pw{display:flex;margin:0;font:inherit;letter-spacing:0;color:inherit}.lg-pw input{flex:1;min-width:0}
+.lg-eye{flex:none;padding:0 12px;background:#05070c;border:1.5px solid #2a3044;border-left:0;color:var(--mut);font:600 12px 'Chakra Petch',sans-serif;cursor:pointer}
+.lg-eye:hover,.lg-eye:focus-visible{color:var(--cyan)}
 .lg-note{margin:18px 0 0;padding-top:14px;border-top:1px solid #1d2232;color:var(--mut);font-size:13.5px;line-height:1.45}
 .lg-skip{margin-top:18px;padding-top:14px;border-top:1px solid #1d2232}
 .lg-skip .linkbtn{font-size:15px}
@@ -7534,7 +7542,7 @@ if (!HEADLESS) {
    Sans compte ou hors connexion, le jeu fonctionne comme avant (tout reste dans le navigateur).
    ===================================================================== */
 const CLOUD = { url: 'https://rrjpougtknbentlsfaga.supabase.co', key: 'sb_publishable_Doyjah4Iy-HaJQjXbCV0UQ_evpNkVZ7' };
-var CLOUD_KEY = 'cptcg-cloud', CLOUD_BUSY = false, CLOUD_EMAIL = '';
+var CLOUD_KEY = 'cptcg-cloud', CLOUD_BUSY = false;
 function cloudState() { try { return JSON.parse(localStorage.getItem(CLOUD_KEY) || '{}') || {}; } catch (e) { return {}; } }
 function cloudSet(patch) { const st = { ...cloudState(), ...patch }; try { localStorage.setItem(CLOUD_KEY, JSON.stringify(st)); } catch (e) {} return st; }
 function cloudSession() { return cloudState().session || null; }
@@ -7585,19 +7593,27 @@ function collApply(sv, quiet) {
   }
   if (sv.daily) { const d = dailyLoad(); d.done = { ...(sv.daily.done || {}) }; d.streak = sv.daily.streak | 0; d.best = sv.daily.best | 0; d.last = sv.daily.last || ''; dailySave(d); dailyBadge(); }
 }
-async function cloudSendCode(email, back) { await cloudFetch('/auth/v1/otp' + (back ? '?redirect_to=' + encodeURIComponent(back) : ''), { method: 'POST', body: { email, create_user: true }, auth: false }); }
-// Ce qu'on a reçu par e-mail : soit un code à 6 chiffres, soit le lien de connexion (collé tel quel, utile pour la version locale).
-async function cloudVerify(email, input) {
-  const m = String(input).match(/[?&]token=([^&\s]+)/);
-  if (m) {
-    const t = decodeURIComponent(m[1]), ty = (String(input).match(/[?&]type=([a-z_]+)/) || [])[1];
-    let last;
-    for (const type of [...new Set([ty === 'signup' ? 'signup' : 'magiclink', 'email', 'signup'])]) {
-      try { return cloudKeep(await cloudFetch('/auth/v1/verify', { method: 'POST', body: { type, token_hash: t }, auth: false }), email); } catch (e) { last = e; }
-    }
-    throw last;
-  }
-  cloudKeep(await cloudFetch('/auth/v1/verify', { method: 'POST', body: { type: 'email', email, token: String(input).replace(/\D/g, '') }, auth: false }), email);
+// Connexion par e-mail et mot de passe. Les liens envoyés par e-mail (confirmation, nouveau mot de passe) ouvrent la page de connexion du site.
+const authBack = () => location.protocol.startsWith('http') ? location.origin + location.pathname.replace(/[^/]*$/, '') + 'connexion.html' : null;
+async function cloudSignIn(email, password) { cloudKeep(await cloudFetch('/auth/v1/token?grant_type=password', { method: 'POST', body: { email, password }, auth: false }), email); }
+// Renvoie true si le compte est ouvert tout de suite, false s'il faut d'abord confirmer l'adresse (e-mail envoyé).
+async function cloudSignUp(email, password) {
+  const back = authBack();
+  const j = await cloudFetch('/auth/v1/signup' + (back ? '?redirect_to=' + encodeURIComponent(back) : ''), { method: 'POST', body: { email, password }, auth: false });
+  if (j && j.access_token) { cloudKeep(j, email); return true; }
+  return false;
+}
+async function cloudRecover(email) { const back = authBack(); await cloudFetch('/auth/v1/recover' + (back ? '?redirect_to=' + encodeURIComponent(back) : ''), { method: 'POST', body: { email }, auth: false }); }
+function authErr(e) {
+  const m = String((e && e.message) || ''), c = (e && e.code) || '';
+  if (c === 'invalid_credentials' || /invalid login/i.test(m)) return L('E-mail ou mot de passe incorrect.', 'Wrong e-mail or password.');
+  if (c === 'email_not_confirmed' || /not confirmed/i.test(m)) return L("Adresse pas encore confirmée : cliquez sur le lien de l'e-mail de confirmation, puis connectez-vous.", 'Address not confirmed yet: click the link in the confirmation e-mail, then sign in.');
+  if (c === 'user_already_exists' || /already registered|already exists/i.test(m)) return L('Un compte existe déjà avec cette adresse : connectez-vous, ou utilisez « Mot de passe oublié ».', 'An account already exists with this address: sign in, or use "Forgot password".');
+  if (c === 'weak_password' || /password should|at least|weak/i.test(m)) return L('Mot de passe trop faible : au moins 8 caractères.', 'Password too weak: at least 8 characters.');
+  if (e && e.status === 429 || /rate limit/i.test(m)) return L('Trop de tentatives : attendez quelques minutes.', 'Too many attempts: wait a few minutes.');
+  if (/sending|smtp/i.test(m)) return L("Le serveur n'a pas réussi à envoyer l'e-mail. Réessayez plus tard.", 'The server could not send the e-mail. Try again later.');
+  if (/fetch|network/i.test(m)) return L('Serveur injoignable : vérifiez votre connexion internet.', 'Server unreachable: check your internet connection.');
+  return L(`Erreur : ${m}`, `Error: ${m}`);
 }
 // Synchronisation : si l'autre appareil a enregistré entre-temps et que rien n'a changé ici, on reprend ses données telles quelles ;
 // si les deux ont changé (ou à la première connexion sur cet appareil), on fusionne comme l'import d'un fichier ; puis on envoie le résultat.
@@ -7632,7 +7648,7 @@ async function cloudSync(force, serverWins) {
   } finally { CLOUD_BUSY = false; renderCloud(); }
 }
 /* ---------- page de connexion : au lancement (tant qu'on n'a pas choisi « Jouer sans compte »), depuis l'accueil (👤) et les paramètres ---------- */
-const LG = { step: 'mail', msg: '', bad: false, auto: false, music: false };
+const LG = { step: 'login', msg: '', bad: false, auto: false, music: false };
 function loginTime(t) { return new Date(t).toLocaleString(LANG === 'en' ? 'en-GB' : 'fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
 function renderLogin() {
   const el = document.getElementById('login');
@@ -7648,17 +7664,24 @@ function renderLogin() {
       <p class="lg-lead">${L('Connecté avec', 'Signed in as')} <b>${esc(ses.email || '')}</b>. ${L('Votre collection, vos decks, votre campagne et vos statistiques se synchronisent tout seuls entre vos appareils.', 'Your collection, decks, campaign and statistics sync on their own between your devices.')}</p>
       <p class="lg-sync ${st.err ? 'ko' : ''}">${st.err ? L(`Synchronisation impossible pour l'instant (${esc(st.err)}). Le jeu réessaiera tout seul.`, `Sync not possible right now (${esc(st.err)}). The game will try again on its own.`) : st.last ? L(`✓ Dernière synchronisation : ${loginTime(st.last)}`, `✓ Last sync: ${loginTime(st.last)}`) : L('Synchronisation en cours…', 'Syncing…')}</p>
       <div class="lg-acts"><button class="btn solid big" data-lg="play">${L('Jouer', 'Play')}</button><button class="btn cy" data-lg="sync">${L('Synchroniser maintenant', 'Sync now')}</button><button class="btn" data-lg="out">${L('Se déconnecter', 'Sign out')}</button></div>`;
-  } else if (LG.step === 'code') {
-    body = `<h2 id="lg-t">${L('Entrez votre code', 'Enter your code')}</h2>
-      <p class="lg-lead">${L(`Un e-mail vient d'être envoyé à <b>${esc(CLOUD_EMAIL)}</b>. Il arrive en une minute environ ; pensez aux courriers indésirables.`, `An e-mail has just been sent to <b>${esc(CLOUD_EMAIL)}</b>. It arrives within a minute or so; check your spam folder.`)}</p>
-      <label class="lg-f"><span>${L('Code reçu par e-mail', 'Code from the e-mail')}</span><input id="lg-code" autocomplete="one-time-code" inputmode="text" placeholder="123456" aria-describedby="lg-help"></label>
-      <p class="lg-help" id="lg-help">${L("Pas de code dans l'e-mail ? Copiez le lien de connexion (clic droit → Copier le lien) et collez-le ici.", 'No code in the e-mail? Copy the sign-in link (right-click → Copy link) and paste it here.')}</p>
-      <div class="lg-acts"><button class="btn solid big" data-lg="verify">${L('Se connecter', 'Sign in')}</button><button class="btn" data-lg="back">${L("Changer d'adresse", 'Change address')}</button><button class="btn" data-lg="resend">${L('Renvoyer', 'Resend')}</button></div>`;
   } else {
-    body = `<h2 id="lg-t">${L('Connexion', 'Sign in')}</h2>
-      <p class="lg-lead">${L('Connectez-vous pour retrouver votre collection, vos decks et votre campagne sur tous vos appareils. Pas de mot de passe : vous recevez un code par e-mail.', 'Sign in to find your collection, decks and campaign on all your devices. No password: you get a code by e-mail.')}</p>
-      <label class="lg-f"><span>${L('Adresse e-mail', 'E-mail address')}</span><input id="lg-mail" type="email" autocomplete="email" placeholder="${L('vous@exemple.fr', 'you@example.com')}" value="${escAttr(CLOUD_EMAIL || st.lastMail || '')}"></label>
-      <div class="lg-acts"><button class="btn solid big" data-lg="send">${L('Recevoir mon code', 'Send me a code')}</button></div>`;
+    if (location.protocol.startsWith('http')) { location.replace('connexion.html'); return; }   // site : la vraie page de connexion
+    const mail = `<label class="lg-f"><span>${L('Adresse e-mail', 'E-mail address')}</span><input id="lg-mail" type="email" autocomplete="email" placeholder="${L('vous@exemple.fr', 'you@example.com')}" value="${escAttr(st.lastMail || '')}"></label>`;
+    const pass = (id, ac, lbl) => `<label class="lg-f"><span>${lbl}</span><span class="lg-pw"><input id="${id}" type="password" autocomplete="${ac}" minlength="8"><button type="button" class="lg-eye" data-lg="eye" aria-label="${L('Afficher le mot de passe', 'Show password')}">${L('Afficher', 'Show')}</button></span></label>`;
+    if (LG.step === 'signup') body = `<h2 id="lg-t">${L('Créer un compte', 'Create an account')}</h2>
+      <p class="lg-lead">${L('Votre collection, vos decks et votre campagne seront gardés sur le serveur et vous les retrouverez sur tous vos appareils.', 'Your collection, decks and campaign will be kept on the server and you will find them on all your devices.')}</p>
+      ${mail}${pass('lg-pass', 'new-password', L('Mot de passe (8 caractères minimum)', 'Password (8 characters minimum)'))}${pass('lg-pass2', 'new-password', L('Confirmer le mot de passe', 'Confirm the password'))}
+      <div class="lg-acts"><button class="btn solid big" data-lg="signup">${L('Créer mon compte', 'Create my account')}</button></div>
+      <p class="lg-links"><button class="linkbtn" data-lg="to-login">${L("J'ai déjà un compte", 'I already have an account')}</button></p>`;
+    else if (LG.step === 'forgot') body = `<h2 id="lg-t">${L('Mot de passe oublié', 'Forgot password')}</h2>
+      <p class="lg-lead">${L("Entrez votre adresse : vous recevrez un lien pour choisir un nouveau mot de passe. Le lien ouvre le site du jeu.", 'Enter your address: you will get a link to choose a new password. The link opens the game website.')}</p>
+      ${mail}<div class="lg-acts"><button class="btn solid big" data-lg="recover">${L('Envoyer le lien', 'Send the link')}</button></div>
+      <p class="lg-links"><button class="linkbtn" data-lg="to-login">${L('Retour à la connexion', 'Back to sign in')}</button></p>`;
+    else body = `<h2 id="lg-t">${L('Connexion', 'Sign in')}</h2>
+      <p class="lg-lead">${L('Connectez-vous pour retrouver votre collection, vos decks et votre campagne.', 'Sign in to find your collection, decks and campaign.')}</p>
+      ${mail}${pass('lg-pass', 'current-password', L('Mot de passe', 'Password'))}
+      <div class="lg-acts"><button class="btn solid big" data-lg="signin">${L('Se connecter', 'Sign in')}</button></div>
+      <p class="lg-links"><button class="linkbtn" data-lg="to-signup">${L('Créer un compte', 'Create an account')}</button><button class="linkbtn" data-lg="to-forgot">${L('Mot de passe oublié ?', 'Forgot password?')}</button></p>`;
   }
   el.innerHTML = `<div class="lg-box" role="dialog" aria-modal="true" aria-labelledby="lg-t">
     ${pkArt('logo') ? `<img class="lg-logo" src="${pkArt('logo')}" alt="">` : ''}
@@ -7666,13 +7689,13 @@ function renderLogin() {
     <p class="lg-msg ${LG.bad ? 'ko' : ''}" role="status">${LG.msg}</p>
     ${ses ? '' : `<p class="lg-note">${L("Un compte est nécessaire pour jouer : votre collection et votre progression sont gardées sur le serveur, et vous les retrouvez sur tous vos appareils.", 'An account is required to play: your collection and progress are kept on the server, and you find them on all your devices.')}</p>`}
     ${ses && !LG.auto ? `<button class="set-x lg-x" data-lg="close" aria-label="${L('Fermer', 'Close')}">✕</button>` : ''}</div>`;
-  const f = el.querySelector('#lg-code') || el.querySelector('#lg-mail') || el.querySelector('[data-lg="play"], [data-lg="retry"]');
+  const f = (el.querySelector('#lg-mail') && !el.querySelector('#lg-mail').value ? el.querySelector('#lg-mail') : el.querySelector('#lg-pass')) || el.querySelector('#lg-mail') || el.querySelector('[data-lg="play"], [data-lg="retry"]');
   if (f) f.focus({ preventScroll: true });
 }
 function openLogin(auto) {
   const el = document.getElementById('login');
   LG.auto = !!auto; LG.msg = ''; LG.bad = false;
-  if (!CLOUD_EMAIL) LG.step = 'mail';
+  if (!LG.step || LG.step === 'mail' || LG.step === 'code') LG.step = 'login';
   el.classList.add('on'); renderLogin();
 }
 function closeLogin() {
@@ -7692,19 +7715,31 @@ function loginAtStart() {
 }
 function loginSay(t, bad) { LG.msg = t; LG.bad = !!bad; const m = document.querySelector('#login .lg-msg'); if (m) { m.textContent = t; m.classList.toggle('ko', !!bad); } }
 async function loginAct(a) {
-  if (a === 'send' || a === 'resend') {
-    const m = a === 'send' ? document.getElementById('lg-mail').value.trim() : CLOUD_EMAIL;
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)) return loginSay(L("Cette adresse e-mail n'est pas valide.", 'This e-mail address is not valid.'), true);
-    loginSay(L('Envoi…', 'Sending…'));
-    try { await cloudSendCode(m, location.protocol.startsWith('http') ? location.origin + location.pathname : null); CLOUD_EMAIL = m; cloudSet({ lastMail: m }); LG.step = 'code'; LG.msg = a === 'resend' ? L('Nouvel e-mail envoyé.', 'New e-mail sent.') : ''; LG.bad = false; renderLogin(); }
-    catch (e) { loginSay(e.status === 429 ? L('Trop de demandes : attendez quelques minutes avant de redemander un code.', 'Too many requests: wait a few minutes before asking for a new code.') : L(`Envoi impossible : ${e.message}`, `Could not send: ${e.message}`), true); }
-  } else if (a === 'verify') {
-    const c = document.getElementById('lg-code').value.trim();
-    if (!/token=/.test(c) && c.replace(/\D/g, '').length < 6) return loginSay(L("Entrez le code reçu par e-mail, ou collez le lien de connexion.", 'Enter the code from the e-mail, or paste the sign-in link.'), true);
-    loginSay(L('Connexion…', 'Signing in…'));
-    try { await cloudVerify(CLOUD_EMAIL, c); CLOUD_EMAIL = ''; LG.step = 'mail'; cloudSet({ synced: '', hash: '', skip: false }); LG.msg = L('✓ Connecté. Synchronisation de votre progression…', '✓ Signed in. Syncing your progress…'); LG.bad = false; renderLogin(); await cloudSync(true); LG.msg = ''; renderLogin(); }
-    catch (e) { loginSay(L("Code ou lien refusé : il ne sert qu'une fois et expire au bout d'une heure. Vérifiez-le ou demandez-en un nouveau.", 'Code or link rejected: it works only once and expires after an hour. Check it or ask for a new one.'), true); }
-  } else if (a === 'back') { CLOUD_EMAIL = ''; LG.step = 'mail'; LG.msg = ''; renderLogin(); }
+  const val = id => (document.getElementById(id) || {}).value || '';
+  const okMail = m => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m);
+  if (a === 'to-login' || a === 'to-signup' || a === 'to-forgot') { const m = val('lg-mail').trim(); if (m) cloudSet({ lastMail: m }); LG.step = a.slice(3); LG.msg = ''; LG.bad = false; return renderLogin(); }
+  if (a === 'eye') { for (const x of document.querySelectorAll('#login input[id^="lg-pass"]')) x.type = x.type === 'password' ? 'text' : 'password'; return; }
+  if (a === 'signin' || a === 'signup') {
+    const m = val('lg-mail').trim(), p = val('lg-pass');
+    if (!okMail(m)) return loginSay(L("Cette adresse e-mail n'est pas valide.", 'This e-mail address is not valid.'), true);
+    if (p.length < (a === 'signup' ? 8 : 1)) return loginSay(a === 'signup' ? L('Le mot de passe doit faire au moins 8 caractères.', 'The password must be at least 8 characters.') : L('Entrez votre mot de passe.', 'Enter your password.'), true);
+    if (a === 'signup' && p !== val('lg-pass2')) return loginSay(L('Les deux mots de passe ne sont pas identiques.', 'The two passwords do not match.'), true);
+    cloudSet({ lastMail: m });
+    loginSay(a === 'signup' ? L('Création du compte…', 'Creating the account…') : L('Connexion…', 'Signing in…'));
+    try {
+      if (a === 'signup' && !await cloudSignUp(m, p)) { LG.step = 'login'; LG.msg = L(`Compte créé. Un e-mail de confirmation a été envoyé à ${m} : cliquez sur son lien, puis connectez-vous ici.`, `Account created. A confirmation e-mail was sent to ${m}: click its link, then sign in here.`); LG.bad = false; return renderLogin(); }
+      if (a === 'signin') await cloudSignIn(m, p);
+      cloudSet({ synced: '', hash: '' }); renderCloud();
+      return loginAct('play');   // connecté : on charge la progression et on joue (ce clic a aussi lancé la musique)
+    } catch (e) { return loginSay(authErr(e), true); }
+  }
+  if (a === 'recover') {
+    const m = val('lg-mail').trim();
+    if (!okMail(m)) return loginSay(L("Cette adresse e-mail n'est pas valide.", 'This e-mail address is not valid.'), true);
+    cloudSet({ lastMail: m }); loginSay(L('Envoi…', 'Sending…'));
+    try { await cloudRecover(m); LG.step = 'login'; LG.msg = L(`Si un compte existe pour ${m}, un e-mail vient de partir. Son lien ouvre le site du jeu pour choisir un nouveau mot de passe.`, `If an account exists for ${m}, an e-mail is on its way. Its link opens the game website to choose a new password.`); LG.bad = false; return renderLogin(); }
+    catch (e) { return loginSay(authErr(e), true); }
+  }
   else if (a === 'sync') { loginSay(L('Synchronisation…', 'Syncing…')); await cloudSync(true); LG.msg = ''; renderLogin(); }
   else if (a === 'out' && confirm(L('Se déconnecter ? Vos données restent sur cet appareil et dans votre compte.', 'Sign out? Your data stays on this device and in your account.'))) {
     const ses = cloudSession();
@@ -7751,8 +7786,7 @@ if (!HEADLESS) {
   lg.addEventListener('keydown', e => {
     if (!['Tab', 'Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) music();
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (!LG.auto) closeLogin(); return; }
-    if (e.key === 'Enter' && e.target.id === 'lg-mail') { e.preventDefault(); loginAct('send'); }
-    if (e.key === 'Enter' && e.target.id === 'lg-code') { e.preventDefault(); loginAct('verify'); }
+    if (e.key === 'Enter' && /^lg-(mail|pass2?)$/.test(e.target.id)) { e.preventDefault(); const b = lg.querySelector('[data-lg="signin"], [data-lg="signup"], [data-lg="recover"]'); if (b) b.click(); }
     if (e.key === 'Tab') { const f = [...lg.querySelectorAll('button, input')]; if (!f.length) return; const i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } }
   });
   document.getElementById('cloud-row').addEventListener('click', e => { if (e.target.closest('[data-cloud="open"]')) { closeSettings(); openLogin(false); } });

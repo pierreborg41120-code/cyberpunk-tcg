@@ -1,7 +1,7 @@
 // Cyberpunk TCG — fonctionnement hors connexion.
 // Le jeu (un seul gros fichier) est gardé sur l'appareil ; publish.sh change VERSION à chaque mise à jour,
 // ce qui fait télécharger la nouvelle version en arrière-plan.
-const VERSION = '440fbf8121';
+const VERSION = 'fd63bd371a';
 const CACHE = 'cptcg-' + VERSION;
 const EXT = 'cptcg-ext';   // polices et PeerJS (sites externes)
 const MUS = 'cptcg-musique';   // musiques et vidéo d'accueil : téléchargées au premier passage, gardées d'une version à l'autre
@@ -31,6 +31,8 @@ self.addEventListener('fetch', e => {
   }
   if (u.origin === location.origin) {
     // Le jeu s'ouvre depuis l'appareil (instantané, même hors connexion).
+    // La page de connexion vient toujours du réseau (elle a besoin du serveur de toute façon).
+    if (r.mode === 'navigate' && u.pathname.endsWith('/connexion.html')) { e.respondWith(fetch(r).catch(() => caches.match(r))); return; }
     if (r.mode === 'navigate') { e.respondWith(caches.match('./').then(h => h || fetch(r))); return; }
     e.respondWith(caches.match(r, { ignoreSearch: true }).then(h => h || fetch(r)));
     return;

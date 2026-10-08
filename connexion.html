@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connexion — Cyberpunk TCG</title>
+<meta name="theme-color" content="#07080d">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080d;--panel:#0b0d13;--line:#232838;--ylw:#fcee0a;--cyan:#00e5ff;--red:#ff4b5c;--green:#3ddc84;--txt:#e6e8ef;--mut:#8b92a6}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:var(--bg);color:var(--txt);font:500 16px/1.45 'Rajdhani',system-ui,sans-serif;
+  background-image:linear-gradient(rgba(252,238,10,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(252,238,10,.035) 1px,transparent 1px),radial-gradient(ellipse at 50% 0%,rgba(0,229,255,.10),transparent 60%);
+  background-size:44px 44px,44px 44px,100% 100%}
+.wrap{width:min(440px,100%)}
+.brand{margin:0 0 22px}
+.brand h1{margin:0;font:700 clamp(34px,9vw,46px)/1 'Chakra Petch',sans-serif;letter-spacing:.02em;color:var(--ylw);text-transform:uppercase;text-shadow:3px 3px 0 rgba(0,229,255,.35)}
+.brand p{margin:8px 0 0;display:flex;align-items:center;gap:10px;font:600 13px 'Chakra Petch',sans-serif;letter-spacing:.12em;color:var(--mut);text-transform:uppercase}
+.brand p i{display:inline-block;width:28px;height:8px;background:repeating-linear-gradient(-45deg,var(--ylw) 0 5px,transparent 5px 10px)}
+.card{position:relative;padding:26px 26px 22px;background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--ylw);
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.tabs{display:flex;gap:4px;margin:0 0 20px;border-bottom:1px solid var(--line)}
+.tabs button{all:unset;cursor:pointer;padding:8px 2px 10px;margin-right:18px;font:600 15px 'Chakra Petch',sans-serif;color:var(--mut);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--txt);border-color:var(--ylw)}
+.tabs button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+h2{margin:0 0 6px;font:700 24px 'Chakra Petch',sans-serif;color:var(--txt)}
+.lead{margin:0 0 18px;color:#c9cddb}
+label{display:block;margin:0 0 14px}
+label>span{display:block;margin-bottom:5px;font:600 13px 'Chakra Petch',sans-serif;letter-spacing:.04em;color:var(--mut)}
+.field{display:flex}
+input{flex:1;min-width:0;width:100%;padding:11px 12px;background:#05070c;border:1.5px solid #2a3044;color:#fff;font:500 18px 'Rajdhani',sans-serif;outline:none;border-radius:0}
+input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.18)}
+.eye{flex:none;padding:0 12px;background:#05070c;border:1.5px solid #2a3044;border-left:0;color:var(--mut);font:600 12px 'Chakra Petch',sans-serif;cursor:pointer}
+.eye:hover,.eye:focus-visible{color:var(--cyan);outline:none}
+.go{display:block;width:100%;margin-top:6px;padding:13px 16px;border:0;cursor:pointer;background:var(--ylw);color:#000;font:700 15px 'Chakra Petch',sans-serif;letter-spacing:.14em;text-transform:uppercase;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.go:hover{filter:brightness(1.08)}.go:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.go[disabled]{opacity:.6;cursor:wait}
+.links{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin:14px 0 0}
+.link{all:unset;cursor:pointer;color:var(--cyan);font-size:15px;text-decoration:underline;text-underline-offset:3px}
+.link:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.msg{margin:14px 0 0;padding:9px 11px;border-left:3px solid var(--cyan);background:#0f1420;font-size:15px}
+.msg:empty{display:none}.msg.ko{border-color:var(--red);color:#ffb3bb}.msg.ok{border-color:var(--green)}
+.foot{margin:18px 2px 0;color:var(--mut);font-size:13.5px}
+.foot a{color:var(--mut)}
+.lang{all:unset;cursor:pointer;float:right;margin-top:-2px;font:600 12px 'Chakra Petch',sans-serif;color:var(--mut);letter-spacing:.08em}
+.lang:hover,.lang:focus-visible{color:var(--cyan)}
+@media (max-width:420px){.card{padding:22px 18px 18px}}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .35s ease-out both}@keyframes in{from{opacity:0;transform:translateY(8px)}}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="brand"><h1>Cyberpunk TCG</h1><p><i aria-hidden="true"></i><span id="sub">Simulateur non officiel</span></p></header>
+  <section class="card" aria-labelledby="t">
+    <button class="lang" id="lang" type="button">EN</button>
+    <div id="view"></div>
+    <p class="msg" id="msg" role="status" aria-live="polite"></p>
+  </section>
+  <p class="foot" id="foot"></p>
+</main>
+<script>
+'use strict';
+// Page de connexion du site : e-mail et mot de passe (Supabase). Une fois connecté, direction le jeu.
+// La session est rangée là où le jeu la cherche (cptcg-cloud), à la même adresse.
+const CLOUD = { url: 'https://rrjpougtknbentlsfaga.supabase.co', key: 'sb_publishable_Doyjah4Iy-HaJQjXbCV0UQ_evpNkVZ7' };
+const KEY = 'cptcg-cloud', GAME = './';
+let lang = 'fr'; try { lang = localStorage.getItem('cptcg-lang') === 'en' ? 'en' : (localStorage.getItem('cptcg-lang') ? 'fr' : (navigator.language || 'fr').startsWith('fr') ? 'fr' : 'en'); } catch (e) {}
+const L = (fr, en) => lang === 'en' ? en : fr;
+const state = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } };
+const setState = p => { try { localStorage.setItem(KEY, JSON.stringify({ ...state(), ...p })); } catch (e) {} };
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const back = () => location.origin + location.pathname;   // les liens des e-mails reviennent ici
+let step = 'login', recoveryToken = null, busy = false;
+
+async function api(path, { method = 'POST', body, token } = {}) {
+  const h = { apikey: CLOUD.key, 'Content-Type': 'application/json' };
+  if (token) h.Authorization = 'Bearer ' + token;
+  const r = await fetch(CLOUD.url + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
+  const txt = await r.text(); let j = null; try { j = txt ? JSON.parse(txt) : null; } catch (e) {}
+  if (!r.ok) { const e = new Error((j && (j.msg || j.message || j.error_description || j.error)) || ('HTTP ' + r.status)); e.status = r.status; e.code = j && (j.error_code || j.code); throw e; }
+  return j;
+}
+function keep(j, email) {
+  setState({ session: { access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Date.now() + (j.expires_in || 3600) * 1000, user_id: j.user && j.user.id, email: (j.user && j.user.email) || email },
+    synced: '', hash: '', lastMail: (j.user && j.user.email) || email });
+}
+function errText(e) {
+  const m = String(e.message || ''), c = e.code || '';
+  if (c === 'invalid_credentials' || /invalid login/i.test(m)) return L('E-mail ou mot de passe incorrect.', 'Wrong e-mail or password.');
+  if (c === 'email_not_confirmed' || /not confirmed/i.test(m)) return L("Adresse pas encore confirmée : cliquez sur le lien de l'e-mail de confirmation, puis connectez-vous.", 'Address not confirmed yet: click the link in the confirmation e-mail, then sign in.');
+  if (c === 'user_already_exists' || /already registered|already exists/i.test(m)) return L('Un compte existe déjà avec cette adresse : connectez-vous, ou utilisez « Mot de passe oublié ».', 'An account already exists with this address: sign in, or use "Forgot password".');
+  if (c === 'weak_password' || /password should|at least|weak/i.test(m)) return L('Mot de passe trop faible : au moins 8 caractères.', 'Password too weak: at least 8 characters.');
+  if (c === 'same_password') return L("Choisissez un mot de passe différent de l'ancien.", 'Choose a password different from the old one.');
+  if (e.status === 429 || /rate limit/i.test(m)) return L('Trop de tentatives : attendez quelques minutes.', 'Too many attempts: wait a few minutes.');
+  if (/sending|smtp/i.test(m)) return L("Le serveur n'a pas réussi à envoyer l'e-mail. Réessayez plus tard.", 'The server could not send the e-mail. Try again later.');
+  if (/fetch|network/i.test(m)) return L('Serveur injoignable : vérifiez votre connexion internet.', 'Server unreachable: check your internet connection.');
+  return L(`Erreur : ${m}`, `Error: ${m}`);
+}
+function say(t, kind) { const m = document.getElementById('msg'); m.textContent = t; m.className = 'msg' + (kind ? ' ' + kind : ''); }
+
+function render() {
+  document.documentElement.lang = lang;
+  document.getElementById('sub').textContent = L('Simulateur non officiel', 'Unofficial simulator');
+  document.getElementById('lang').textContent = lang === 'en' ? 'FR' : 'EN';
+  document.getElementById('lang').setAttribute('aria-label', lang === 'en' ? 'Français' : 'English');
+  document.getElementById('foot').textContent = L('Votre collection, vos decks et votre progression sont gardés sur le serveur : vous les retrouvez sur tous vos appareils.', 'Your collection, decks and progress are kept on the server: you find them on all your devices.');
+  const mail = `<label><span>${L('Adresse e-mail', 'E-mail address')}</span><input id="mail" type="email" autocomplete="email" required value="${esc(state().lastMail || '')}" placeholder="${L('vous@exemple.fr', 'you@example.com')}"></label>`;
+  const pass = (id, ac, lbl) => `<label><span>${lbl}</span><span class="field"><input id="${id}" type="password" autocomplete="${ac}" required minlength="${ac === 'new-password' ? 8 : 1}"><button class="eye" type="button" data-a="eye" aria-label="${L('Afficher le mot de passe', 'Show password')}">${L('Afficher', 'Show')}</button></span></label>`;
+  const tabs = `<div class="tabs" role="tablist"><button role="tab" type="button" data-a="tab-login" aria-selected="${step === 'login'}">${L('Connexion', 'Sign in')}</button><button role="tab" type="button" data-a="tab-signup" aria-selected="${step === 'signup'}">${L('Créer un compte', 'Create an account')}</button></div>`;
+  let h;
+  if (step === 'reset') h = `<h2 id="t">${L('Nouveau mot de passe', 'New password')}</h2><p class="lead">${L('Choisissez votre nouveau mot de passe.', 'Choose your new password.')}</p>
+    <form novalidate data-f="reset">${pass('pass', 'new-password', L('Nouveau mot de passe (8 caractères minimum)', 'New password (8 characters minimum)'))}${pass('pass2', 'new-password', L('Confirmer le mot de passe', 'Confirm the password'))}
+    <button class="go" type="submit">${L('Enregistrer et jouer', 'Save and play')}</button></form>`;
+  else if (step === 'forgot') h = `<h2 id="t">${L('Mot de passe oublié', 'Forgot password')}</h2><p class="lead">${L('Vous recevrez un e-mail avec un lien pour choisir un nouveau mot de passe.', 'You will get an e-mail with a link to choose a new password.')}</p>
+    <form novalidate data-f="forgot">${mail}<button class="go" type="submit">${L('Envoyer le lien', 'Send the link')}</button></form>
+    <div class="links"><button class="link" type="button" data-a="tab-login">${L('Retour à la connexion', 'Back to sign in')}</button></div>`;
+  else if (step === 'signup') h = `${tabs}<h2 id="t" class="sr">${L('Créer un compte', 'Create an account')}</h2>
+    <form novalidate data-f="signup">${mail}${pass('pass', 'new-password', L('Mot de passe (8 caractères minimum)', 'Password (8 characters minimum)'))}${pass('pass2', 'new-password', L('Confirmer le mot de passe', 'Confirm the password'))}
+    <button class="go" type="submit">${L('Créer mon compte', 'Create my account')}</button></form>`;
+  else h = `${tabs}<h2 id="t" class="sr">${L('Connexion', 'Sign in')}</h2>
+    <form novalidate data-f="login">${mail}${pass('pass', 'current-password', L('Mot de passe', 'Password'))}<button class="go" type="submit">${L('Se connecter', 'Sign in')}</button></form>
+    <div class="links"><button class="link" type="button" data-a="tab-forgot">${L('Mot de passe oublié ?', 'Forgot password?')}</button></div>`;
+  document.getElementById('view').innerHTML = h;
+  const m = document.getElementById('mail'), p = document.getElementById('pass');
+  (m && !m.value ? m : p || m).focus();
+}
+
+async function submit(kind) {
+  if (busy) return;
+  const v = id => (document.getElementById(id) || {}).value || '';
+  const email = v('mail').trim(), p = v('pass');
+  if (kind !== 'reset' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say(L("Cette adresse e-mail n'est pas valide.", 'This e-mail address is not valid.'), 'ko');
+  if ((kind === 'signup' || kind === 'reset') && p.length < 8) return say(L('Le mot de passe doit faire au moins 8 caractères.', 'The password must be at least 8 characters.'), 'ko');
+  if ((kind === 'signup' || kind === 'reset') && p !== v('pass2')) return say(L('Les deux mots de passe ne sont pas identiques.', 'The two passwords do not match.'), 'ko');
+  if (kind === 'login' && !p) return say(L('Entrez votre mot de passe.', 'Enter your password.'), 'ko');
+  if (email) setState({ lastMail: email });
+  busy = true; const btn = document.querySelector('.go'); btn.disabled = true;
+  say(L('Un instant…', 'One moment…'));
+  try {
+    if (kind === 'login') { keep(await api('/auth/v1/token?grant_type=password', { body: { email, password: p } }), email); return go(); }
+    if (kind === 'signup') {
+      const j = await api('/auth/v1/signup?redirect_to=' + encodeURIComponent(back()), { body: { email, password: p } });
+      if (j && j.access_token) { keep(j, email); return go(); }
+      step = 'login'; render(); return say(L(`Compte créé. Un e-mail de confirmation vient d'être envoyé à ${email} : cliquez sur son lien (pensez aux courriers indésirables).`, `Account created. A confirmation e-mail was sent to ${email}: click its link (check your spam folder).`), 'ok');
+    }
+    if (kind === 'forgot') {
+      await api('/auth/v1/recover?redirect_to=' + encodeURIComponent(back()), { body: { email } });
+      step = 'login'; render(); return say(L(`Si un compte existe pour ${email}, un e-mail vient de partir avec un lien pour choisir un nouveau mot de passe.`, `If an account exists for ${email}, an e-mail is on its way with a link to choose a new password.`), 'ok');
+    }
+    if (kind === 'reset') {
+      await api('/auth/v1/user', { method: 'PUT', body: { password: p }, token: recoveryToken.access_token });
+      keep(recoveryToken); return go();
+    }
+  } catch (e) { say(errText(e), 'ko'); }
+  finally { busy = false; const b = document.querySelector('.go'); if (b) b.disabled = false; }
+}
+function go() { say(L('✓ Connecté. Ouverture du jeu…', '✓ Signed in. Opening the game…'), 'ok'); location.replace(GAME); }
+
+document.addEventListener('submit', e => { const f = e.target.closest('[data-f]'); if (f) { e.preventDefault(); submit(f.dataset.f); } });
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-a]'); if (!b) return;
+  const a = b.dataset.a;
+  if (a === 'eye') { for (const x of document.querySelectorAll('input[id^="pass"]')) x.type = x.type === 'password' ? 'text' : 'password'; b.textContent = b.textContent === L('Afficher', 'Show') ? L('Masquer', 'Hide') : L('Afficher', 'Show'); return; }
+  if (a.startsWith('tab-')) { const m = document.getElementById('mail'); if (m && m.value) setState({ lastMail: m.value.trim() }); step = a.slice(4); say(''); render(); }
+});
+document.addEventListener('keydown', e => {
+  const t = e.target.closest('[role="tab"]'); if (!t || !/^Arrow(Left|Right)$/.test(e.key)) return;
+  e.preventDefault(); step = step === 'login' ? 'signup' : 'login'; render(); document.querySelector('[role="tab"][aria-selected="true"]').focus();
+});
+document.getElementById('lang').onclick = () => { lang = lang === 'en' ? 'fr' : 'en'; try { localStorage.setItem('cptcg-lang', lang); } catch (e) {} render(); };
+
+// Arrivée par un lien d'e-mail (#access_token=…) : confirmation d'adresse → connecté ; nouveau mot de passe → formulaire.
+const start = async () => {
+  if (/access_token=/.test(location.hash)) {
+    const q = new URLSearchParams(location.hash.slice(1));
+    history.replaceState(null, '', location.pathname + location.search);
+    const tok = { access_token: q.get('access_token'), refresh_token: q.get('refresh_token'), expires_in: +q.get('expires_in') || 3600 };
+    try { tok.user = await api('/auth/v1/user', { method: 'GET', token: tok.access_token }); } catch (e) { render(); return say(L('Ce lien a expiré ou a déjà servi. Connectez-vous, ou demandez un nouveau lien.', 'This link has expired or was already used. Sign in, or ask for a new link.'), 'ko'); }
+    if (q.get('type') === 'recovery') { recoveryToken = tok; step = 'reset'; render(); return; }
+    keep(tok); return go();
+  }
+  if (/error_description=/.test(location.hash)) {
+    const q = new URLSearchParams(location.hash.slice(1)); history.replaceState(null, '', location.pathname + location.search);
+    render(); return say(L('Ce lien a expiré ou a déjà servi. Connectez-vous, ou demandez un nouveau lien.', 'This link has expired or was already used. Sign in, or ask for a new link.') + ' (' + q.get('error_description') + ')', 'ko');
+  }
+  if (state().session) return location.replace(GAME);   // déjà connecté
+  render();
+};
+start();
+addEventListener('hashchange', () => { if (/access_token=|error_description=/.test(location.hash)) start(); });   // lien ouvert dans un onglet déjà sur cette page
+</script>
+<style>.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}</style>
+</body>
+</html>
