@@ -8770,14 +8770,12 @@ function firstRunOffer() {
   m.innerHTML = `<div class="mbox firstrun" role="dialog" aria-modal="true" aria-labelledby="fr-t"><h3 id="fr-t">${L('Première fois à Night City ?', 'First time in Night City?')}</h3>
     <p>${L("Le tutoriel vous fait visiter le plateau, puis vous jouez une vraie partie contre une IA facile, avec un conseil à chaque étape. Comptez une dizaine de minutes.", 'The tutorial shows you around the board, then you play a real game against an easy AI, with a tip at every step. It takes about ten minutes.')}</p>
     <div class="opts"><button class="opt" data-fr="go">${L('Lancer le tutoriel', 'Start the tutorial')}</button><button class="opt plain cancel" data-fr="skip">${L('Passer, je connais le jeu', 'Skip, I know the game')}</button></div>
-    <p class="fr-note">${L('Vous avez déjà joué sur un autre appareil ou une autre copie du jeu ?', 'Already played on another device or another copy of the game?')} <button class="linkbtn" data-fr="restore">${L('Récupérer une sauvegarde', 'Restore a backup')}</button></p>
     <p class="fr-note">${L('Vous le retrouverez à tout moment dans les Paramètres.', 'You can find it at any time in Settings.')}</p></div>`;
   m.classList.add('on');
   m.onclick = e => {
     const b = e.target.closest('[data-fr]'); if (!b) return;
     m.classList.remove('on'); m.innerHTML = ''; m.onclick = null;
     if (b.dataset.fr === 'go') startTutorial();
-    else if (b.dataset.fr === 'restore') { setTuto('skip'); if (navigator.onLine) openLogin(false); else { openSettings(document.getElementById('b-settings2')); const fi = document.getElementById('data-file'); fi.value = ''; fi.click(); } }
     else { setTuto('skip'); const f = document.querySelector('#mm-nav .mm-item.on'); if (f) f.focus(); }
   };
   const f = m.querySelector('[data-fr="go"]'); if (f) f.focus();
