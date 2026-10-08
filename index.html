@@ -2,6 +2,8 @@
 <html lang="fr">
 <head>
 <script>
+// Le jeu se joue sur le site : ouvert depuis le disque, il y renvoie (pour un aperçu local, lancer apercu.sh).
+if (location.protocol === 'file:') location.replace('https://pierreborg41120-code.github.io/cyberpunk-tcg/');
 // Site : sans compte connecté, on passe d'abord par la page de connexion (bien plus légère que le jeu).
 (function () { try { if (/^https?:$/.test(location.protocol) && !/access_token=/.test(location.hash) && !(JSON.parse(localStorage.getItem('cptcg-cloud') || '{}') || {}).session) location.replace('connexion.html'); } catch (e) {} })();
 </script>
@@ -585,6 +587,22 @@ body.calm .mp.playing .mp-eq i{animation:none;height:70%}
 .cp-lock{margin:14px 22px;color:var(--mut)}
 .cp-end{margin:12px 22px;color:var(--ylw);font-weight:600}
 .cp-rules{margin:12px 22px 18px;font-size:13px;color:var(--mut)}
+.cp-opp,.cp-side{margin:12px 22px 0;padding:12px 14px;border:1px solid #2a3044;background:rgba(8,10,18,.75)}
+.cp-opp h4,.cp-side h4{margin:0 0 8px;font:700 16px 'Chakra Petch',sans-serif;color:#fff}
+.cp-opp h4 small{margin-left:6px;font:600 13px 'Rajdhani',sans-serif;color:var(--cc,var(--ylw))}
+.cp-oleg{display:flex;flex-wrap:wrap;gap:8px 14px;margin:0 0 8px}
+.cp-ol{display:inline-flex;align-items:center;gap:8px;font:600 15px 'Rajdhani',sans-serif;color:#fff;cursor:default}
+.cp-ol i{width:34px;height:34px;border-radius:50%;border:2px solid #2a3044;background-color:#141824;background-position:center 20%;background-size:cover}
+.cp-ost{margin:0 0 6px;font-size:15px;color:#d6d9e4}.cp-ost b{margin-right:6px;color:var(--cc,var(--ylw))}
+.cp-omore{margin:0 0 6px;font-size:14px;color:#c9cdd8}
+.cp-oc{display:inline-block;padding:0 7px;border-left:3px solid var(--oc);background:#141824;font-size:13px}
+.cp-olist,.cp-sopp{margin-top:6px;font-size:14px;color:#c9cdd8}
+.cp-olist summary,.cp-sopp summary{cursor:pointer;color:var(--cyan)}
+.cp-olist p{margin:6px 0}.cp-olist b{display:block;color:#fff;font-size:13px}
+.cp-sopp .cp-opp{margin:8px 0 0}
+.cp-side .cp-go{margin:8px 0 0}
+.cp-sgoal{margin:0 0 6px;font:600 17px 'Rajdhani',sans-serif;color:var(--ylw)}
+.cp-side.done .cp-sgoal{color:#d6d9e4}
 .cp-win{border-color:var(--ylw);background:rgba(252,238,10,.1)}
 @media (max-width:900px){.cp-main{grid-template-columns:1fr}.cp-route{flex-direction:row;overflow-x:auto;gap:6px}.cp-route::before{display:none}.cp-d{flex:none;width:170px}.cp-prog .bar{width:90px}.cp-head h3{font-size:30px}}
 .mm-news{position:relative;padding:9px 34px 10px 12px;background:rgba(36,6,30,.9);border:1.5px solid var(--mag);font-size:13.5px;line-height:1.4;color:#f0d9ec}
@@ -602,8 +620,6 @@ body.calm .mp.playing .mp-eq i{animation:none;height:70%}
 .quitbox .opt.danger{border-color:var(--red);color:#ffc2c8}.quitbox .opt.danger:hover{background:var(--red);color:#fff}.quitbox .opt.danger:hover small{color:#ffe0e3}
 .quitbox .opt small{display:block;font-weight:400;font-size:12.5px;color:var(--mut);margin-top:2px;text-transform:none;letter-spacing:0}
 @media (max-width:860px){.mm-h,.mm-cur,.mm-foot,.mm-news{grid-column:1/-1}.mm-h{margin-top:4px}}
-.isocopy{max-width:820px;margin:0 auto 10px;padding:9px 14px;border:1.5px solid var(--red);border-left-width:4px;background:rgba(40,6,12,.88);font-size:14px;line-height:1.45;color:#f1d4d8;text-align:left}
-.isocopy b{display:block;color:#ff8a96;font-family:'Chakra Petch';font-size:15px}
 .mm-badge{position:absolute;top:10px;right:14px;min-width:24px;height:24px;padding:0 6px;display:grid;place-items:center;font:700 13px 'Chakra Petch',sans-serif;font-style:normal;background:var(--mag);color:#fff;box-shadow:0 0 12px rgba(255,43,214,.6)}
 .mm-badge[hidden]{display:none}
 .mm-item.on .mm-badge{background:#000;color:var(--ylw)}
@@ -1077,10 +1093,69 @@ label.set-row{cursor:pointer}
 .ad-tbl th,.ad-tbl td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
 .ad-tbl th{font:600 13px 'Chakra Petch',sans-serif;color:var(--mut)}
 .ad-tbl td.n,.ad-tbl th.n{text-align:right;font-variant-numeric:tabular-nums}
-.ad-sec{margin:24px 0 0}
+.ad-sec{margin:24px 0 0;scroll-margin-top:90px}
 .ad-sec h3{margin:0 0 6px;font:700 17px 'Chakra Petch',sans-serif;color:#fff}
 .ad-sec p{margin:0 0 6px;color:var(--mut);font-size:14px}
 /* invitation reçue */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* tableau de bord : agir sur un compte */
+.ac-blk{margin:0 0 14px;padding:10px 12px;border-left:3px solid var(--red);background:rgba(40,6,12,.8);color:#ffd0d5}
+.ad-find,.ad-wadd{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px}
+.ad-find input,.ad-wadd input,.tr-filter input[type="search"]{flex:1 1 220px;padding:9px 12px;background:#05070c;border:1.5px solid #2a3044;color:#fff;font:500 16.5px 'Rajdhani',sans-serif}
+.ad-find input:focus,.ad-wadd input:focus,.tr-filter input[type="search"]:focus{outline:none;border-color:var(--cyan)}
+.ad-pls{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ad-pl{padding:10px 12px;background:#0b0d13;border:1px solid var(--line)}
+.ad-pl.blk{box-shadow:inset 3px 0 0 var(--red)}
+.ad-pl-h{display:flex;gap:4px 10px;align-items:baseline;flex-wrap:wrap}
+.ad-pl-h b{font:700 17px 'Chakra Petch',sans-serif;color:#fff}
+.ad-pl-h span{color:var(--mut);font-size:14px}
+.ad-pl-h .ad-tag{color:#ffb3bb;font-weight:600}
+.ad-pl-s{margin:4px 0 8px;color:#c9cdd8;font-size:14.5px}
+.ad-pl .sc-acts{justify-content:flex-start}
+.ad-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.ad-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 3px 2px 10px;background:#141824;border:1px solid var(--line);font-size:14.5px;color:#e6e8ef}
+.ad-chip button{all:unset;cursor:pointer;width:24px;height:24px;display:grid;place-items:center;color:var(--mut)}
+.ad-chip button:hover,.ad-chip button:focus-visible{color:#fff;background:var(--red)}
+.ad-tbl .btn{padding:4px 8px;font-size:11.5px}
+/* échanges de cartes */
+.tr-rules{margin:0 0 14px;color:var(--mut);font-size:14.5px}
+.tr-bal{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:12px 14px;margin:0 0 12px;background:#0b0d13;border:1px solid var(--line);box-shadow:0 8px 20px rgba(0,0,0,.45)}
+.tr-side h4{margin:0;font:700 15px 'Chakra Petch',sans-serif;color:#fff}
+.tr-side small{color:var(--mut);font-size:13.5px}
+.tr-sel{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 0;min-height:28px}
+.tr-sel .ad-chip{font-size:13.5px}
+.tr-sel .none{color:var(--mut);font-size:13.5px;align-self:center}
+.tr-state{grid-column:1/-1;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.tr-state p{margin:0;font-size:14.5px;color:#b7f5cf}.tr-state p.ko{color:#ffb3bb}
+.tr-state .row{display:flex;gap:8px}
+.tr-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:12px}
+.tr-col{padding:10px 12px;background:#0b0d13;border:1px solid var(--line)}
+.tr-col h4{margin:0 0 4px;font:700 15px 'Chakra Petch',sans-serif;color:#fff}
+.tr-filter{display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center;margin:6px 0 8px;font-size:14.5px;color:#c9cdd8}
+.tr-filter label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.tr-filter input[type="checkbox"]{width:16px;height:16px;margin:0;accent-color:var(--cyan)}
+.tr-list{list-style:none;margin:0;padding:0;max-height:420px;overflow:auto;border-top:1px solid var(--line)}
+.tr-list li{display:grid;grid-template-columns:22px 1fr auto auto;gap:8px;align-items:center;padding:5px 2px;border-bottom:1px solid var(--line)}
+.tr-r{width:20px;height:20px;display:grid;place-items:center;font:700 11px 'Chakra Petch',sans-serif;color:#05070c;background:var(--rc)}
+.tr-n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:15.5px;cursor:default}
+.tr-n em{font-style:normal;color:var(--ylw);margin-left:6px;font-size:13px}
+.tr-n i{font-style:normal;color:var(--cyan);margin-left:6px;font-size:13px}
+.tr-q{color:var(--mut);font-size:13.5px;font-variant-numeric:tabular-nums}
+.tr-pm{display:flex;gap:3px;align-items:center}
+.tr-pm button{all:unset;cursor:pointer;width:28px;height:28px;display:grid;place-items:center;border:1px solid #2a3044;color:#fff;font-weight:700}
+.tr-pm button:hover:not(:disabled),.tr-pm button:focus-visible{border-color:var(--cyan)}
+.tr-pm button:disabled{opacity:.3;cursor:default}
+.tr-pm b{min-width:16px;text-align:center;color:var(--ylw);font-variant-numeric:tabular-nums}
+.tr-cards{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.tr-card{padding:10px 12px;background:#0b0d13;border:1px solid var(--line);display:grid;gap:8px}
+.tr-who{display:flex;gap:10px;align-items:center}
+.tr-who b{color:#fff;font:600 17px 'Rajdhani',sans-serif}
+.tr-who span{color:var(--mut);font-size:14px}
+.tr-who .done{color:#b7f5cf}.tr-who .ko{color:#ffb3bb}
+.tr-sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:14.5px;color:#e6e8ef}
+.tr-sum small{display:block;color:var(--mut);font-size:13px}
+.tr-card .sc-acts{justify-content:flex-start}
+@media (max-width:560px){.tr-bal,.tr-sum{grid-template-columns:1fr}}
 #invite-toast{position:fixed;right:16px;bottom:16px;z-index:65;width:min(380px,calc(100vw - 32px));padding:14px 16px;background:#0b0d13;border:1.5px solid var(--cyan);box-shadow:0 10px 40px rgba(0,0,0,.6),0 0 24px rgba(0,229,255,.18)}
 #invite-toast[hidden]{display:none}
 #invite-toast p{margin:0 0 10px;display:flex;align-items:center;gap:10px;color:#fff;font-size:16px}
@@ -3854,8 +3929,9 @@ function newGame(deckKey, opts = {}) {
   G.daily = opts.daily || null;
   G.campaign = opts.campaign ?? null;
   G.campMode = opts.campMode || null;
+  G.side = opts.side || null;   // mission secondaire de la campagne : { mode, k }
   if (!HEADLESS && !opts.bothAI && !opts.sandbox && !opts.tutorial) applyFoils(G.players[0]);
-  if (!opts.online && !opts.tutorial && !opts.sandbox && !opts.bothAI) G.replay = { deckKey, opts: { aiDeck: opts.aiDeck, level: opts.level, learn: opts.learn, daily: opts.daily, campaign: opts.campaign, campMode: opts.campMode } };
+  if (!opts.online && !opts.tutorial && !opts.sandbox && !opts.bothAI) G.replay = { deckKey, opts: { aiDeck: opts.aiDeck, level: opts.level, learn: opts.learn, daily: opts.daily, campaign: opts.campaign, campMode: opts.campMode, side: opts.side } };
   if (opts.learn) { G.learn = { key: typeof deckKey === 'string' && LEARN_DECKS[deckKey] ? deckKey : null, deck: deckKey }; G.advice = false; }
   G.gameId = Date.now().toString(36) + rnd(1e6).toString(36);
   // Le serveur note le début de la partie : sans ça (ou si elle dure moins de 45 s), elle ne rapporte rien.
@@ -4655,7 +4731,7 @@ function render() {
   const me = G.players[VIEW], ai = G.players[1 - VIEW];
   const cur = G.players[G.current];
   const phaseTxt = { setup: L('Mise en place', 'Setup'), start: 'Start Phase', main: 'Main Phase', end: L('Fin du tour', 'End of turn') }[G.phase];
-  document.getElementById('turninfo').innerHTML = `${L('Tour', 'Turn')} <b>${cur.turns}</b> · ${cur.idx === VIEW ? `<b>${cur.name}</b>` : `<b style="color:var(--red)">${cur.name}</b>`} · ${phaseTxt} ${G.overtime ? '<span class="ot">OVERTIME</span>' : ''}${G.daily ? ` <span class="dchip" title="${escAttr(L('Défi du jour', 'Daily challenge'))}">${L('Défi :', 'Challenge:')} ${esc(dailyText(dailyFor(G.daily)))}</span>` : ''}`;
+  document.getElementById('turninfo').innerHTML = `${L('Tour', 'Turn')} <b>${cur.turns}</b> · ${cur.idx === VIEW ? `<b>${cur.name}</b>` : `<b style="color:var(--red)">${cur.name}</b>`} · ${phaseTxt} ${G.overtime ? '<span class="ot">OVERTIME</span>' : ''}${G.daily ? ` <span class="dchip" title="${escAttr(L('Défi du jour', 'Daily challenge'))}">${L('Défi :', 'Challenge:')} ${esc(dailyText(dailyFor(G.daily)))}</span>` : ''}${G.side ? ` <span class="dchip" title="${escAttr(L('Mission secondaire', 'Side mission'))}">${L('Mission :', 'Mission:')} ${esc(sideText(G.side.k))}</span>` : ''}`;
   let status = `<span class="ph">…</span>`;
   if (G.over) status = `<span class="ph">${L('PARTIE TERMINÉE', 'GAME OVER')}</span> ${G.reason}`;
   else if (humanTurn()) status = L(`<span class="ph">À VOUS</span> Cliquez une carte de votre main pour la jouer/vendre${me.sold ? ' (vente déjà faite)' : ''}, une Unité <span style="color:var(--cyan)">en surbrillance</span> pour attaquer, une Légende face visible pour GO SOLO ou utiliser sa capacité ÉPUISER.`,
@@ -4709,13 +4785,14 @@ function render() {
   autosave();
   if (G.over && G.winner && !end.classList.contains('on') && !G.endShown) {
     G.endShown = true;
-    const rw = collReward(), dr = dailyResult(), cr = campResult();
+    const rw = collReward(), dr = dailyResult(), cr = campResult(), sr = sideResult();
+    G.sideOk = !!(sr && sr.ok);
     G.gainShown = true;
     dailyBadge();
     const win = G.winner.idx === VIEW;
     end.innerHTML = `<div class="box"><h1 class="${win ? 'win' : 'lose'}">${win ? L('VICTOIRE', 'VICTORY') : L('DÉFAITE', 'DEFEAT')}</h1><p style="font-size:18px">${G.reason}</p>
       <p style="color:var(--mut)">Gigs : ${me.name} ${me.gigs.length} — ${ai.name} ${ai.gigs.length}</p>
-      ${campHTML(cr)}${dailyHTML(dr)}${gainBox(rw)}<div class="endbtns">${cr && cr.win ? `<button class="btn solid big" onclick="openCamp()">${L('Continuer la campagne', 'Continue the campaign')}</button>` : cr ? `<button class="btn solid big" onclick="rematch()">${L('Retenter', 'Try again')}</button><button class="btn cy big" onclick="openCamp()">${L('Campagne', 'Campaign')}</button>`
+      ${campHTML(cr)}${dailyHTML(dr)}${sideEndHTML(sr)}${gainBox(rw)}<div class="endbtns">${cr && cr.win ? `<button class="btn solid big" onclick="openCamp()">${L('Continuer la campagne', 'Continue the campaign')}</button>` : sr ? (sr.ok ? `<button class="btn solid big" onclick="openCamp()">${L('Retour à la campagne', 'Back to the campaign')}</button>` : `<button class="btn solid big" onclick="rematch()">${L('Retenter la mission', 'Retry the mission')}</button>`) : cr ? `<button class="btn solid big" onclick="rematch()">${L('Retenter', 'Try again')}</button><button class="btn cy big" onclick="openCamp()">${L('Campagne', 'Campaign')}</button>`
         : G.tutorial ? `<button class="btn solid big" onclick="showStart()">${L('Jouer contre l\'IA', 'Play the AI')}</button>`
         : G.replay ? `<button class="btn solid big" onclick="rematch()">${G.daily && dr && !dr.ok ? L('Retenter le défi', 'Retry the challenge') : L('Revanche', 'Rematch')}</button>` : ''}
       <button class="btn big" onclick="showStart()">${L('Menu', 'Menu')}</button><button class="btn cy big" onclick="document.getElementById('end').classList.remove('on')">${L('Voir le plateau', 'View the board')}</button>${G.tutorial ? '' : `<button class="btn cy big" onclick="document.getElementById('end').classList.remove('on');openStats()">${L('Statistiques', 'Statistics')}</button>`}</div></div>`;
@@ -5817,39 +5894,14 @@ const SFX = {
    entre deux morceaux et quand le moment change. Les morceaux décochés dans le lecteur ne passent plus.
    En ligne, chaque morceau est téléchargé au premier passage puis gardé sur l'appareil (service worker). */
 var MP_READY = false;
-// Texte base64 d'un morceau intégré ; si la page n'est pas encore entièrement lue, on attend la fin de la lecture.
-function musEmbedded(id) {
-  const get = () => { const el = document.querySelector(`script.mus-b64[data-id="${id}"]`); if (!el) return null; const t = el.textContent; el.remove(); return t; };
-  const now = get();
-  if (now || document.readyState !== 'loading') return Promise.resolve(now);
-  return new Promise(r => document.addEventListener('DOMContentLoaded', () => r(get()), { once: true }));
-}   // le lecteur des paramètres existe (setLang peut être appelé avant)
+
 const MUSIC = {
   on: true, vol: 0.35, timer: null, cur: null, mode: null, urls: {}, last: {}, off: new Set(), bad: new Set(), hist: [],
   tracks: typeof MUSIC_TRACKS !== 'undefined' ? MUSIC_TRACKS.map((t, i) => ({ ...t, i })) : [],
   MODES: { intro: ['Accueil (1er morceau)', 'Home (first track)'], menu: ['Menus', 'Menus'], game: ['Partie', 'Game'], overtime: ['Overtime', 'Overtime'] },
   src(t) { return 'musique/' + t.id + '.webm'; },
-  // Copie en ligne : sert quand le jeu est ouvert depuis le disque mais que le navigateur ne peut pas lire le dossier musique/
-  // (navigateur Flatpak, fichier HTML copié seul ailleurs…).
-  REMOTE: 'https://pierreborg41120-code.github.io/cyberpunk-tcg/',
-  // En local (fichier ouvert depuis le disque), le navigateur lit le fichier directement ; en ligne, on le télécharge en entier.
+  // Morceau du dossier musique/ : téléchargé en entier au premier passage (puis gardé sur l'appareil par le service worker).
   load(t) {
-    // Morceau intégré au fichier (balise de texte en fin de page) : décodé au premier passage seulement.
-    if (!this.urls[t.id]) {
-      const p = musEmbedded(t.id).then(b64 => {
-        if (!b64) { delete this.urls[t.id]; return this.loadExt(t); }
-        const bin = atob(b64), a = new Uint8Array(bin.length);
-        for (let k = 0; k < bin.length; k++) a[k] = bin.charCodeAt(k);
-        return URL.createObjectURL(new Blob([a], { type: 'audio/webm' }));
-      });
-      this.urls[t.id] = p;
-      p.catch(() => { if (this.urls[t.id] === p) delete this.urls[t.id]; });
-    }
-    return this.urls[t.id];
-  },
-  // Morceau non intégré (site) : dossier musique/ à côté du jeu.
-  loadExt(t) {
-    if (location.protocol === 'file:') return Promise.resolve(this.localOk === false ? this.REMOTE + this.src(t) : this.src(t));
     if (!this.urls[t.id]) this.urls[t.id] = fetch(this.src(t))
       .then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); })
       .then(b => URL.createObjectURL(b))
@@ -5900,19 +5952,12 @@ const MUSIC = {
     this.load(t).then(u => {
       if (!this.cur || this.cur.el !== el) return;
       const fail = () => {
-        // Fichier illisible : en local, on essaie la copie en ligne ; sinon on écarte le morceau et on passe au suivant.
+        // Fichier illisible : on écarte le morceau et on passe au suivant.
         if (!this.cur || this.cur.el !== el) return;
-        if (location.protocol === 'file:' && !el.src.startsWith(this.REMOTE)) {
-          if (this.localOk !== true) this.localOk = false;
-          el.src = this.REMOTE + this.src(t);
-          if (this.timer) el.play().then(() => this.unblocked(), e => this.playErr(e));
-          return;
-        }
         this.bad.add(t.id);
         this.playTrack(this.pick(this.mode), true);
       };
       el.onerror = fail;
-      el.oncanplay = () => { if (location.protocol === 'file:' && !el.src.startsWith(this.REMOTE)) this.localOk = true; };
       el.src = u;
       if (!this.timer) return;   // musique coupée pendant le chargement
       el.play().then(() => this.unblocked(), e => this.playErr(e));
@@ -6025,8 +6070,7 @@ function mpUpdate(full) {
   if (!mpSeeking) document.getElementById('mp-seek').value = el && dur ? Math.round(el.currentTime / dur * 1000) : 0;
   if (!full) return;
   document.getElementById('mp-title').textContent = c ? c.t.title : MUSIC.tracks.some(t => MUSIC.enabled(t)) ? '—'
-    : MUSIC.tracks.some(t => !MUSIC.off.has(t.id)) ? (/^\/run\/user\/\d+\/doc\//.test(location.pathname) ? L('Jeu ouvert dans une copie isolée (Flatpak) : ouvrez-le par son vrai chemin dans la barre d\'adresse', 'Game opened as an isolated copy (Flatpak): open it by its real path in the address bar')
-      : location.protocol === 'file:' ? L('Dossier musique/ inaccessible au navigateur', 'The browser cannot read the musique/ folder') : L('Musique introuvable (pas de connexion ?)', 'Music not found (offline?)')) : L('Aucun morceau coché', 'No track selected');
+    : MUSIC.tracks.some(t => !MUSIC.off.has(t.id)) ? L('Musique introuvable (pas de connexion ?)', 'Music not found (offline?)') : L('Aucun morceau coché', 'No track selected');
   document.getElementById('mp-artist').textContent = c ? c.t.artist : '';
   document.getElementById('mp-mode').textContent = c ? MUSIC.MODES[c.t.mode][LANG === 'en' ? 1 : 0] : '';
   document.getElementById('mp-seek').disabled = !el;
@@ -6155,7 +6199,7 @@ function autosave() {
 function writeSave(kind = 'solo') {
   if (TAB.lock && !TAB.held) return;
   const s = { v: 1, t: Date.now(), uid: UID, gameId: G.gameId, players: G.players, current: G.current, first: G.first, round: G.round, overtime: G.overtime,
-    tf: G.tf, log: G.log.slice(0, 200), seen: [...G.seen], learn: G.learn ? { key: G.learn.key, deck: G.learn.deck } : null, daily: G.daily || null, campaign: G.campaign ?? null, campMode: G.campMode || null };
+    tf: G.tf, log: G.log.slice(0, 200), seen: [...G.seen], learn: G.learn ? { key: G.learn.key, deck: G.learn.deck } : null, daily: G.daily || null, campaign: G.campaign ?? null, campMode: G.campMode || null, side: G.side || null };
   if (kind === 'online') s.net = { code: NET.code, token: NET.token };
   try { localStorage.setItem(kind === 'online' ? SAVE_KEY_ON : SAVE_KEY, JSON.stringify(s, (k, v) => k === 'c' || typeof v === 'function' ? undefined : v)); } catch (e) {}
 }
@@ -6221,7 +6265,7 @@ function resumeGame() {
   document.getElementById('start').style.display = 'none';
   G = { players: s.players, log: s.log || [], current: s.current, first: s.first, round: s.round || 0, overtime: !!s.overtime, over: false, busy: false, attack: null,
     phase: 'main', tf: s.tf || {}, radio: [], speed: +document.getElementById('speed').value, endTurnResolve: null, onEnd: null,
-    tutorial: false, advice: s.learn ? false : document.getElementById('advice').checked, tip: null, seen: new Set(s.seen || []), sandbox: false, gameId: s.gameId, learn: s.learn || null, daily: s.daily || null, campMode: s.campMode || null, campaign: s.campaign ?? null };
+    tutorial: false, advice: s.learn ? false : document.getElementById('advice').checked, tip: null, seen: new Set(s.seen || []), sandbox: false, gameId: s.gameId, learn: s.learn || null, daily: s.daily || null, campMode: s.campMode || null, campaign: s.campaign ?? null, side: s.side || null };
   for (const p of G.players) p.payPlan = null;
   UID = Math.max(UID, s.uid || 0);
   VIEW = 0;
@@ -6801,10 +6845,12 @@ function gainRowsHTML(r) {
   for (const x of r.rows || []) {
     if (x.k === 'game') rows.push([x.online ? (x.won ? L('Victoire en ligne', 'Online win') : L('Partie en ligne jouée', 'Online game played')) : L(`Victoire contre l'IA (${levelName(x.level || 'medium')})`, `Win against the AI (${levelName(x.level || 'medium')})`), x.n]);
     else if (x.k === 'camp') { const d = CAMP[Math.floor(x.fight / 2)]; rows.push([x.foil ? L(`Fin de la campagne (et ${CARDS[x.foil].name} en Brillante)`, `Campaign complete (plus a Foil ${CARDS[x.foil].name})`) : x.boss ? L(`Campagne : chef vaincu (${CARDS[d.boss].name})`, `Campaign: boss beaten (${CARDS[d.boss].name})`) : L(`Campagne : lieutenant ${d.gang} vaincu`, `Campaign: ${d.gang} lieutenant beaten`), x.n]); }
+    else if (x.k === 'side') rows.push([L(`Mission secondaire : ${CAMP[x.d].name}`, `Side mission: ${CAMP[x.d].name}`), x.n]);
     else if (x.k === 'daily') rows.push([L(`Défi du jour réussi${x.n > 1 ? ' (bonus de série)' : ''}`, `Daily challenge completed${x.n > 1 ? ' (streak bonus)' : ''}`), x.n]);
     else if (x.k === 'ach') { const a = ACH.find(y => y.id === x.id); rows.push([a ? L(`Succès « ${a.fr[0]} »`, `Achievement "${a.en[0]}"`) : L('Succès', 'Achievement'), x.n]); }
   }
   if (r.dup) return `<p class="pk-rew none">${L('Récompenses déjà reçues pour cette partie.', 'Rewards already received for this game.')}</p>`;
+  if (r.refused === 'blocked') return `<p class="pk-rew none">${L("Votre compte a été bloqué par l'organisateur : vos parties ne rapportent plus de booster. Pour en parler : cyberpunk.tcg.unofficial@gmail.com.", 'Your account has been blocked by the organiser: your games no longer earn boosters. To discuss it: cyberpunk.tcg.unofficial@gmail.com.')}</p>`;
   if (r.refused === 'too_fast') return `<p class="pk-rew none">${L('Partie terminée en moins de 45 secondes : elle ne rapporte pas de booster.', 'Game finished in under 45 seconds: it does not earn boosters.')}</p>`;
   if (r.refused === 'not_started') return `<p class="pk-rew none">${L("Le début de cette partie n'a pas pu être enregistré sur le serveur (connexion coupée ?) : elle ne rapporte pas de booster.", 'The start of this game could not be recorded on the server (connection lost?): it does not earn boosters.')}</p>`;
   if (!rows.length) return `<p class="pk-rew none">${L('Pas de booster cette fois : gagnez une partie pour en recevoir.', 'No booster this time: win a game to earn some.')}</p>`;
@@ -6820,6 +6866,7 @@ async function claimGame(rw, dr) {
   const p = { id: G.gameId, won: rw.win, level: G.players[1 - VIEW].level, online: !!G.online, ach: G.achGain || [] };
   if (G.campaign != null && rw.win && (G.campMode === 'story' || !G.campMode)) p.camp = { mode: G.campMode === 'story' ? 'story' : 'classic', fight: G.campaign };
   if (G.daily && dr && dr.ok) p.daily = { date: G.daily, ok: true };
+  if (G.side && G.sideOk) p.side = { mode: G.side.mode, k: G.side.k };
   const box = () => document.getElementById('gain-box');
   try { const r = await srv('claim_game', { p }); if (box()) box().outerHTML = gainRowsHTML(r); }
   catch (e) { claimLater(p); if (box()) box().querySelector('.gain-wait').textContent = L("Serveur injoignable : vos récompenses seront ajoutées dès qu'il répondra.", 'Server unreachable: your rewards will be added as soon as it responds.'); }
@@ -7184,14 +7231,6 @@ if (!HEADLESS) {
   el.addEventListener('pointerleave', () => { const h = el.querySelector('.pk-hit'); if (h) { h.style.removeProperty('--rx'); h.style.removeProperty('--ry'); } });
   // Autre onglet du jeu (même adresse) : la collection se met à jour ici aussi.
   addEventListener('storage', e => { if (e.key === COLL_KEY) { collBadge(); if (!PK.anim && !PK.reveal) renderPacks(); } });
-  // Fichier ouvert par un double-clic depuis un navigateur Flatpak : le navigateur reçoit une copie temporaire
-  // (/run/user/…/doc/…), dont l'adresse change d'une fois à l'autre ; ses sauvegardes sont donc séparées.
-  if (/^\/run\/user\/\d+\/doc\//.test(location.pathname)) {
-    const w = document.createElement('div');
-    w.className = 'isocopy'; w.setAttribute('role', 'note');
-    w.innerHTML = `<b>${L('Copie temporaire du jeu', 'Temporary copy of the game')}</b> ${L("Votre navigateur a ouvert le fichier par une adresse provisoire : vos boosters, decks et statistiques sont enregistrés à part et peuvent sembler disparaître la prochaine fois. Ouvrez toujours le jeu par la même adresse, par exemple en tapant son chemin réel dans la barre d'adresse (file:///…/cyberpunk-tcg.html) et en l'ajoutant aux favoris, ou utilisez le site.", 'Your browser opened the file through a temporary address: your boosters, decks and statistics are saved separately and may seem to vanish next time. Always open the game through the same address, for example by typing its real path in the address bar (file:///…/cyberpunk-tcg.html) and bookmarking it, or use the website.')}`;
-    const box = document.querySelector('#start .box'); if (box) box.prepend(w);
-  }
   document.getElementById('b-packs').onclick = () => openPacks('open');
   collBadge();
 }
@@ -7425,6 +7464,71 @@ function campStoryDeck(d, boss, k) {
   for (const c of fill) { if (deckSize(dk) >= POOL_MIN) break; while ((dk.list[c.id] || 0) < 2 && deckSize(dk) < POOL_MIN) dk.list[c.id] = (dk.list[c.id] || 0) + 1; }
   return dk;
 }
+// Deck de l'adversaire d'un combat. Mode Histoire : tiré une fois, puis gardé (l'aperçu montre donc le deck qu'on affrontera).
+function campOppDeck(i) {
+  const f = campFight(i);
+  if (CP_MODE !== 'story') return campDeck(f.d, f.boss);
+  const c = campLoad('story'); c.ai = c.ai || {};
+  if (!c.ai[i]) { c.ai[i] = campStoryDeck(f.d, f.boss, Math.floor(i / 2)); campSave(c); }
+  return c.ai[i];
+}
+// Portrait d'un deck adverse : son style (d'après le coût moyen et les types de cartes), ses couleurs, ses cartes les plus fortes.
+function deckProfile(dk) {
+  const ids = Object.entries(dk.list).flatMap(([id, n]) => CARDS[id] ? Array(n).fill(id) : []), n = ids.length || 1;
+  const share = t => ids.filter(id => CARDS[id].type === t).length / n, avg = ids.reduce((a, id) => a + (CARDS[id].cost || 0), 0) / n;
+  const cols = {}; for (const id of ids) cols[CARDS[id].color] = (cols[CARDS[id].color] || 0) + 1;
+  const style = avg <= 2.5 && share('UNIT') >= 0.6 ? [L('Agressif', 'Aggressive'), L("Beaucoup d'unités bon marché : il attaque dès les premiers tours. Gardez de quoi bloquer.", 'Lots of cheap units: it attacks from the first turns. Keep blockers ready.')]
+    : avg >= 3.2 ? [L('Lent mais puissant', 'Slow but powerful'), L("Des cartes chères qui arrivent tard : prenez l'avantage avant qu'elles tombent.", 'Expensive cards that come late: take the lead before they land.')]
+    : share('PROGRAM') >= 0.25 ? [L('Programmes', 'Programs'), L('Beaucoup de programmes : attendez-vous à des effets surprises au mauvais moment.', 'Lots of programs: expect surprise effects at the worst moment.')]
+    : share('GEAR') >= 0.18 ? [L('Équipement', 'Gear'), L("Ses unités s'équipent et grossissent : éliminez-les avant.", 'Its units gear up and grow: take them out first.')]
+    : [L('Équilibré', 'Balanced'), L('Un peu de tout, sans point faible évident : jouez votre plan.', 'A bit of everything, no obvious weakness: play your game plan.')];
+  return { n: ids.length, avg, style, cols: Object.entries(cols).sort((a, b) => b[1] - a[1]).map(([c]) => c), key: [...new Set(ids)].sort((a, b) => cardW(b) - cardW(a)).slice(0, 4) };
+}
+function campOppHTML(i) {
+  const f = campFight(i), dk = campOppDeck(i), pr = deckProfile(dk), name = f.boss ? CARDS[f.d.boss].name : L(`Lieutenant ${f.d.gang}`, `${f.d.gang} lieutenant`);
+  const byType = ['UNIT', 'PROGRAM', 'GEAR'].map(t => [t, Object.entries(dk.list).filter(([id]) => CARDS[id] && CARDS[id].type === t).sort((a, b) => (CARDS[a[0]].cost || 0) - (CARDS[b[0]].cost || 0))]).filter(([, l]) => l.length);
+  const tName = { UNIT: L('Unités', 'Units'), PROGRAM: L('Programmes', 'Programs'), GEAR: L('Équipements', 'Gear') };
+  return `<section class="cp-opp" aria-labelledby="cp-opp-t"><h4 id="cp-opp-t">${L('Votre adversaire', 'Your opponent')} : ${esc(name)} <small>${LVL_NAME()[f.level]}</small></h4>
+    <div class="cp-oleg">${dk.legends.map(id => `<span class="cp-ol" data-cid="${id}"><i class="${IMGS[id] && IMGS[id].art ? 'art-' + id : ''}" aria-hidden="true"></i>${esc(CARDS[id].name)}</span>`).join('')}</div>
+    <p class="cp-ost"><b>${pr.style[0]}</b> ${esc(pr.style[1])}</p>
+    <p class="cp-omore">${L('Couleurs', 'Colours')} : ${pr.cols.map(c => `<span class="cp-oc" style="--oc:var(--${c})">${colorName(c)}</span>`).join(' ')} · ${L('coût moyen', 'average cost')} ${pr.avg.toFixed(1).replace('.', LANG === 'en' ? '.' : ',')}</p>
+    <p class="cp-omore">${L('Ses cartes les plus fortes', 'Its strongest cards')} : ${pr.key.map(id => `<span class="lc" data-cid="${id}">${esc(CARDS[id].name)}</span>`).join(', ')}</p>
+    <details class="cp-olist"><summary>${L(`Voir ses ${pr.n} cartes`, `See its ${pr.n} cards`)}</summary>${byType.map(([t, l]) => `<p><b>${tName[t]}</b> ${l.map(([id, k]) => `<span class="lc" data-cid="${id}">${esc(CARDS[id].name)}</span>${k > 1 ? ' ×' + k : ''}`).join(', ')}</p>`).join('')}</details></section>`;
+}
+// Missions secondaires : une par quartier libéré, contre son chef un cran plus fort, avec une condition ; 1 booster la première fois.
+const CAMP_SIDE = [{ cond: 'fast', n: 10 }, { cond: 'nosell' }, { cond: 'stars' }, { cond: 'clean' }, { cond: 'thief', n: 4 }, { cond: 'fast', n: 12 }];
+const LV_UP = { easy: 'medium', medium: 'hard', hard: 'expert', expert: 'expert' };
+const sideText = k => { const m = CAMP_SIDE[k], c = DAILY_CONDS.find(x => x.id === m.cond); return (LANG === 'en' ? c.en : c.fr)(m.n ?? c.n); };
+const sideDone = (k, mode = CP_MODE) => !!(collLoad().side || {})[`${mode}:${k}`];
+function sideStart(k) {
+  const story = CP_MODE === 'story', c = campLoad(), i = 2 * k + 1, f = campFight(i);
+  if (story && (!c.started || storyErrors(c).length)) return;
+  const sel = document.getElementById('cp-deck'); if (sel && !story) { c.deck = sel.value; campSave(c); }
+  const ai = campOppDeck(i), side = { mode: story ? 'story' : 'classic', k };
+  document.getElementById('camp').classList.remove('on');
+  netClose();
+  document.getElementById('start').style.display = 'none';
+  if (story) newGame({ name: c.deck.name || L('Mon deck Histoire', 'My story deck'), legends: [...c.deck.legends], list: { ...c.deck.list } }, { aiDeck: ai, level: LV_UP[f.level], side });
+  else newGame(c.deck, { aiDeck: ai, level: LV_UP[f.level], side });
+}
+function sideResult() {
+  if (HEADLESS || !G || !G.side || !G.over || !G.winner) return null;
+  const m = CAMP_SIDE[G.side.k], c = DAILY_CONDS.find(x => x.id === m.cond), win = G.winner.idx === VIEW;
+  return { ok: win && c.ok(G.players[VIEW], G.players[1 - VIEW], m.n ?? c.n), win, k: G.side.k, done: sideDone(G.side.k, G.side.mode) };
+}
+function sideEndHTML(r) {
+  if (!r) return '';
+  if (!r.ok) return `<p class="pk-rew none">${L(`Mission secondaire ratée : ${esc(sideText(r.k))} Retentez autant de fois que vous voulez.`, `Side mission failed: ${esc(sideText(r.k))} Try again as often as you like.`)}</p>`;
+  return `<p class="pk-rew">✓ ${r.done ? L('Mission secondaire réussie (déjà récompensée).', 'Side mission completed (already rewarded).') : L(`Mission secondaire de ${CAMP[r.k].name} réussie !`, `${CAMP[r.k].name} side mission completed!`)}</p>`;
+}
+function campSideHTML(k, deckSel) {
+  const f = campFight(2 * k + 1), done = sideDone(k), c = campLoad(), err = CP_MODE === 'story' && storyErrors(c).length;
+  return `<section class="cp-side ${done ? 'done' : ''}"><h4>${L('Mission secondaire', 'Side mission')}${done ? ` <span class="cp-ok">✓ ${L('Réussie', 'Completed')}</span>` : ''}</h4>
+    <p class="cp-sgoal">${esc(sideText(k))}</p>
+    <p class="cp-omore">${L(`Contre ${esc(CARDS[f.d.boss].name)}, plus fort qu'au premier combat (${LVL_NAME()[LV_UP[f.level]]}).`, `Against ${esc(CARDS[f.d.boss].name)}, stronger than the first time (${LVL_NAME()[LV_UP[f.level]]}).`)} ${done ? L('Rejouable sans récompense.', 'Replayable with no reward.') : L('Récompense : 1 booster, la première fois.', 'Reward: 1 booster, the first time.')}</p>
+    <div class="cp-go">${deckSel}<button class="btn ${done ? 'cy' : 'solid'}" data-cp="side" data-k="${k}" ${err ? 'disabled' : ''}>${L('Lancer la mission', 'Start the mission')}</button></div>
+    <details class="cp-sopp"><summary>${L('Voir son deck', 'See its deck')}</summary>${campOppHTML(2 * k + 1)}</details></section>`;
+}
 // Decks jouables par le joueur : decks de base, conseillés et les siens s'ils sont valides.
 function campDecks() {
   return [['arasaka', DECKS.arasaka.name], ['mercs', DECKS.mercs.name], ...REC_DECKS.map(k => [k, DECKS[k].name]),
@@ -7551,7 +7655,8 @@ function renderCamp() {
         <div><b>${esc(opp)}</b><small>${f.boss ? L('Chef du gang', 'Gang boss') : L('Premier combat', 'First fight')} · ${LVL_NAME()[f.level]} · ${L(`${n} booster${n > 1 ? 's' : ''}`, `${n} booster${n > 1 ? 's' : ''}`)}</small></div>
         ${won ? `<span class="cp-ok">${L('Gagné', 'Won')}</span>` : ''}</div>`;
     }).join('');
-    const canFight = !c.done && cur === k;
+    const canFight = !c.done && cur === k, freed = c.done || k < cur;
+    const deckSel = () => `<label>${L('Votre deck', 'Your deck')} <select id="cp-deck" class="bfield">${campDecks().map(([v, t]) => `<option value="${escAttr(v)}" ${v === c.deck ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></label>`;
     let go = '';
     if (canFight && !story) {
       go = `<div class="cp-go"><label>${L('Votre deck', 'Your deck')} <select id="cp-deck" class="bfield">${campDecks().map(([v, t]) => `<option value="${escAttr(v)}" ${v === c.deck ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
@@ -7571,7 +7676,9 @@ function renderCamp() {
         <div class="cp-art ${IMGS[d.boss] && IMGS[d.boss].art ? 'art-' + d.boss : ''}"><div class="cp-shade"></div><div class="cp-head"><small>${L('Quartier', 'District')} ${k + 1} · ${esc(d.gang)}</small><h3>${esc(d.name)}</h3></div></div>
         <p class="cp-flav">${esc(L(d.fr, d.en))}</p>
         ${locked ? `<p class="cp-lock">🔒 ${L(`Libérez d'abord ${CAMP[cur].name}.`, `Free ${CAMP[cur].name} first.`)}</p>` : `<div class="cp-fights">${fights}</div>`}
+        ${canFight ? campOppHTML(c.prog) : ''}
         ${go}
+        ${freed && run ? campSideHTML(k, story ? '' : deckSel()) : ''}
         ${c.done && k === CAMP.length - 1 ? `<p class="cp-end">★ ${story ? L('Mode Histoire terminé : Night City est à vous.', 'Story mode complete: Night City is yours.') : L('Campagne terminée : Night City est à vous.', 'Campaign complete: Night City is yours.')} <button class="pk-quit" data-cp="reset">${story ? L('Rejouer la campagne (vous gardez votre collection)', 'Replay the campaign (you keep your collection)') : L('Recommencer la campagne', 'Restart the campaign')}</button></p>` : ''}
         <p class="cp-rules">${story ? L("Chaque victoire rapporte des boosters pour votre collection ; la fin offre 8 boosters de plus et une Légende Brillante. Les duels contre l'IA, le défi du jour et les succès en rapportent aussi.", 'Every win earns boosters for your collection; the end grants 8 more boosters and a Foil Legend. Duels against the AI, the daily challenge and achievements earn some too.')
           : L("Campagne libre : jouez avec n'importe quel deck. Chaque victoire rapporte des boosters ; la fin offre 5 boosters de plus et une Légende Brillante.", 'Free campaign: play with any deck. Every win earns boosters; the end grants 5 more boosters and a Foil Legend.')}
@@ -7607,6 +7714,7 @@ if (!HEADLESS) {
     const act = a.dataset.cp;
     if (act === 'back') closeCamp();
     else if (act === 'fight') campStart(campLoad().prog);
+    else if (act === 'side') sideStart(+a.dataset.k);
     else if (act === 'reset' && await uiConfirm(CP_MODE === 'story' ? L('Rejouer la campagne depuis Watson ? Vous gardez votre collection.', 'Replay the campaign from Watson? You keep your collection.') : L('Recommencer la campagne depuis Watson ? Les boosters déjà gagnés restent à vous.', 'Restart the campaign from Watson? Boosters already earned stay yours.'), { ok: L('Recommencer', 'Restart') })) {
       const c = campLoad(); srv('camp_reset', { mode: CP_MODE }).catch(() => {});
       campSave({ ...c, prog: 0, done: false, wins: {}, told: {}, ai: {}, runs: (c.runs || 0) + 1 }); CP_SEL = 0; renderCamp();
@@ -7710,13 +7818,14 @@ async function srv(fn, args = {}, quiet) {
   if (!await cloudToken()) throw new Error(L("vous n'êtes plus connecté", 'you are no longer signed in'));
   const r = await cloudFetch('/rest/v1/rpc/' + fn, { method: 'POST', body: args });
   if (r && r.coll) collApply(r.coll, quiet);
+  else if (fn === 'coll_get' && r && r.cards) collApply(r, quiet);   // coll_get renvoie la collection elle-même
   return r;
 }
 function srvErr(e) { return L(`Action refusée ou serveur injoignable (${e.message}). Réessayez dans un instant.`, `Action refused or server unreachable (${e.message}). Try again in a moment.`); }
 // Ce que le serveur renvoie devient la collection affichée ; ses succès, sa campagne et son défi du jour font foi.
 function collApply(sv, quiet) {
   collSave({ v: 1, started: true, cards: sv.cards || {}, foil: sv.foil || {}, wish: sv.wish || {}, packs: sv.packs | 0, opened: sv.opened | 0, scrap: sv.scrap | 0,
-    log: sv.log || [], gift: sv.gift || '', dayPacks: sv.day_packs | 0, dayCap: sv.day_cap | 0 });
+    log: sv.log || [], gift: sv.gift || '', dayPacks: sv.day_packs | 0, dayCap: sv.day_cap | 0, blocked: !!sv.blocked, side: (sv.camp && sv.camp.side) || {} });
   const had = loadAch(), fresh = Object.keys(sv.ach || {}).filter(id => !had[id] && ACH.some(a => a.id === id));
   for (const id of Object.keys(sv.ach || {})) achMark(id, quiet);
   if (!quiet && fresh.length) PK.bonus = [...(PK.bonus || []), ...fresh];
@@ -7727,17 +7836,6 @@ function collApply(sv, quiet) {
   }
   if (sv.daily) { const d = dailyLoad(); d.done = { ...(sv.daily.done || {}) }; d.streak = sv.daily.streak | 0; d.best = sv.daily.best | 0; d.last = sv.daily.last || ''; dailySave(d); dailyBadge(); }
 }
-// Connexion par e-mail et mot de passe. Les liens envoyés par e-mail (confirmation, nouveau mot de passe) ouvrent la page de connexion du site.
-const authBack = () => location.protocol.startsWith('http') ? location.origin + location.pathname.replace(/[^/]*$/, '') + 'connexion.html' : null;
-async function cloudSignIn(email, password) { cloudKeep(await cloudFetch('/auth/v1/token?grant_type=password', { method: 'POST', body: { email, password }, auth: false }), email); }
-// Renvoie true si le compte est ouvert tout de suite, false s'il faut d'abord confirmer l'adresse (e-mail envoyé).
-async function cloudSignUp(email, password) {
-  const back = authBack();
-  const j = await cloudFetch('/auth/v1/signup' + (back ? '?redirect_to=' + encodeURIComponent(back) : ''), { method: 'POST', body: { email, password }, auth: false });
-  if (j && j.access_token) { cloudKeep(j, email); return true; }
-  return false;
-}
-async function cloudRecover(email) { const back = authBack(); await cloudFetch('/auth/v1/recover' + (back ? '?redirect_to=' + encodeURIComponent(back) : ''), { method: 'POST', body: { email }, auth: false }); }
 function authErr(e) {
   const m = String((e && e.message) || ''), c = (e && e.code) || '';
   if (c === 'invalid_credentials' || /invalid login/i.test(m)) return L('E-mail ou mot de passe incorrect.', 'Wrong e-mail or password.');
@@ -7802,24 +7900,7 @@ function renderLogin() {
       <p class="lg-sync ${st.err ? 'ko' : ''}">${st.err ? L(`Synchronisation impossible pour l'instant (${esc(st.err)}). Le jeu réessaiera tout seul.`, `Sync not possible right now (${esc(st.err)}). The game will try again on its own.`) : st.last ? L(`✓ Dernière synchronisation : ${loginTime(st.last)}`, `✓ Last sync: ${loginTime(st.last)}`) : L('Synchronisation en cours…', 'Syncing…')}</p>
       <div class="lg-acts"><button class="btn solid big" data-lg="play">${L('Jouer', 'Play')}</button><button class="btn cy" data-lg="sync">${L('Synchroniser maintenant', 'Sync now')}</button><button class="btn" data-lg="out">${L('Se déconnecter', 'Sign out')}</button></div>`;
   } else {
-    if (location.protocol.startsWith('http')) { location.replace('connexion.html'); return; }   // site : la vraie page de connexion
-    const mail = `<label class="lg-f"><span>${L('Adresse e-mail', 'E-mail address')}</span><input id="lg-mail" type="email" autocomplete="email" placeholder="${L('vous@exemple.fr', 'you@example.com')}" value="${escAttr(st.lastMail || '')}"></label>`;
-    const pass = (id, ac, lbl) => `<label class="lg-f"><span>${lbl}</span><span class="lg-pw"><input id="${id}" type="password" autocomplete="${ac}" minlength="8"><button type="button" class="lg-eye" data-lg="eye" aria-label="${L('Afficher le mot de passe', 'Show password')}">${L('Afficher', 'Show')}</button></span></label>`;
-    if (LG.step === 'signup') body = `<h2 id="lg-t">${L('Créer un compte', 'Create an account')}</h2>
-      <p class="lg-lead">${L('Votre collection, vos decks et votre campagne seront gardés sur le serveur et vous les retrouverez sur tous vos appareils.', 'Your collection, decks and campaign will be kept on the server and you will find them on all your devices.')}</p>
-      ${mail}${pass('lg-pass', 'new-password', L('Mot de passe (8 caractères minimum)', 'Password (8 characters minimum)'))}${pass('lg-pass2', 'new-password', L('Confirmer le mot de passe', 'Confirm the password'))}
-      <p class="lg-help">${L(`En créant un compte, vous acceptez que vos données de jeu soient gardées comme expliqué dans <a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Données personnelles</a>.`, `By creating an account, you agree that your game data is kept as explained in <a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Personal data</a>.`)}</p>
-      <div class="lg-acts"><button class="btn solid big" data-lg="signup">${L('Créer mon compte', 'Create my account')}</button></div>
-      <p class="lg-links"><button class="linkbtn" data-lg="to-login">${L("J'ai déjà un compte", 'I already have an account')}</button></p>`;
-    else if (LG.step === 'forgot') body = `<h2 id="lg-t">${L('Mot de passe oublié', 'Forgot password')}</h2>
-      <p class="lg-lead">${L("Entrez votre adresse : vous recevrez un lien pour choisir un nouveau mot de passe. Le lien ouvre le site du jeu.", 'Enter your address: you will get a link to choose a new password. The link opens the game website.')}</p>
-      ${mail}<div class="lg-acts"><button class="btn solid big" data-lg="recover">${L('Envoyer le lien', 'Send the link')}</button></div>
-      <p class="lg-links"><button class="linkbtn" data-lg="to-login">${L('Retour à la connexion', 'Back to sign in')}</button></p>`;
-    else body = `<h2 id="lg-t">${L('Connexion', 'Sign in')}</h2>
-      <p class="lg-lead">${L('Connectez-vous pour retrouver votre collection, vos decks et votre campagne.', 'Sign in to find your collection, decks and campaign.')}</p>
-      ${mail}${pass('lg-pass', 'current-password', L('Mot de passe', 'Password'))}
-      <div class="lg-acts"><button class="btn solid big" data-lg="signin">${L('Se connecter', 'Sign in')}</button></div>
-      <p class="lg-links"><button class="linkbtn" data-lg="to-signup">${L('Créer un compte', 'Create an account')}</button><button class="linkbtn" data-lg="to-forgot">${L('Mot de passe oublié ?', 'Forgot password?')}</button></p>`;
+    location.replace('connexion.html'); return;   // pas connecté : la page de connexion du site
   }
   el.innerHTML = `<div class="lg-box ${ses && !LG.auto && navigator.onLine ? 'wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="lg-t">
     ${pkArt('logo') ? `<img class="lg-logo" src="${pkArt('logo')}" alt="">` : ''}
@@ -7863,6 +7944,7 @@ function accountHTML(st, ses) {
   const av = LG.av !== undefined ? LG.av : pf.avatar || null;
   return `<div class="ac-head">${av && IMGS[av] ? `<span class="ac-av art-${av}" aria-hidden="true"></span>` : '<span class="ac-av none" aria-hidden="true">👤</span>'}
       <div><h2 id="lg-t">${pf.pseudo ? esc(pf.pseudo) : L('Mon compte', 'My account')}</h2><p class="ac-mail">${esc(ses.email || '')}</p></div></div>
+    ${collLoad().blocked ? `<p class="ac-blk">${L("Compte bloqué par l'organisateur : vos parties ne rapportent plus de booster et vous ne pouvez plus échanger de cartes. Pour en parler : cyberpunk.tcg.unofficial@gmail.com.", 'Account blocked by the organiser: your games no longer earn boosters and you can no longer trade cards. To discuss it: cyberpunk.tcg.unofficial@gmail.com.')}</p>` : ''}
     <section class="ac-sec"><h3>${L('Profil', 'Profile')}</h3>
       <label class="lg-f"><span>${L('Pseudo (3 à 20 caractères, visible par les autres joueurs)', 'Nickname (3 to 20 characters, visible to other players)')}</span><input id="ac-pseudo" maxlength="20" autocomplete="nickname" value="${escAttr(LG.pseudo !== undefined ? LG.pseudo : pf.pseudo || '')}"></label>
       <p class="ac-lbl">${L('Avatar', 'Avatar')}</p>
@@ -7890,37 +7972,12 @@ async function profileLoad() {
 function musicGo() { MUSIC_OK = true; LG.music = true; try { if (MUSIC.on && MUSIC.tracks.length) MUSIC.kick(); } catch (x) {} }
 async function loginAct(a) {
   const val = id => (document.getElementById(id) || {}).value || '';
-  const okMail = m => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m);
-  if (a === 'to-login' || a === 'to-signup' || a === 'to-forgot') { const m = val('lg-mail').trim(); if (m) cloudSet({ lastMail: m }); LG.step = a.slice(3); LG.msg = ''; LG.bad = false; return renderLogin(); }
-  if (a === 'eye') { for (const x of document.querySelectorAll('#login input[id^="lg-pass"]')) x.type = x.type === 'password' ? 'text' : 'password'; return; }
-  if (a === 'signin' || a === 'signup') {
-    const m = val('lg-mail').trim(), p = val('lg-pass');
-    if (!okMail(m)) return loginSay(L("Cette adresse e-mail n'est pas valide.", 'This e-mail address is not valid.'), true);
-    if (p.length < (a === 'signup' ? 8 : 1)) return loginSay(a === 'signup' ? L('Le mot de passe doit faire au moins 8 caractères.', 'The password must be at least 8 characters.') : L('Entrez votre mot de passe.', 'Enter your password.'), true);
-    if (a === 'signup' && p !== val('lg-pass2')) return loginSay(L('Les deux mots de passe ne sont pas identiques.', 'The two passwords do not match.'), true);
-    cloudSet({ lastMail: m });
-    loginSay(a === 'signup' ? L('Création du compte…', 'Creating the account…') : L('Connexion…', 'Signing in…'));
-    try {
-      if (a === 'signup' && !await cloudSignUp(m, p)) { LG.step = 'login'; LG.msg = L(`Compte créé. Un e-mail de confirmation a été envoyé à ${m} : cliquez sur son lien, puis connectez-vous ici.`, `Account created. A confirmation e-mail was sent to ${m}: click its link, then sign in here.`); LG.bad = false; return renderLogin(); }
-      if (a === 'signin') await cloudSignIn(m, p);
-      cloudSet({ synced: '', hash: '' }); renderCloud();
-      musicGo();
-      return loginAct('play');   // connecté : on charge la progression et on joue (ce clic a aussi lancé la musique)
-    } catch (e) { return loginSay(authErr(e), true); }
-  }
-  if (a === 'recover') {
-    const m = val('lg-mail').trim();
-    if (!okMail(m)) return loginSay(L("Cette adresse e-mail n'est pas valide.", 'This e-mail address is not valid.'), true);
-    cloudSet({ lastMail: m }); loginSay(L('Envoi…', 'Sending…'));
-    try { await cloudRecover(m); LG.step = 'login'; LG.msg = L(`Si un compte existe pour ${m}, un e-mail vient de partir. Son lien ouvre le site du jeu pour choisir un nouveau mot de passe.`, `If an account exists for ${m}, an e-mail is on its way. Its link opens the game website to choose a new password.`); LG.bad = false; return renderLogin(); }
-    catch (e) { return loginSay(authErr(e), true); }
-  }
   if (a === 'profile') {
     const p = val('ac-pseudo').trim(), av = LG.av !== undefined ? LG.av : (cloudState().profile || {}).avatar || null;
     if (!/^[A-Za-z0-9À-ÖØ-öø-ÿ _.-]{3,20}$/.test(p)) return loginSay(L('Pseudo : 3 à 20 caractères (lettres, chiffres, espace, tiret, point ou tiret bas).', 'Nickname: 3 to 20 characters (letters, digits, space, dash, dot or underscore).'), true);
     loginSay(L('Enregistrement…', 'Saving…'));
     try { await cloudToken(); const r = await cloudFetch('/rest/v1/rpc/set_profile', { method: 'POST', body: { pseudo: p, avatar: av } }); cloudSet({ profile: { pseudo: r.pseudo, avatar: r.avatar } }); try { localStorage.setItem('cptcg-name', r.pseudo); } catch (e) {} LG.pseudo = LG.av = undefined; LG.msg = L('✓ Profil enregistré.', '✓ Profile saved.'); LG.bad = false; renderLogin(); renderCloud(); }
-    catch (e) { loginSay(/déjà pris/.test(e.message) ? L('Ce pseudo est déjà pris : choisissez-en un autre.', 'This nickname is already taken: choose another one.') : /invalide/.test(e.message) ? L('Pseudo refusé : 3 à 20 caractères simples.', 'Nickname refused: 3 to 20 plain characters.') : L(`Enregistrement impossible : ${e.message}`, `Could not save: ${e.message}`), true); }
+    catch (e) { loginSay(/déjà pris/.test(e.message) ? L('Ce pseudo est déjà pris : choisissez-en un autre.', 'This nickname is already taken: choose another one.') : /refusé/.test(e.message) ? L('Ce pseudo contient un mot interdit (insulte, ou nom réservé comme « admin » ou « support ») : choisissez-en un autre.', 'This nickname contains a forbidden word (an insult, or a reserved name like "admin" or "support"): choose another one.') : /invalide/.test(e.message) ? L('Pseudo refusé : 3 à 20 caractères simples.', 'Nickname refused: 3 to 20 plain characters.') : L(`Enregistrement impossible : ${e.message}`, `Could not save: ${e.message}`), true); }
     return;
   }
   if (a === 'password') {
@@ -7947,7 +8004,7 @@ async function loginAct(a) {
   }
   else if (a === 'sync') { loginSay(L('Synchronisation…', 'Syncing…')); await cloudSync(true); LG.msg = ''; renderLogin(); }
   else if (a === 'out' && await uiConfirm(L('Se déconnecter ? Vos données restent sur cet appareil et dans votre compte.', 'Sign out? Your data stays on this device and in your account.'), { ok: L('Se déconnecter', 'Sign out') })) {
-    const ses = cloudSession();
+    const ses = cloudSession(); rtStop();
     loginSay(L('Envoi de vos dernières modifications…', 'Sending your latest changes…'));
     await cloudSync(true);
     if (ses) await fetch(CLOUD.url + '/auth/v1/logout', { method: 'POST', headers: { apikey: CLOUD.key, Authorization: 'Bearer ' + ses.access_token } }).catch(() => {});
@@ -8021,7 +8078,7 @@ if (!HEADLESS) {
    COMMUNAUTÉ : classement, amis et invitations aux parties en ligne, tableau de bord de l'organisateur.
    Tout passe par des fonctions du serveur ; il faut un pseudo (Mon compte) pour apparaître au classement et avoir des amis.
    ===================================================================== */
-const SOC = { tab: 'rank', kind: 'story', rank: {}, friends: null, admin: false, adminData: null, invites: [], requests: 0, msg: '', bad: false, poll: null };
+const SOC = { tab: 'rank', kind: 'story', rank: {}, friends: null, admin: false, adminData: null, adWords: null, adFound: null, adQ: '', invites: [], requests: 0, tradesIn: 0, trades: null, tr: null, msg: '', bad: false, poll: null };
 async function socRpc(fn, args = {}) {
   if (!await cloudToken()) throw new Error(L("vous n'êtes plus connecté", 'you are no longer signed in'));
   return cloudFetch('/rest/v1/rpc/' + fn, { method: 'POST', body: args });
@@ -8046,12 +8103,13 @@ function openSocial(tab) {
   clearInterval(SOC.poll); SOC.poll = setInterval(() => { if (SOC.tab === 'friends' && el.classList.contains('on')) socLoad(); }, 15000);
   const f = el.querySelector('.sc-tabs [aria-selected="true"]'); if (f) f.focus({ preventScroll: true });
 }
-function closeSocial(keep) { clearInterval(SOC.poll); document.getElementById('social').classList.remove('on'); if (!keep) { showStart(); const b = document.getElementById(SOC.tab === 'friends' ? 'b-friends' : SOC.tab === 'admin' ? 'b-admin' : 'b-rank'); if (b) b.focus(); } }
+function closeSocial(keep) { clearInterval(SOC.poll); hideHover(); document.getElementById('social').classList.remove('on'); if (!keep) { showStart(); const b = document.getElementById(SOC.tab === 'friends' || SOC.tab === 'trades' ? 'b-friends' : SOC.tab === 'admin' ? 'b-admin' : 'b-rank'); if (b) b.focus(); } }
 async function socLoad() {
   try {
     if (SOC.tab === 'rank') SOC.rank[SOC.kind] = await socRpc('leaderboard', { kind: SOC.kind });
     else if (SOC.tab === 'friends') SOC.friends = await socRpc('friends_list');
-    else if (SOC.tab === 'admin') SOC.adminData = await socRpc('admin_stats');
+    else if (SOC.tab === 'trades') { SOC.trades = await socRpc('trade_list'); if (SOC.tr && !SOC.tr.view) SOC.tr.view = await socRpc('trade_view', { other: SOC.tr.other }); }
+    else if (SOC.tab === 'admin') [SOC.adminData, SOC.adWords] = await Promise.all([socRpc('admin_stats'), socRpc('admin_words', { word: '', add: false })]);
     SOC.loadErr = '';
   } catch (e) { SOC.loadErr = e.message; }
   renderSocial();
@@ -8060,7 +8118,7 @@ function socSay(t, bad) { SOC.msg = t; SOC.bad = !!bad; const m = document.query
 function renderSocial() {
   const el = document.getElementById('social');
   if (!el.classList.contains('on')) return;
-  const tabs = [['rank', L('Classement', 'Leaderboard')], ['friends', L('Amis', 'Friends') + (SOC.requests ? ` (${SOC.requests})` : '')], ...(SOC.admin ? [['admin', L('Tableau de bord', 'Dashboard')]] : [])];
+  const tabs = [['rank', L('Classement', 'Leaderboard')], ['friends', L('Amis', 'Friends') + (SOC.requests ? ` (${SOC.requests})` : '')], ['trades', L('Échanges', 'Trades') + (SOC.tradesIn ? ` (${SOC.tradesIn})` : '')], ...(SOC.admin ? [['admin', L('Tableau de bord', 'Dashboard')]] : [])];
   const noPseudo = `<div class="sc-note">${L('Choisissez un pseudo pour apparaître au classement et avoir des amis.', 'Choose a nickname to appear on the leaderboard and have friends.')}<br><button class="btn solid" data-soc="pseudo">${L('Choisir mon pseudo', 'Choose my nickname')}</button></div>`;
   let body = '';
   if (SOC.loadErr) body = `<p class="sc-msg ko">${L(`Le serveur ne répond pas (${esc(SOC.loadErr)}). Réessayez dans un instant.`, `The server is not responding (${esc(SOC.loadErr)}). Try again in a moment.`)}</p>`;
@@ -8073,17 +8131,127 @@ function renderSocial() {
       ${d && d.me && !d.rows.some(r => r.me) ? `<p class="sc-me">${L(`Votre place : <b>${d.me.rank}e</b>`, `Your rank: <b>#${d.me.rank}</b>`)} · ${rankVal(SOC.kind, d.me.value)}</p>` : ''}`;
   } else if (SOC.tab === 'friends') {
     const fl = SOC.friends || [], inc = fl.filter(f => f.status === 'incoming'), fr = fl.filter(f => f.status === 'friend'), out = fl.filter(f => f.status === 'outgoing');
-    const row = (f, acts) => `<li>${socAv(f.avatar)}<span class="sc-ps">${esc(f.pseudo)} ${f.status === 'friend' ? `<span class="sc-st ${f.online ? 'on' : ''}"><i></i>${f.online ? L('En ligne', 'Online') : L('Hors ligne', 'Offline')}</span>` : ''}</span><span class="sc-acts">${acts}</span></li>`;
+    for (const f of fl) f.live = friendOnline(f);
+    const row = (f, acts) => `<li>${socAv(f.avatar)}<span class="sc-ps">${esc(f.pseudo)} ${f.status === 'friend' ? `<span class="sc-st ${f.live ? 'on' : ''}"><i></i>${f.live ? L('En ligne', 'Online') : L('Hors ligne', 'Offline')}</span>` : ''}</span><span class="sc-acts">${acts}</span></li>`;
     body = !hasPseudo() ? noPseudo : `<div class="sc-add"><input id="sc-add" maxlength="20" placeholder="${L("Pseudo d'un ami", "A friend's nickname")}" aria-label="${L("Pseudo d'un ami", "A friend's nickname")}"><button class="btn solid" data-soc="add">${L('Ajouter', 'Add')}</button></div>
       <p class="sc-msg ${SOC.bad ? 'ko' : ''}" role="status">${esc(SOC.msg)}</p>
       ${inc.length ? `<h3 class="sc-h">${L('Demandes reçues', 'Requests received')}</h3><ul class="sc-list sc-fr">${inc.map(f => row(f, `<button class="btn solid" data-soc="accept" data-id="${f.id}">${L('Accepter', 'Accept')}</button><button class="btn" data-soc="refuse" data-id="${f.id}">${L('Refuser', 'Decline')}</button>`)).join('')}</ul>` : ''}
       <h3 class="sc-h">${L('Mes amis', 'My friends')}</h3>
-      ${!SOC.friends ? `<p class="sc-empty">${L('Chargement…', 'Loading…')}</p>` : fr.length ? `<ul class="sc-list sc-fr">${fr.map(f => row(f, `<button class="btn ${f.online ? 'cy' : ''}" data-soc="invite" data-id="${f.id}" ${f.online ? '' : `disabled title="${escAttr(L('Disponible quand cet ami est en ligne', 'Available when this friend is online'))}"`}>${L('Inviter à jouer', 'Invite to play')}</button><button class="btn" data-soc="remove" data-id="${f.id}">${L('Retirer', 'Remove')}</button>`)).join('')}</ul>`
+      ${!SOC.friends ? `<p class="sc-empty">${L('Chargement…', 'Loading…')}</p>` : fr.length ? `<ul class="sc-list sc-fr">${fr.map(f => row(f, `<button class="btn ${f.live ? 'cy' : ''}" data-soc="invite" data-id="${f.id}" ${f.live ? '' : `disabled title="${escAttr(L('Disponible quand cet ami est en ligne', 'Available when this friend is online'))}"`}>${L('Inviter à jouer', 'Invite to play')}</button><button class="btn" data-soc="trade" data-id="${f.id}">${L('Échanger', 'Trade')}</button><button class="btn" data-soc="remove" data-id="${f.id}">${L('Retirer', 'Remove')}</button>`)).join('')}</ul>`
         : `<p class="sc-empty">${L("Pas encore d'amis : ajoutez-en un avec son pseudo.", 'No friends yet: add one with their nickname.')}</p>`}
       ${out.length ? `<h3 class="sc-h">${L('Demandes envoyées', 'Requests sent')}</h3><ul class="sc-list sc-fr">${out.map(f => row(f, `<span class="sc-st">${L('En attente', 'Pending')}</span><button class="btn" data-soc="remove" data-id="${f.id}">${L('Annuler', 'Cancel')}</button>`)).join('')}</ul>` : ''}`;
-  } else body = adminHTML(SOC.adminData);
+  } else if (SOC.tab === 'trades') body = !hasPseudo() ? noPseudo : tradesHTML();
+  else body = adminHTML(SOC.adminData);
+  // les listes gardent leur défilement d'un affichage à l'autre
+  const keep = [...el.querySelectorAll('[data-keep]')].map(x => [x.dataset.keep, x.scrollTop]), y = el.scrollTop;
   el.innerHTML = `<div class="sc-wrap"><header class="pk-top"><button class="bback" data-soc="back">← ${L('Menu', 'Menu')}</button><h2 class="cp-title">${L('Communauté', 'Community')}</h2>
     <div class="sc-tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" data-soct="${k}" aria-selected="${SOC.tab === k}" tabindex="${SOC.tab === k ? 0 : -1}">${t}</button>`).join('')}</div></header>${body}</div>`;
+  for (const [k, t] of keep) { const x = el.querySelector(`[data-keep="${k}"]`); if (x) x.scrollTop = t; }
+  el.scrollTop = y;
+}
+/* ---------- échanges de cartes entre amis ----------
+   Des exemplaires normaux (pas les Brillantes) ; au plus 10 cartes et 3 exemplaires d'une carte de chaque côté ;
+   chaque côté doit valoir au moins la moitié de l'autre (valeur de fabrication). Le serveur vérifie tout au moment de l'échange. */
+const trVal = j => Object.entries(j).reduce((v, [id, n]) => v + CRAFT_COST[rarity(id)] * n, 0);
+const trCount = j => Object.values(j).reduce((a, b) => a + b, 0);
+const trNames = j => Object.entries(j).map(([id, n]) => `<span data-cid="${id}">${esc(CARDS[id] ? CARDS[id].name : id)}${n > 1 ? ' ×' + n : ''}</span>`).join(', ');
+function trMine() { const c = collLoad(), out = {}; for (const [id, n] of Object.entries(c.cards)) { const k = n - ((c.foil || {})[id] || 0); if (k > 0 && CARDS[id]) out[id] = k; } return out; }
+function trProblem(t) {
+  const g = trCount(t.give), w = trCount(t.want), vg = trVal(t.give), vw = trVal(t.want);
+  if (!g || !w) return L('Choisissez au moins une carte de chaque côté.', 'Pick at least one card on each side.');
+  if (g > 10 || w > 10) return L('10 cartes au plus de chaque côté.', '10 cards at most on each side.');
+  if (Math.min(vg, vw) * 2 < Math.max(vg, vw)) return L(`Échange déséquilibré (${vg} contre ${vw}) : chaque côté doit valoir au moins la moitié de l'autre.`, `Unbalanced trade (${vg} vs ${vw}): each side must be worth at least half of the other.`);
+  return '';
+}
+function trList(side) {
+  const t = SOC.tr, mine = side === 'give', pool = mine ? trMine() : (t.view.cards || {}), sel = t[side], c = collLoad();
+  const wishOther = mine ? (t.view.wish || {}) : (c.wish || {}), q = (t.q || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const ids = Object.keys(pool).filter(id => {
+    if (q && !CARDS[id].name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q)) return false;
+    if (mine && t.dup && pool[id] < 2) return false;
+    if (!mine && t.miss && (c.cards[id] || 0) > 0) return false;
+    return true;
+  }).sort((a, b) => (wishOther[b] ? 1 : 0) - (wishOther[a] ? 1 : 0) || RAR_ORDER.indexOf(rarity(a)) - RAR_ORDER.indexOf(rarity(b)) || CARDS[a].name.localeCompare(CARDS[b].name));
+  if (!ids.length) return `<p class="sc-empty">${L('Aucune carte ne correspond.', 'No card matches.')}</p>`;
+  return `<ul class="tr-list" data-keep="tr-${side}">${ids.map(id => {
+    const k = sel[id] || 0, r = rarity(id), max = Math.min(3, pool[id]);
+    const tag = wishOther[id] ? `<em>★ ${mine ? L('souhaitée', 'wanted') : L('dans vos souhaits', 'on your wishlist')}</em>` : !mine && !(c.cards[id] || 0) ? `<i>${L('nouvelle pour vous', 'new for you')}</i>` : '';
+    return `<li class="r-${r}"><span class="tr-r" title="${escAttr(rarName(r))}">${r}</span><span class="tr-n" data-cid="${id}">${esc(CARDS[id].name)}${tag}</span><span class="tr-q">${pool[id]} ${L('dispo', 'avail.')}</span>
+      <span class="tr-pm"><button data-trs="${side}" data-id="${id}" data-d="-1" ${k ? '' : 'disabled'} aria-label="${escAttr(L(`Retirer ${CARDS[id].name}`, `Remove ${CARDS[id].name}`))}">−</button><b>${k || ''}</b><button data-trs="${side}" data-id="${id}" data-d="1" ${k < max ? '' : 'disabled'} aria-label="${escAttr(L(`Ajouter ${CARDS[id].name}`, `Add ${CARDS[id].name}`))}">+</button></span></li>`;
+  }).join('')}</ul>`;
+}
+const TR_ST = () => ({ pending: L('En attente', 'Pending'), done: L('Échange fait ✓', 'Trade done ✓'), refused: L('Refusé', 'Declined'), cancelled: L('Annulé', 'Cancelled'), expired: L('Expiré', 'Expired'), failed: L('Échoué : cartes plus disponibles', 'Failed: cards no longer available') });
+function tradesHTML() {
+  const t = SOC.tr, rules = `<p class="tr-rules">${L("Échangez des exemplaires normaux (les Brillantes restent à vous) : 10 cartes au plus de chaque côté, des valeurs comparables, 5 échanges par jour. Une proposition reste valable 3 jours.", 'Trade normal copies (your Foils stay yours): 10 cards at most on each side, comparable values, 5 trades per day. A proposal stays valid for 3 days.')}</p>`;
+  const msg = `<p class="sc-msg ${SOC.bad ? 'ko' : ''}" role="status">${esc(SOC.msg)}</p>`;
+  if (collLoad().blocked) return `<p class="ac-blk">${L("Compte bloqué par l'organisateur : les échanges ne sont pas possibles.", 'Account blocked by the organiser: trading is not possible.')}</p>`;
+  if (t) {
+    if (!t.view) return `<h3 class="sc-h">${L(`Échange avec ${esc(t.pseudo)}`, `Trade with ${esc(t.pseudo)}`)}</h3>${msg}<p class="sc-empty">${L('Chargement de ses cartes…', 'Loading their cards…')}</p>`;
+    const pb = trProblem(t), chips = side => trCount(t[side]) ? Object.entries(t[side]).map(([id, n]) => `<span class="ad-chip" data-cid="${id}">${esc(CARDS[id].name)}${n > 1 ? ' ×' + n : ''}<button data-trs="${side}" data-id="${id}" data-d="-1" aria-label="${escAttr(L(`Retirer ${CARDS[id].name}`, `Remove ${CARDS[id].name}`))}">×</button></span>`).join('') : `<span class="none">${L('Rien pour l\'instant', 'Nothing yet')}</span>`;
+    return `<h3 class="sc-h">${L(`Échange avec ${esc(t.pseudo)}`, `Trade with ${esc(t.pseudo)}`)}</h3>${rules}${msg}
+      <div class="tr-bal">
+        <div class="tr-side"><h4>${L('Vous donnez', 'You give')}</h4><small>${trCount(t.give)} ${L('carte(s)', 'card(s)')} · ${L('valeur', 'value')} ${trVal(t.give)}</small><div class="tr-sel">${chips('give')}</div></div>
+        <div class="tr-side"><h4>${L('Vous recevez', 'You receive')}</h4><small>${trCount(t.want)} ${L('carte(s)', 'card(s)')} · ${L('valeur', 'value')} ${trVal(t.want)}</small><div class="tr-sel">${chips('want')}</div></div>
+        <div class="tr-state"><p class="${pb ? 'ko' : ''}">${pb ? esc(pb) : L('✓ Échange équilibré : vous pouvez le proposer.', '✓ Balanced trade: you can propose it.')}</p>
+          <div class="row"><button class="btn" data-soc="tr-close">${L('Annuler', 'Cancel')}</button><button class="btn solid" data-soc="tr-send" ${pb ? 'disabled' : ''}>${L("Proposer l'échange", 'Propose the trade')}</button></div></div>
+      </div>
+      <div class="tr-filter"><input type="search" id="tr-q" value="${escAttr(t.q || '')}" placeholder="${escAttr(L('Chercher une carte', 'Search a card'))}" aria-label="${escAttr(L('Chercher une carte', 'Search a card'))}"></div>
+      <div class="tr-cols">
+        <section class="tr-col"><h4>${L('Vos cartes', 'Your cards')}</h4><div class="tr-filter"><label><input type="checkbox" data-trf="dup" ${t.dup ? 'checked' : ''}>${L('Seulement mes doubles', 'Only my duplicates')}</label></div>${trList('give')}</section>
+        <section class="tr-col"><h4>${L(`Cartes de ${esc(t.pseudo)}`, `${esc(t.pseudo)}'s cards`)}</h4><div class="tr-filter"><label><input type="checkbox" data-trf="miss" ${t.miss ? 'checked' : ''}>${L('Seulement celles qui me manquent', 'Only the ones I miss')}</label></div>${trList('want')}</section>
+      </div>`;
+  }
+  const all = SOC.trades;
+  if (!all) return rules + msg + `<p class="sc-empty">${L('Chargement…', 'Loading…')}</p>`;
+  const inc = all.filter(x => !x.mine && x.status === 'pending'), out = all.filter(x => x.mine && x.status === 'pending'), old = all.filter(x => x.status !== 'pending');
+  const card = (x, acts) => `<li class="tr-card"><div class="tr-who">${socAv(x.avatar)}<b>${esc(x.pseudo)}</b><span class="${x.status === 'done' ? 'done' : x.status === 'failed' ? 'ko' : ''}">${TR_ST()[x.status]} · ${loginTime(new Date(x.at).getTime())}</span></div>
+    <div class="tr-sum"><div><small>${L('Vous donnez', 'You give')}</small>${trNames(x.mine ? x.give : x.want)}</div><div><small>${L('Vous recevez', 'You receive')}</small>${trNames(x.mine ? x.want : x.give)}</div></div>${acts ? `<div class="sc-acts">${acts}</div>` : ''}</li>`;
+  return rules + msg + `<h3 class="sc-h">${L('Propositions reçues', 'Proposals received')}</h3>
+    ${inc.length ? `<ul class="tr-cards">${inc.map(x => card(x, `<button class="btn solid" data-soc="tr-accept" data-id="${x.id}">${L('Accepter', 'Accept')}</button><button class="btn" data-soc="tr-refuse" data-id="${x.id}">${L('Refuser', 'Decline')}</button>`)).join('')}</ul>` : `<p class="sc-empty">${L("Aucune pour l'instant. Pour proposer un échange : Amis → Échanger.", 'None for now. To propose a trade: Friends → Trade.')}</p>`}
+    ${out.length ? `<h3 class="sc-h">${L('Vos propositions', 'Your proposals')}</h3><ul class="tr-cards">${out.map(x => card(x, `<button class="btn" data-soc="tr-cancel" data-id="${x.id}">${L('Annuler la proposition', 'Cancel the proposal')}</button>`)).join('')}</ul>` : ''}
+    ${old.length ? `<h3 class="sc-h">${L('Ces 7 derniers jours', 'Last 7 days')}</h3><ul class="tr-cards">${old.map(x => card(x, '')).join('')}</ul>` : ''}`;
+}
+function trErr(e) {
+  const m = e.message || '';
+  return /déséquilibré/.test(m) ? L("Échange déséquilibré : chaque côté doit valoir au moins la moitié de l'autre.", 'Unbalanced trade: each side must be worth at least half of the other.')
+    : /votre ami n'a pas/.test(m) ? L("Votre ami n'a plus certaines de ces cartes : rechargez la liste.", 'Your friend no longer has some of these cards: reload the list.')
+    : /pas ces cartes/.test(m) ? L("Vous n'avez plus certaines de ces cartes.", 'You no longer have some of these cards.')
+    : /5 échanges/.test(m) ? L("Limite de 5 échanges par jour atteinte (pour vous ou votre ami) : réessayez demain.", 'Limit of 5 trades per day reached (for you or your friend): try again tomorrow.')
+    : /trop de propositions/.test(m) ? L('Vous avez déjà 10 propositions en attente : attendez des réponses ou annulez-en.', 'You already have 10 pending proposals: wait for answers or cancel some.')
+    : /expirée/.test(m) ? L("Cette proposition n'est plus valable.", 'This proposal is no longer valid.')
+    : /bloqué/.test(m) ? L('Échange impossible : un des deux comptes est bloqué.', 'Trade not possible: one of the two accounts is blocked.')
+    : /ami/.test(m) ? L("Ce joueur n'est plus votre ami.", 'This player is no longer your friend.') : L(`Impossible : ${m}`, `Not possible: ${m}`);
+}
+async function trAct(a, b) {
+  const id = b && +b.dataset.id, x = (SOC.trades || []).find(y => y.id === id);
+  try {
+    if (a === 'tr-close') { SOC.tr = null; SOC.msg = ''; renderSocial(); return socLoad(); }
+    if (a === 'tr-send') {
+      const t = SOC.tr; if (trProblem(t)) return;
+      b.disabled = true;
+      await socRpc('trade_propose', { other: t.other, give: t.give, want: t.want });
+      SOC.tr = null; SOC.msg = L(`✓ Proposition envoyée à ${t.pseudo}. Elle reste valable 3 jours.`, `✓ Proposal sent to ${t.pseudo}. It stays valid for 3 days.`); SOC.bad = false;
+      return socLoad();
+    }
+    if (a === 'tr-accept') {
+      b.disabled = true;
+      const r = await srv('trade_answer', { id, accept: true });
+      SOC.msg = r.status === 'done' ? L(`✓ Échange fait avec ${x.pseudo} : vos nouvelles cartes sont dans votre collection.`, `✓ Trade done with ${x.pseudo}: your new cards are in your collection.`)
+        : L(`Échange impossible : ${x.pseudo} n'a plus les cartes proposées, ou vous n'avez plus les vôtres.`, `Trade not possible: ${x.pseudo} no longer has the offered cards, or you no longer have yours.`);
+      SOC.bad = r.status !== 'done'; await socLoad(); return presenceTick();
+    }
+    if (a === 'tr-refuse') { await socRpc('trade_answer', { id, accept: false }); SOC.msg = ''; await socLoad(); return presenceTick(); }
+    if (a === 'tr-cancel') { await socRpc('trade_cancel', { id }); SOC.msg = ''; return socLoad(); }
+  } catch (e) { if (b) b.disabled = false; socSay(trErr(e), true); }
+}
+function trPick(side, id, d) {
+  const t = SOC.tr, sel = t[side], pool = side === 'give' ? trMine() : t.view.cards || {};
+  const k = Math.max(0, Math.min((sel[id] || 0) + d, 3, pool[id] || 0));
+  if (k) sel[id] = k; else delete sel[id];
+  if (d > 0 && trCount(sel) > 10) { sel[id] = k - 1; if (!sel[id]) delete sel[id]; return socSay(L('10 cartes au plus de chaque côté.', '10 cards at most on each side.'), true); }
+  SOC.msg = ''; renderSocial();
+  const n = document.querySelector(`#social [data-trs="${side}"][data-id="${id}"][data-d="${d}"]:not(:disabled)`) || document.querySelector(`#social [data-trs="${side}"][data-id="${id}"]:not(:disabled)`) || document.querySelector('#social [data-soc="tr-send"]');
+  if (n) n.focus({ preventScroll: true });
 }
 // ---------- tableau de bord ----------
 const fmtDay = d => new Date(d + 'T12:00:00').toLocaleDateString(LANG === 'en' ? 'en-GB' : 'fr-FR', { day: 'numeric', month: 'short' });
@@ -8097,13 +8265,72 @@ function adBars(title, days, key, unit) {
 function adminHTML(a) {
   if (!a) return `<p class="sc-empty">${L('Chargement…', 'Loading…')}</p>`;
   const tile = (v, t) => `<div class="ad-tile"><b>${v}</b><span>${t}</span></div>`;
-  const people = list => list.length ? `<table class="ad-tbl"><thead><tr><th>${L('Pseudo', 'Nickname')}</th><th>E-mail</th><th class="n">${L('Jours au plafond', 'Days at limit')}</th><th class="n">${L('Boosters gagnés', 'Boosters earned')}</th><th class="n">${L('Parties', 'Games')}</th><th class="n">${L('Victoires', 'Wins')}</th><th class="n">${L('Boosters ouverts', 'Boosters opened')}</th></tr></thead>
-    <tbody>${list.map(x => `<tr><td>${esc(x.pseudo || '—')}</td><td>${esc(x.email || '')}</td><td class="n">${x.cap_days ?? '—'}</td><td class="n">${x.packs | 0}</td><td class="n">${x.games | 0}</td><td class="n">${x.wins != null ? `${x.wins} (${Math.round(100 * x.wins / Math.max(1, x.games))} %)` : '—'}</td><td class="n">${x.opened | 0}</td></tr>`).join('')}</tbody></table>` : `<p class="sc-empty">${L('Rien à signaler.', 'Nothing to report.')}</p>`;
+  const people = list => list.length ? `<table class="ad-tbl"><thead><tr><th>${L('Pseudo', 'Nickname')}</th><th>E-mail</th><th class="n">${L('Jours au plafond', 'Days at limit')}</th><th class="n">${L('Boosters gagnés', 'Boosters earned')}</th><th class="n">${L('Parties', 'Games')}</th><th class="n">${L('Victoires', 'Wins')}</th><th class="n">${L('Boosters ouverts', 'Boosters opened')}</th><th><span class="sr-only">${L('Action', 'Action')}</span></th></tr></thead>
+    <tbody>${list.map(x => `<tr><td>${esc(x.pseudo || '—')}${x.blocked ? ` <span class="ad-tag" style="color:#ffb3bb">${L('bloqué', 'blocked')}</span>` : ''}</td><td>${esc(x.email || '')}</td><td class="n">${x.cap_days ?? '—'}</td><td class="n">${x.packs | 0}</td><td class="n">${x.games | 0}</td><td class="n">${x.wins != null ? `${x.wins} (${Math.round(100 * x.wins / Math.max(1, x.games))} %)` : '—'}</td><td class="n">${x.opened | 0}</td><td><button class="btn" data-ad="manage" data-q="${escAttr(x.email || '')}">${L('Gérer', 'Manage')}</button></td></tr>`).join('')}</tbody></table>` : `<p class="sc-empty">${L('Rien à signaler.', 'Nothing to report.')}</p>`;
+  const w = SOC.adWords || { words: [], flagged: [] };
+  const logTxt = x => ({ block: L('Bloqué', 'Blocked'), unblock: L('Débloqué', 'Unblocked'), reset: L('Collection remise à zéro', 'Collection reset'), rename: L('Renommé', 'Renamed') })[x.action] || x.action;
   return `<div class="ad-tiles">${tile(a.players, L('joueurs inscrits', 'registered players'))}${tile(a.profiles, L('avec un pseudo', 'with a nickname'))}${tile(a.online, L('en ligne maintenant', 'online now'))}${tile(a.games_total, L('parties récompensées', 'rewarded games'))}${tile(a.opened_total, L('boosters ouverts', 'boosters opened'))}</div>
     <div class="ad-charts">${adBars(L('Inscriptions', 'Sign-ups'), a.days, 'signups', L('inscription(s)', 'sign-up(s)'))}${adBars(L('Joueurs actifs', 'Active players'), a.days, 'active', L('joueur(s)', 'player(s)'))}
       ${adBars(L('Parties récompensées', 'Rewarded games'), a.days, 'games', L('partie(s)', 'game(s)'))}${adBars(L('Boosters gagnés', 'Boosters earned'), a.days, 'packs', L('booster(s)', 'booster(s)'))}</div>
+    <section class="ad-sec" id="ad-manage"><h3>${L('Gérer un compte', 'Manage an account')}</h3><p>${L('Cherchez un joueur par son pseudo ou son e-mail, puis renommez-le, remettez sa collection à zéro ou bloquez-le.', 'Find a player by nickname or e-mail, then rename them, reset their collection or block them.')}</p>
+      <div class="ad-find"><input id="ad-q" type="search" value="${escAttr(SOC.adQ)}" placeholder="${escAttr(L('Pseudo ou e-mail', 'Nickname or e-mail'))}" aria-label="${escAttr(L('Pseudo ou e-mail', 'Nickname or e-mail'))}"><button class="btn solid" data-ad="find">${L('Chercher', 'Search')}</button></div>
+      <p class="sc-msg ${SOC.bad ? 'ko' : ''}" role="status">${esc(SOC.msg)}</p>
+      ${SOC.adFound ? SOC.adFound.length ? `<ul class="ad-pls">${SOC.adFound.map(adPlayer).join('')}</ul>` : `<p class="sc-empty">${L('Aucun joueur trouvé.', 'No player found.')}</p>` : ''}</section>
     <section class="ad-sec"><h3>${L('Comptes à surveiller', 'Accounts to watch')}</h3><p>${L('Au plafond de 30 boosters plusieurs jours sur les 14 derniers, ou plus de 95 % de victoires sur au moins 20 parties.', 'At the 30-booster limit on several of the last 14 days, or over 95% wins on at least 20 games.')}</p>${people(a.suspects)}</section>
-    <section class="ad-sec"><h3>${L('Joueurs les plus actifs (14 jours)', 'Most active players (14 days)')}</h3>${people(a.top)}</section>`;
+    <section class="ad-sec"><h3>${L('Joueurs les plus actifs (14 jours)', 'Most active players (14 days)')}</h3>${people(a.top)}</section>
+    <section class="ad-sec"><h3>${L('Comptes bloqués', 'Blocked accounts')}</h3>${(a.blocked || []).length ? `<ul class="ad-pls">${a.blocked.map(adPlayer).join('')}</ul>` : `<p class="sc-empty">${L('Aucun.', 'None.')}</p>`}</section>
+    <section class="ad-sec"><h3>${L('Pseudos à vérifier', 'Nicknames to check')}</h3><p>${L('Pseudos actuels qui contiennent un mot interdit (souvent choisis avant que le mot soit ajouté).', 'Current nicknames containing a forbidden word (often chosen before the word was added).')}</p>
+      ${w.flagged.length ? `<table class="ad-tbl"><tbody>${w.flagged.map(x => `<tr><td>${esc(x.pseudo)}</td><td>${L('contient', 'contains')} « ${esc(x.word)} »</td><td><button class="btn" data-ad="rename" data-id="${x.id}" data-p="${escAttr(x.pseudo)}">${L('Renommer', 'Rename')}</button></td></tr>`).join('')}</tbody></table>` : `<p class="sc-empty">${L('Rien à signaler.', 'Nothing to report.')}</p>`}</section>
+    <section class="ad-sec"><h3>${L('Mots interdits dans les pseudos', 'Words forbidden in nicknames')}</h3><p>${L('Comparés sans accents ni majuscules, en lisant 0 comme o, 1 comme i, 3 comme e, 4 comme a… Un mot interdit refuse aussi les pseudos qui le contiennent : évitez les mots trop courts (« con » refuserait « Falcon »).', 'Compared without accents or case, reading 0 as o, 1 as i, 3 as e, 4 as a… A forbidden word also refuses nicknames containing it: avoid very short words ("con" would refuse "Falcon").')}</p>
+      <div class="ad-wadd"><input id="ad-w" maxlength="30" placeholder="${escAttr(L('Nouveau mot', 'New word'))}" aria-label="${escAttr(L('Nouveau mot interdit', 'New forbidden word'))}"><button class="btn solid" data-ad="word-add">${L('Ajouter', 'Add')}</button></div>
+      <div class="ad-chips">${w.words.map(x => `<span class="ad-chip">${esc(x)}<button data-ad="word-del" data-w="${escAttr(x)}" aria-label="${escAttr(L(`Retirer ${x}`, `Remove ${x}`))}">×</button></span>`).join('')}</div></section>
+    <section class="ad-sec"><h3>${L('Journal de vos actions', 'Log of your actions')}</h3>${(a.log || []).length ? `<table class="ad-tbl"><tbody>${a.log.map(x => `<tr><td>${loginTime(new Date(x.at).getTime())}</td><td>${logTxt(x)}</td><td>${esc(x.pseudo || x.email || L('compte supprimé', 'deleted account'))}</td><td>${esc(x.detail || '')}</td></tr>`).join('')}</tbody></table>` : `<p class="sc-empty">${L('Aucune action pour l\'instant.', 'No action yet.')}</p>`}</section>`;
+}
+function adPlayer(p) {
+  const seen = p.seen ? loginTime(new Date(p.seen).getTime()) : L('jamais', 'never');
+  return `<li class="ad-pl ${p.blocked ? 'blk' : ''}"><div class="ad-pl-h"><b>${esc(p.pseudo || L('(sans pseudo)', '(no nickname)'))}</b><span>${esc(p.email || '')}</span>${p.blocked ? `<span class="ad-tag">${L('Bloqué', 'Blocked')}${p.reason ? ' : ' + esc(p.reason) : ''}</span>` : ''}</div>
+    <div class="ad-pl-s">${L(`Inscrit le ${fmtDay(p.since)} · vu ${seen} · ${p.cards}/150 cartes · ${p.opened} boosters ouverts, ${p.packs} à ouvrir · ${p.games} parties (${Math.round(100 * p.wins / Math.max(1, p.games))} % de victoires)`, `Joined ${fmtDay(p.since)} · seen ${seen} · ${p.cards}/150 cards · ${p.opened} boosters opened, ${p.packs} to open · ${p.games} games (${Math.round(100 * p.wins / Math.max(1, p.games))}% wins)`)}</div>
+    <div class="sc-acts">${p.pseudo ? `<button class="btn" data-ad="rename" data-id="${p.id}" data-p="${escAttr(p.pseudo)}">${L('Renommer', 'Rename')}</button>` : ''}<button class="btn" data-ad="reset" data-id="${p.id}" data-p="${escAttr(p.pseudo || p.email)}">${L('Remettre la collection à zéro', 'Reset the collection')}</button>
+      ${p.blocked ? `<button class="btn cy" data-ad="unblock" data-id="${p.id}" data-p="${escAttr(p.pseudo || p.email)}">${L('Débloquer', 'Unblock')}</button>` : `<button class="btn" data-ad="block" data-id="${p.id}" data-p="${escAttr(p.pseudo || p.email)}" style="border-color:var(--red);color:#ffb3bb">${L('Bloquer', 'Block')}</button>`}</div></li>`;
+}
+async function adAct(a, b) {
+  const id = b && b.dataset.id, who = b && b.dataset.p;
+  const done = async (p, m) => { if (p && SOC.adFound) SOC.adFound = SOC.adFound.map(x => x.id === p.id ? p : x); SOC.msg = m; SOC.bad = false; [SOC.adminData, SOC.adWords] = await Promise.all([socRpc('admin_stats'), socRpc('admin_words', { word: '', add: false })]); renderSocial(); };
+  try {
+    if (a === 'find' || a === 'manage') {
+      SOC.adQ = a === 'manage' ? b.dataset.q : (document.getElementById('ad-q').value || '').trim();
+      SOC.adFound = await socRpc('admin_find', { q: SOC.adQ }); SOC.msg = ''; renderSocial();
+      const sec = document.getElementById('ad-manage'); if (a === 'manage' && sec) sec.scrollIntoView({ block: 'start' });
+      const n = document.querySelector('#ad-manage .ad-pl button') || document.getElementById('ad-q'); if (n) n.focus({ preventScroll: true });
+      return;
+    }
+    if (a === 'block') {
+      const why = await uiPrompt(L(`Bloquer ${who} ? Ses parties ne rapporteront plus de booster, ses échanges en attente seront annulés et il disparaîtra du classement. Raison (visible par vous seul) :`, `Block ${who}? Their games will no longer earn boosters, their pending trades will be cancelled and they will disappear from the leaderboard. Reason (visible only to you):`), { ok: L('Bloquer', 'Block'), danger: true, title: L('Bloquer un compte', 'Block an account') });
+      if (why == null) return;
+      return done(await socRpc('admin_block', { target: id, block: true, reason: why.trim() || null }), L(`✓ ${who} est bloqué.`, `✓ ${who} is blocked.`));
+    }
+    if (a === 'unblock') { if (!await uiConfirm(L(`Débloquer ${who} ? Ses parties rapporteront de nouveau des boosters.`, `Unblock ${who}? Their games will earn boosters again.`), { ok: L('Débloquer', 'Unblock') })) return; return done(await socRpc('admin_block', { target: id, block: false, reason: null }), L(`✓ ${who} est débloqué.`, `✓ ${who} is unblocked.`)); }
+    if (a === 'reset') {
+      if (!await uiConfirm(L(`Remettre la collection de ${who} à zéro ? Il repartira des deux decks de base, sans booster ni composant, et ses campagnes seront à refaire. Ses succès et statistiques restent. Impossible à annuler.`, `Reset ${who}'s collection? They will restart from the two starter decks, with no booster or component, and their campaigns will have to be replayed. Achievements and statistics stay. This cannot be undone.`), { ok: L('Remettre à zéro', 'Reset'), danger: true, title: L('Remettre une collection à zéro', 'Reset a collection') })) return;
+      return done(await socRpc('admin_reset', { target: id }), L(`✓ Collection de ${who} remise à zéro.`, `✓ ${who}'s collection was reset.`));
+    }
+    if (a === 'rename') {
+      const p = await uiPrompt(L(`Nouveau pseudo pour ${who} (laissez vide pour « Joueur » suivi de 4 chiffres) :`, `New nickname for ${who} (leave empty for "Joueur" followed by 4 digits):`), { ok: L('Renommer', 'Rename'), title: L('Renommer un joueur', 'Rename a player') });
+      if (p == null) return;
+      const r = await socRpc('admin_rename', { target: id, pseudo: p.trim() });
+      return done(r, L(`✓ ${who} s'appelle maintenant ${r.pseudo}.`, `✓ ${who} is now called ${r.pseudo}.`));
+    }
+    if (a === 'word-add' || a === 'word-del') {
+      const word = a === 'word-add' ? (document.getElementById('ad-w').value || '').trim() : b.dataset.w;
+      if (!word) return;
+      SOC.adWords = await socRpc('admin_words', { word, add: a === 'word-add' }); renderSocial();
+      const n = document.getElementById('ad-w'); if (n && a === 'word-add') n.focus({ preventScroll: true });
+      return;
+    }
+  } catch (e) {
+    SOC.msg = /pris/.test(e.message) ? L('Ce pseudo est déjà pris.', 'This nickname is already taken.') : /invalide/.test(e.message) ? L('Pseudo invalide : 3 à 20 caractères simples.', 'Invalid nickname: 3 to 20 plain characters.') : /court/.test(e.message) ? L('Mot trop court (3 lettres au moins).', 'Word too short (at least 3 letters).') : L(`Impossible : ${e.message}`, `Not possible: ${e.message}`);
+    SOC.bad = true; renderSocial();
+  }
 }
 // ---------- amis : actions ----------
 async function socAct(a, b) {
@@ -8119,6 +8346,7 @@ async function socAct(a, b) {
     if (a === 'accept' || a === 'refuse') { await socRpc('friend_respond', { other: id, accept: a === 'accept' }); SOC.msg = a === 'accept' ? L(`✓ ${f.pseudo} et vous êtes maintenant amis.`, `✓ You and ${f.pseudo} are now friends.`) : ''; await socLoad(); presenceTick(); return; }
     if (a === 'remove') { if (f.status === 'friend' && !await uiConfirm(L(`Retirer ${f.pseudo} de vos amis ?`, `Remove ${f.pseudo} from your friends?`), { ok: L('Retirer', 'Remove'), danger: true })) return; await socRpc('friend_remove', { other: id }); SOC.msg = ''; await socLoad(); return; }
     if (a === 'invite') return inviteFriend(f);
+    if (a === 'trade') { SOC.tab = 'trades'; SOC.tr = { other: f.id, pseudo: f.pseudo, give: {}, want: {}, view: null, q: '', dup: false, miss: false }; SOC.msg = ''; renderSocial(); await socLoad(); const n = document.getElementById('tr-q'); if (n) n.focus({ preventScroll: true }); return; }
   } catch (e) {
     socSay(/introuvable/.test(e.message) ? L("Aucun joueur n'a ce pseudo.", 'No player has this nickname.') : /vous/.test(e.message) ? L("C'est votre propre pseudo.", 'That is your own nickname.') : L(`Impossible : ${e.message}`, `Not possible: ${e.message}`), true);
   }
@@ -8131,17 +8359,17 @@ async function inviteFriend(f) {
   await onlineGo('host');
   const box = document.getElementById('o-inv');
   if (NET.role !== 'host' || !NET.code) return;
-  try { await socRpc('friend_invite', { other: f.id, code: NET.code }); if (box) box.innerHTML = L(`✓ Invitation envoyée à <b>${esc(f.pseudo)}</b> : elle s'affichera sur son écran dans les 30 secondes. La partie démarre dès qu'il rejoint.`, `✓ Invitation sent to <b>${esc(f.pseudo)}</b>: it will show on their screen within 30 seconds. The game starts as soon as they join.`); }
+  try { await socRpc('friend_invite', { other: f.id, code: NET.code }); if (box) box.innerHTML = L(`✓ Invitation envoyée à <b>${esc(f.pseudo)}</b> : elle s'affiche tout de suite sur son écran. La partie démarre dès qu'il rejoint.`, `✓ Invitation sent to <b>${esc(f.pseudo)}</b>: it shows on their screen right away. The game starts as soon as they join.`); }
   catch (e) { if (box) { box.textContent = L(`L'invitation n'a pas pu être envoyée (${e.message}). Donnez-lui le code ci-dessus.`, `The invitation could not be sent (${e.message}). Give them the code above.`); box.classList.add('err'); } }
 }
 // ---------- présence et invitations reçues (toutes les 30 s) ----------
 async function presenceTick() {
   if (!cloudSession() || (TAB.lock && !TAB.held) || !navigator.onLine) return;
-  try { const r = await socRpc('presence'); SOC.invites = r.invites || []; SOC.requests = +r.requests || 0; } catch (e) { return; }
-  const n = SOC.requests + SOC.invites.length, bd = document.getElementById('fr-badge');
+  try { const r = await socRpc('presence'); SOC.invites = r.invites || []; SOC.requests = +r.requests || 0; SOC.tradesIn = +r.trades || 0; } catch (e) { return; }
+  const n = SOC.requests + SOC.invites.length + SOC.tradesIn, bd = document.getElementById('fr-badge');
   bd.hidden = !n; bd.textContent = n;
   renderInvites();
-  if (document.getElementById('social').classList.contains('on') && SOC.tab !== 'admin') renderSocial();
+  if (document.getElementById('social').classList.contains('on') && SOC.tab !== 'admin' && !SOC.tr) renderSocial();
 }
 function renderInvites() {
   const el = document.getElementById('invite-toast'), inv = SOC.invites[0];
@@ -8164,33 +8392,121 @@ async function inviteAnswer(join) {
   document.querySelector('#online .obox').classList.add('invited');
   document.getElementById('o-deck').focus();
 }
-// Après « Jouer » : profil, droits d'organisateur, présence.
+// Après « Jouer » : profil, droits d'organisateur, présence, temps réel.
 async function socialInit() {
   profileLoad();
   try { SOC.admin = (await socRpc('is_admin')) === true; } catch (e) { SOC.admin = false; }
   document.getElementById('b-admin').hidden = !SOC.admin;
   presenceTick();
+  rtStart();
+}
+/* ---------- temps réel (Supabase Realtime, protocole Phoenix sur WebSocket) ----------
+   Invitations, demandes d'ami et échanges arrivent dans la seconde ; la liste des amis en ligne suit les arrivées et les départs.
+   Si la connexion échoue ou se coupe, le relevé toutes les 30 secondes (presenceTick) continue de tout faire, en plus lent. */
+const RT = { ws: null, ref: 0, joinRef: null, hb: null, retry: 0, timer: null, joined: false, stopped: false, uid: null, token: null, online: new Set(), left: new Set() };
+const RT_TOPIC = 'realtime:cptcg';
+function rtSend(topic, event, payload) {
+  if (!RT.ws || RT.ws.readyState !== 1) return;
+  RT.ws.send(JSON.stringify({ topic, event, payload, ref: String(++RT.ref), ...(topic === 'phoenix' ? {} : { join_ref: RT.joinRef }) }));
+}
+// Un ami est en ligne s'il est connecté au temps réel, ou s'il s'est signalé il y a moins de 2 minutes (et n'est pas parti depuis).
+const friendOnline = f => RT.online.has(f.id) || (f.online && !RT.left.has(f.id));
+async function rtStart() {
+  if (HEADLESS || typeof WebSocket === 'undefined' || RT.ws || !cloudSession() || (TAB.lock && !TAB.held)) return;
+  RT.stopped = false; clearTimeout(RT.timer);
+  if (!await cloudToken()) return rtLater();
+  const ses = cloudSession(); RT.uid = ses.user_id; RT.token = ses.access_token;
+  let ws;
+  try { ws = new WebSocket(CLOUD.url.replace(/^http/, 'ws') + '/realtime/v1/websocket?apikey=' + encodeURIComponent(CLOUD.key) + '&vsn=1.0.0'); } catch (e) { return rtLater(); }
+  RT.ws = ws;
+  ws.onopen = () => {
+    RT.joinRef = String(++RT.ref);
+    const me = RT.uid, on = (table, filter) => ({ event: '*', schema: 'public', table, filter });
+    ws.send(JSON.stringify({ topic: RT_TOPIC, event: 'phx_join', ref: RT.joinRef, join_ref: RT.joinRef, payload: { access_token: RT.token, config: {
+      broadcast: { ack: false, self: false }, presence: { key: me }, private: false,
+      postgres_changes: [on('invites', 'to_id=eq.' + me), on('friends', 'a=eq.' + me), on('friends', 'b=eq.' + me), on('trades', 'to_id=eq.' + me), on('trades', 'from_id=eq.' + me)] } } }));
+    clearInterval(RT.hb);
+    RT.hb = setInterval(async () => {
+      rtSend('phoenix', 'heartbeat', {});
+      // jeton renouvelé : le temps réel doit le connaître pour continuer à filtrer selon le joueur
+      if (await cloudToken()) { const t = cloudSession().access_token; if (t !== RT.token) { RT.token = t; rtSend(RT_TOPIC, 'access_token', { access_token: t }); } }
+    }, 25000);
+  };
+  ws.onmessage = e => { let m; try { m = JSON.parse(e.data); } catch (er) { return; } rtOn(m); };
+  ws.onclose = () => {
+    clearInterval(RT.hb); if (RT.ws === ws) RT.ws = null;
+    const was = RT.joined; RT.joined = false; RT.online.clear(); RT.left.clear();
+    if (was) rtRender();
+    rtLater();
+  };
+  ws.onerror = () => {};
+}
+function rtLater() {
+  if (RT.stopped || !cloudSession()) return;
+  clearTimeout(RT.timer);
+  RT.timer = setTimeout(rtStart, Math.min(300e3, 3000 * 2 ** RT.retry++));
+}
+function rtStop() { RT.stopped = true; clearTimeout(RT.timer); clearInterval(RT.hb); const ws = RT.ws; RT.ws = null; RT.joined = false; RT.online.clear(); RT.left.clear(); if (ws) try { ws.close(); } catch (e) {} }
+function rtRender() { const el = document.getElementById('social'); if (el.classList.contains('on') && SOC.tab === 'friends') renderSocial(); }
+function rtOn(m) {
+  if (m.topic !== RT_TOPIC) return;
+  const p = m.payload || {};
+  if (m.event === 'phx_reply' && m.ref === RT.joinRef) {
+    if (p.status !== 'ok') { RT.retry = Math.max(RT.retry, 4); return RT.ws && RT.ws.close(); }   // refusé (réglages du serveur) : on réessaiera plus tard
+    RT.joined = true; RT.retry = 0;
+    rtSend(RT_TOPIC, 'presence', { type: 'presence', event: 'track', payload: { at: Date.now() } });
+    presenceTick();   // ce qui est arrivé pendant la coupure
+    return;
+  }
+  if (m.event === 'phx_error' || m.event === 'phx_close') return RT.ws && RT.ws.close();
+  if (m.event === 'presence_state') { RT.online = new Set(Object.keys(p)); RT.left.clear(); return rtRender(); }
+  if (m.event === 'presence_diff') {
+    for (const k of Object.keys(p.joins || {})) { RT.online.add(k); RT.left.delete(k); }
+    for (const k of Object.keys(p.leaves || {})) if (!(p.joins || {})[k]) { RT.online.delete(k); RT.left.add(k); }
+    return rtRender();
+  }
+  if (m.event !== 'postgres_changes') return;
+  const d = p.data || {}, rec = d.record || {}, open = document.getElementById('social').classList.contains('on');
+  presenceTick();
+  if (d.table === 'friends' && open && SOC.tab === 'friends') socLoad();
+  if (d.table === 'trades') {
+    // mon échange vient d'être accepté : la collection a changé sur le serveur
+    if (rec.status === 'done' && rec.from_id === RT.uid) srv('coll_get', {}, true).catch(() => {});
+    if (open && SOC.tab === 'trades' && !SOC.tr) socLoad();
+  }
 }
 if (!HEADLESS) {
   setInterval(presenceTick, 30000);
   const el = document.getElementById('social');
   el.addEventListener('click', e => {
     const t = e.target.closest('[data-soct]');
-    if (t) { SOC.tab = t.dataset.soct; SOC.msg = ''; renderSocial(); socLoad(); const n = el.querySelector(`[data-soct="${SOC.tab}"]`); if (n) n.focus({ preventScroll: true }); return; }
+    if (t) { SOC.tab = t.dataset.soct; SOC.msg = ''; if (SOC.tab !== 'trades') SOC.tr = null; renderSocial(); socLoad(); const n = el.querySelector(`[data-soct="${SOC.tab}"]`); if (n) n.focus({ preventScroll: true }); return; }
     const k = e.target.closest('[data-kind]');
     if (k) { SOC.kind = k.dataset.kind; renderSocial(); socLoad(); const n = el.querySelector(`[data-kind="${SOC.kind}"]`); if (n) n.focus({ preventScroll: true }); return; }
+    const ts = e.target.closest('[data-trs]'); if (ts) return trPick(ts.dataset.trs, ts.dataset.id, +ts.dataset.d);
+    const ad = e.target.closest('[data-ad]'); if (ad) return adAct(ad.dataset.ad, ad);
     const b = e.target.closest('[data-soc]'); if (!b) return;
     if (b.dataset.soc === 'back') return closeSocial();
+    if (b.dataset.soc.startsWith('tr-')) return trAct(b.dataset.soc, b);
     if (b.dataset.soc === 'pseudo') return openLogin(false);
     socAct(b.dataset.soc, b);
   });
   el.addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.target.id === 'sc-add') { e.preventDefault(); socAct('add'); }
+    if (e.key === 'Enter' && e.target.id === 'ad-q') { e.preventDefault(); adAct('find'); }
+    if (e.key === 'Enter' && e.target.id === 'ad-w') { e.preventDefault(); adAct('word-add'); }
     const t = e.target.closest('[role="tab"], [data-kind]');
     if (t && /^Arrow(Left|Right)$/.test(e.key)) {
       e.preventDefault(); const all = [...t.parentElement.children], n = all[(all.indexOf(t) + (e.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length]; n.click();
     }
   });
+  el.addEventListener('input', e => {
+    if (e.target.id !== 'tr-q' || !SOC.tr) return;
+    SOC.tr.q = e.target.value; const pos = e.target.selectionStart; renderSocial();
+    const n = document.getElementById('tr-q'); n.focus({ preventScroll: true }); n.setSelectionRange(pos, pos);
+  });
+  el.addEventListener('change', e => { const f = e.target.closest('[data-trf]'); if (f && SOC.tr) { SOC.tr[f.dataset.trf] = f.checked; renderSocial(); const n = el.querySelector(`[data-trf="${f.dataset.trf}"]`); if (n) n.focus({ preventScroll: true }); } });
+  el.addEventListener('mouseover', e => { if (Date.now() - lastTouch < 1500) return; if (!e.target.closest('[data-cid]')) hideHover(); });
   document.getElementById('invite-toast').addEventListener('click', e => { const b = e.target.closest('[data-inv]'); if (b) inviteAnswer(b.dataset.inv === 'join'); });
   document.getElementById('b-rank').onclick = () => openSocial('rank');
   document.getElementById('b-friends').onclick = () => openSocial('friends');
@@ -8236,7 +8552,7 @@ const uiPrompt = (text, o = {}) => uiDialog({ text, title: o.title, ok: o.ok || 
    Deux onglets partageraient la même partie en cours et la même sauvegarde (et joueraient deux musiques).
    L'onglet ouvert en dernier propose de « jouer ici » ; l'autre se met alors en pause. */
 function tabBlock(why) {
-  TAB.held = false;
+  TAB.held = false; rtStop();
   const el = document.getElementById('tabblock');
   el.innerHTML = `<div class="tb-box"><h2 id="tb-t">${why === 'stolen' ? L('Le jeu est ouvert dans un autre onglet', 'The game is open in another tab') : L('Le jeu est déjà ouvert', 'The game is already open')}</h2>
     <p>${why === 'stolen' ? L('Vous avez continué à jouer dans un autre onglet. Celui-ci est en pause pour ne pas mélanger vos parties et votre sauvegarde.', 'You carried on playing in another tab. This one is paused so your games and save are not mixed up.')
@@ -9189,6 +9505,6 @@ if (!HEADLESS) {
 
 if (typeof module !== 'undefined') module.exports = { newGame, getG: () => G, AI_PROFILE, CARDS, DECKS, autoComplete, validateDeck, deckSize };
 </script>
-<script>setTimeout(() => { const e = document.getElementById('hero-b64'); if (!window.initHero) return; if (e) { const t = e.textContent; e.remove(); initHero('data:video/webm;base64,' + t); } else initHero(document.createElement('video').canPlayType('video/webm; codecs="av01.0.08M.10"') ? 'hero-1080.webm' : 'hero-1080-vp9.webm'); }, 0);</script>
+<script>setTimeout(() => { if (window.initHero) initHero(document.createElement('video').canPlayType('video/webm; codecs="av01.0.08M.10"') ? 'hero-1080.webm' : 'hero-1080-vp9.webm'); }, 0);</script>
 </body>
 </html>
