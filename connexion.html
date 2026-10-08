@@ -76,7 +76,7 @@ const state = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}')
 const setState = p => { try { localStorage.setItem(KEY, JSON.stringify({ ...state(), ...p })); } catch (e) {} };
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const back = () => location.origin + location.pathname;   // les liens des e-mails reviennent ici
-let step = 'login', recoveryToken = null, busy = false;
+let step = 'login', recoveryToken = null, busy = false, codeMail = '';
 
 async function api(path, { method = 'POST', body, token } = {}) {
   const h = { apikey: CLOUD.key, 'Content-Type': 'application/json' };
@@ -96,6 +96,7 @@ function errText(e) {
   if (c === 'email_not_confirmed' || /not confirmed/i.test(m)) return L("Adresse pas encore confirmée : cliquez sur le lien de l'e-mail de confirmation, puis connectez-vous.", 'Address not confirmed yet: click the link in the confirmation e-mail, then sign in.');
   if (c === 'user_already_exists' || /already registered|already exists/i.test(m)) return L('Un compte existe déjà avec cette adresse : connectez-vous, ou utilisez « Mot de passe oublié ».', 'An account already exists with this address: sign in, or use "Forgot password".');
   if (c === 'weak_password' || /password should|at least|weak/i.test(m)) return L('Mot de passe trop faible : au moins 8 caractères.', 'Password too weak: at least 8 characters.');
+  if (c === 'otp_expired' || /token has expired|invalid/i.test(m) && e.status === 403) return L("Code incorrect ou expiré. Vérifiez les chiffres, ou demandez un nouvel e-mail (seul le dernier reçu est valable).", 'Wrong or expired code. Check the digits, or ask for a new e-mail (only the latest one is valid).');
   if (c === 'same_password') return L("Choisissez un mot de passe différent de l'ancien.", 'Choose a password different from the old one.');
   if (e.status === 429 || /rate limit/i.test(m)) return L('Trop de tentatives : attendez quelques minutes.', 'Too many attempts: wait a few minutes.');
   if (/sending|smtp/i.test(m)) return L("Le serveur n'a pas réussi à envoyer l'e-mail. Réessayez plus tard.", 'The server could not send the e-mail. Try again later.');
@@ -114,11 +115,19 @@ function render() {
   const pass = (id, ac, lbl) => `<label><span>${lbl}</span><span class="field"><input id="${id}" type="password" autocomplete="${ac}" required minlength="${ac === 'new-password' ? 8 : 1}"><button class="eye" type="button" data-a="eye" aria-label="${L('Afficher le mot de passe', 'Show password')}">${L('Afficher', 'Show')}</button></span></label>`;
   const tabs = `<div class="tabs" role="tablist"><button role="tab" type="button" data-a="tab-login" aria-selected="${step === 'login'}">${L('Connexion', 'Sign in')}</button><button role="tab" type="button" data-a="tab-signup" aria-selected="${step === 'signup'}">${L('Créer un compte', 'Create an account')}</button></div>`;
   let h;
-  if (step === 'reset') h = `<h2 id="t">${L('Nouveau mot de passe', 'New password')}</h2><p class="lead">${L('Choisissez votre nouveau mot de passe.', 'Choose your new password.')}</p>
+  const code = `<label><span>${L('Code reçu par e-mail', 'Code from the e-mail')}</span><input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required placeholder="12345678" style="letter-spacing:.25em;font-size:20px"></label>`;
+  if (step === 'code') h = `<h2 id="t">${L('Nouveau mot de passe', 'New password')}</h2><p class="lead">${L(`Un e-mail est parti vers <b>${esc(codeMail)}</b>. Recopiez ici le code qu'il contient, ou cliquez simplement sur son lien.`, `An e-mail was sent to <b>${esc(codeMail)}</b>. Type the code it contains here, or simply click its link.`)}</p>
+    <form novalidate data-f="code">${code}${pass('pass', 'new-password', L('Nouveau mot de passe (8 caractères minimum)', 'New password (8 characters minimum)'))}${pass('pass2', 'new-password', L('Confirmer le mot de passe', 'Confirm the password'))}
+    <button class="go" type="submit">${L('Enregistrer et jouer', 'Save and play')}</button></form>
+    <div class="links"><button class="link" type="button" data-a="tab-forgot">${L('Renvoyer un e-mail', 'Send the e-mail again')}</button><button class="link" type="button" data-a="tab-login">${L('Retour à la connexion', 'Back to sign in')}</button></div>`;
+  else if (step === 'confirm') h = `<h2 id="t">${L('Confirmez votre adresse', 'Confirm your address')}</h2><p class="lead">${L(`Un e-mail de confirmation est parti vers <b>${esc(codeMail)}</b> (pensez aux courriers indésirables). Recopiez ici son code, ou cliquez simplement sur son lien.`, `A confirmation e-mail was sent to <b>${esc(codeMail)}</b> (check your spam folder). Type its code here, or simply click its link.`)}</p>
+    <form novalidate data-f="confirm">${code}<button class="go" type="submit">${L('Confirmer et jouer', 'Confirm and play')}</button></form>
+    <div class="links"><button class="link" type="button" data-a="tab-login">${L('Retour à la connexion', 'Back to sign in')}</button></div>`;
+  else if (step === 'reset') h = `<h2 id="t">${L('Nouveau mot de passe', 'New password')}</h2><p class="lead">${L('Choisissez votre nouveau mot de passe.', 'Choose your new password.')}</p>
     <form novalidate data-f="reset">${pass('pass', 'new-password', L('Nouveau mot de passe (8 caractères minimum)', 'New password (8 characters minimum)'))}${pass('pass2', 'new-password', L('Confirmer le mot de passe', 'Confirm the password'))}
     <button class="go" type="submit">${L('Enregistrer et jouer', 'Save and play')}</button></form>`;
-  else if (step === 'forgot') h = `<h2 id="t">${L('Mot de passe oublié', 'Forgot password')}</h2><p class="lead">${L('Vous recevrez un e-mail avec un lien pour choisir un nouveau mot de passe.', 'You will get an e-mail with a link to choose a new password.')}</p>
-    <form novalidate data-f="forgot">${mail}<button class="go" type="submit">${L('Envoyer le lien', 'Send the link')}</button></form>
+  else if (step === 'forgot') h = `<h2 id="t">${L('Mot de passe oublié', 'Forgot password')}</h2><p class="lead">${L('Vous recevrez un e-mail avec un code et un lien pour choisir un nouveau mot de passe.', 'You will get an e-mail with a code and a link to choose a new password.')}</p>
+    <form novalidate data-f="forgot">${mail}<button class="go" type="submit">${L("Envoyer l'e-mail", 'Send the e-mail')}</button></form>
     <div class="links"><button class="link" type="button" data-a="tab-login">${L('Retour à la connexion', 'Back to sign in')}</button></div>`;
   else if (step === 'signup') h = `${tabs}<h2 id="t" class="sr">${L('Créer un compte', 'Create an account')}</h2>
     <form novalidate data-f="signup">${mail}${pass('pass', 'new-password', L('Mot de passe (8 caractères minimum)', 'Password (8 characters minimum)'))}${pass('pass2', 'new-password', L('Confirmer le mot de passe', 'Confirm the password'))}
@@ -128,17 +137,19 @@ function render() {
     <form novalidate data-f="login">${mail}${pass('pass', 'current-password', L('Mot de passe', 'Password'))}<button class="go" type="submit">${L('Se connecter', 'Sign in')}</button></form>
     <div class="links"><button class="link" type="button" data-a="tab-forgot">${L('Mot de passe oublié ?', 'Forgot password?')}</button></div>`;
   document.getElementById('view').innerHTML = h;
-  const m = document.getElementById('mail'), p = document.getElementById('pass');
-  (m && !m.value ? m : p || m).focus();
+  const m = document.getElementById('mail'), p = document.getElementById('pass'), c = document.getElementById('code');
+  (c || (m && !m.value ? m : p || m)).focus();
 }
 
 async function submit(kind) {
   if (busy) return;
   const v = id => (document.getElementById(id) || {}).value || '';
   const email = v('mail').trim(), p = v('pass');
-  if (kind !== 'reset' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say(L("Cette adresse e-mail n'est pas valide.", 'This e-mail address is not valid.'), 'ko');
-  if ((kind === 'signup' || kind === 'reset') && p.length < 8) return say(L('Le mot de passe doit faire au moins 8 caractères.', 'The password must be at least 8 characters.'), 'ko');
-  if ((kind === 'signup' || kind === 'reset') && p !== v('pass2')) return say(L('Les deux mots de passe ne sont pas identiques.', 'The two passwords do not match.'), 'ko');
+  const code = v('code').replace(/\D/g, '');
+  if ((kind === 'code' || kind === 'confirm') && code.length < 6) return say(L("Recopiez le code à chiffres de l'e-mail.", 'Type the numeric code from the e-mail.'), 'ko');
+  if (!['reset', 'code', 'confirm'].includes(kind) && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say(L("Cette adresse e-mail n'est pas valide.", 'This e-mail address is not valid.'), 'ko');
+  if (['signup', 'reset', 'code'].includes(kind) && p.length < 8) return say(L('Le mot de passe doit faire au moins 8 caractères.', 'The password must be at least 8 characters.'), 'ko');
+  if (['signup', 'reset', 'code'].includes(kind) && p !== v('pass2')) return say(L('Les deux mots de passe ne sont pas identiques.', 'The two passwords do not match.'), 'ko');
   if (kind === 'login' && !p) return say(L('Entrez votre mot de passe.', 'Enter your password.'), 'ko');
   if (email) setState({ lastMail: email });
   busy = true; const btn = document.querySelector('.go'); btn.disabled = true;
@@ -148,12 +159,19 @@ async function submit(kind) {
     if (kind === 'signup') {
       const j = await api('/auth/v1/signup?redirect_to=' + encodeURIComponent(back()), { body: { email, password: p } });
       if (j && j.access_token) { keep(j, email); return go(); }
-      step = 'login'; render(); return say(L(`Compte créé. Un e-mail de confirmation vient d'être envoyé à ${email} : cliquez sur son lien (pensez aux courriers indésirables).`, `Account created. A confirmation e-mail was sent to ${email}: click its link (check your spam folder).`), 'ok');
+      codeMail = email; step = 'confirm'; render(); return say('');
     }
     if (kind === 'forgot') {
       await api('/auth/v1/recover?redirect_to=' + encodeURIComponent(back()), { body: { email } });
-      step = 'login'; render(); return say(L(`Si un compte existe pour ${email}, un e-mail vient de partir avec un lien pour choisir un nouveau mot de passe.`, `If an account exists for ${email}, an e-mail is on its way with a link to choose a new password.`), 'ok');
+      codeMail = email; step = 'code'; render(); return say('');
     }
+    // code de l'e-mail : il remplace le lien (utile si le lien a déjà été ouvert, par exemple par la messagerie)
+    if (kind === 'code') {
+      const j = await api('/auth/v1/verify', { body: { type: 'recovery', email: codeMail, token: code } });
+      await api('/auth/v1/user', { method: 'PUT', body: { password: p }, token: j.access_token });
+      keep(j, codeMail); return go();
+    }
+    if (kind === 'confirm') { keep(await api('/auth/v1/verify', { body: { type: 'signup', email: codeMail, token: code } }), codeMail); return go(); }
     if (kind === 'reset') {
       await api('/auth/v1/user', { method: 'PUT', body: { password: p }, token: recoveryToken.access_token });
       keep(recoveryToken); return go();
