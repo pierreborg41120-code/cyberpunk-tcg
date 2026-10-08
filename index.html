@@ -454,6 +454,8 @@ body.calm .mp.playing .mp-eq i{animation:none;height:70%}
 .gain ul{list-style:none;margin:8px 0;padding:0}
 .gain li{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:15px;color:#d6d9e4}
 .gain li b,.gain-tot b{color:var(--ylw);font-family:'Chakra Petch',sans-serif}
+.gain-wait{margin:8px 0 2px;color:var(--mut);font-size:14px}
+.gain-cap{margin:4px 0 8px;color:#ffb3bb;font-size:13.5px}
 .gain-tot{display:flex;align-items:center;gap:12px;padding-top:4px;font:600 15px 'Chakra Petch',sans-serif;color:#fff}
 .gain-tot span{margin-right:auto}.gain-tot b{font-size:18px}
 .pk-rew.none{border-color:var(--line);background:none;font:400 14px inherit;color:var(--mut)}
@@ -4589,12 +4591,13 @@ function render() {
     const win = G.winner.idx === VIEW;
     end.innerHTML = `<div class="box"><h1 class="${win ? 'win' : 'lose'}">${win ? L('VICTOIRE', 'VICTORY') : L('DÉFAITE', 'DEFEAT')}</h1><p style="font-size:18px">${G.reason}</p>
       <p style="color:var(--mut)">Gigs : ${me.name} ${me.gigs.length} — ${ai.name} ${ai.gigs.length}</p>
-      ${campHTML(cr)}${dailyHTML(dr)}${gainHTML(rw, dr, cr)}<div class="endbtns">${cr && cr.win ? `<button class="btn solid big" onclick="openCamp()">${L('Continuer la campagne', 'Continue the campaign')}</button>` : cr ? `<button class="btn solid big" onclick="rematch()">${L('Retenter', 'Try again')}</button><button class="btn cy big" onclick="openCamp()">${L('Campagne', 'Campaign')}</button>`
+      ${campHTML(cr)}${dailyHTML(dr)}${gainBox(rw)}<div class="endbtns">${cr && cr.win ? `<button class="btn solid big" onclick="openCamp()">${L('Continuer la campagne', 'Continue the campaign')}</button>` : cr ? `<button class="btn solid big" onclick="rematch()">${L('Retenter', 'Try again')}</button><button class="btn cy big" onclick="openCamp()">${L('Campagne', 'Campaign')}</button>`
         : G.tutorial ? `<button class="btn solid big" onclick="showStart()">${L('Jouer contre l\'IA', 'Play the AI')}</button>`
         : G.replay ? `<button class="btn solid big" onclick="rematch()">${G.daily && dr && !dr.ok ? L('Retenter le défi', 'Retry the challenge') : L('Revanche', 'Rematch')}</button>` : ''}
       <button class="btn big" onclick="showStart()">${L('Menu', 'Menu')}</button><button class="btn cy big" onclick="document.getElementById('end').classList.remove('on')">${L('Voir le plateau', 'View the board')}</button>${G.tutorial ? '' : `<button class="btn cy big" onclick="document.getElementById('end').classList.remove('on');openStats()">${L('Statistiques', 'Statistics')}</button>`}</div></div>`;
     if (G.tutorial) setTuto('done');
     end.classList.add('on');
+    claimGame(rw, dr);
     SFX.play(win ? 'win' : 'lose');
   }
 }
@@ -5066,11 +5069,8 @@ function deckCraftCost(d, have = collCounts()) {
   return cost;
 }
 function collCraftDeck(d) {
-  const have = collCounts(), cost = deckCraftCost(d, have);
-  if (!cost || (collLoad().scrap || 0) < cost) return false;
-  for (const id of d.legends) if (!have[id]) collCraft(id);
-  for (const [id, k] of Object.entries(d.list)) for (let n = have[id] || 0; n < k; n++) collCraft(id);
-  return true;
+  const need = { ...d.list }; for (const id of d.legends) need[id] = 1;
+  return srv('craft_deck', { need }).then(() => true, e => { alert(srvErr(e)); return false; });
 }
 function renderCardSeg() {
   if (!CARDSEG_READY) return;
@@ -5348,10 +5348,10 @@ function showCardDetail(id, list) {
     const go = e.target.closest('[data-cdgo]');
     if (go) { const j = i + +go.dataset.cdgo; if (list[j]) showCardDetail(list[j], list); return; }
     const wb = e.target.closest('[data-wish]');
-    if (wb) { collWish(id); const y = document.getElementById('packs').scrollTop; renderPacks(); document.getElementById('packs').scrollTop = y; showCardDetail(id, list); const n = document.querySelector('#modal [data-wish]'); if (n) n.focus({ preventScroll: true }); return; }
+    if (wb) { collWish(id).then(() => { const y = document.getElementById('packs').scrollTop; renderPacks(); document.getElementById('packs').scrollTop = y; showCardDetail(id, list); const n = document.querySelector('#modal [data-wish]'); if (n) n.focus({ preventScroll: true }); }); return; }
     const cr = e.target.closest('[data-craft]');
     if (cr) {
-      if (collCraft(id)) { try { SFX.play('enter'); } catch (x) {} const y = document.getElementById('packs').scrollTop; renderPacks(); document.getElementById('packs').scrollTop = y; showCardDetail(id, list); const n = document.querySelector('#modal .craft'); if (n) { n.classList.add('done'); n.querySelector('button').focus({ preventScroll: true }); } }
+      collCraft(id).then(ok => { if (!ok) return; try { SFX.play('enter'); } catch (x) {} const y = document.getElementById('packs').scrollTop; renderPacks(); document.getElementById('packs').scrollTop = y; showCardDetail(id, list); const n = document.querySelector('#modal .craft'); if (n) { n.classList.add('done'); n.querySelector('button').focus({ preventScroll: true }); } });
       return;
     }
     if (e.target.closest('[data-close]') || e.target === m) { m.classList.remove('on'); m.innerHTML = ''; m.onclick = null; const b = document.querySelector(`#builder .bc[data-bid="${id}"]`); if (b) b.focus(); }
@@ -5551,10 +5551,11 @@ if (!HEADLESS) {
     const cd = e.target.closest('[data-craftdeck]');
     if (cd) {
       const d = getDeck(cd.dataset.craftdeck), cost = deckCraftCost(d);
-      if (confirm(L(`Fabriquer les cartes manquantes de « ${d.name} » pour ${cost} composants ?`, `Craft the missing cards of "${d.name}" for ${cost} components?`)) && collCraftDeck(d)) {
+      if (confirm(L(`Fabriquer les cartes manquantes de « ${d.name} » pour ${cost} composants ?`, `Craft the missing cards of "${d.name}" for ${cost} components?`))) collCraftDeck(d).then(ok => {
+        if (!ok) return;
         try { SFX.play('enter'); } catch (x) {}
         renderCardSeg(); const n = document.querySelector(`#start .deckpick[data-deck="${CSS.escape(cd.dataset.craftdeck)}"]`); if (n) n.focus();
-      }
+      });
       return;
     }
     const dp = e.target.closest('.deckpick');
@@ -6185,7 +6186,7 @@ if (!HEADLESS && /^https?:$/.test(location.protocol)) {
 /* ---------- mes données : export / import en un fichier ----------
    Tout ce que le jeu garde dans le navigateur (clés cptcg-…). À l'import, les decks et les statistiques
    sont fusionnés, une partie sauvegardée remplace l'actuelle si elle est plus récente ; vos réglages ne changent pas. */
-const DATA_KEEP_LOCAL = ['cptcg-cloud', 'cptcg-backup', 'cptcg-prefs', 'cptcg-music', 'cptcg-sound', 'cptcg-lang', 'cptcg-tab', 'cptcg-level', 'cptcg-rejoin'];
+const DATA_KEEP_LOCAL = ['cptcg-cloud', 'cptcg-coll', 'cptcg-claims', 'cptcg-welcomed', 'cptcg-backup', 'cptcg-prefs', 'cptcg-music', 'cptcg-sound', 'cptcg-lang', 'cptcg-tab', 'cptcg-level', 'cptcg-rejoin'];
 function exportData() {
   const data = {};
   try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith('cptcg-') && k !== CLOUD_KEY) data[k] = localStorage.getItem(k); } } catch (e) {}
@@ -6646,66 +6647,57 @@ function collLoad() {
   if (!c || c.v !== 1) c = { v: 1, cards: {}, foil: {}, packs: 0, opened: 0, gift: '', started: false, rewarded: [] };
   return c;
 }
-function collSave(c) { let ok = true; try { localStorage.setItem(COLL_KEY, JSON.stringify(c)); } catch (e) { ok = false; } collBadge(); collAch(c); return ok; }
-// Succès de collection, vérifiés à chaque changement de la collection.
-function collAch(c) {
-  if (HEADLESS || !c.started) return;
-  const own = Object.keys(c.cards).filter(id => c.cards[id] > 0 && CARDS[id]);
-  const foils = Object.keys(c.foil || {}).filter(id => c.foil[id] > 0 && CARDS[id]).length;
-  const legs = Object.values(CARDS).filter(x => x.type === 'LEGEND');
-  const got = [[foils >= 1, 'coll_foil'], [own.length >= 50, 'coll_50'], [c.opened >= 25, 'packs_25'], [own.length >= 100, 'coll_100'], [foils >= 10, 'coll_foil10'],
-    [legs.every(x => c.cards[x.id] > 0), 'coll_legends'], [own.length >= Object.keys(CARDS).length, 'coll_150']];
-  for (const [ok, id] of got) if (ok) achUnlock(id);
-}
+function collSave(c) { let ok = true; try { localStorage.setItem(COLL_KEY, JSON.stringify(c)); } catch (e) { ok = false; } collBadge(); return ok; }   // copie locale de la collection du serveur
+// Succès de collection : vérifiés et accordés par le serveur (voir collApply).
 const collCounts = () => ({ ...collLoad().cards });
 function today() { return new Date().toISOString().slice(0, 10); }   // fonction : dailyBadge l'appelle depuis setLang, avant ce bloc
-function collAddPacks(n) { if (HEADLESS || !n) return; const c = collLoad(); c.packs += n; collSave(c); }
-// Première visite : les cartes des deux decks de base et 3 boosters offerts.
+// Première visite de l'écran des boosters : un message d'accueil, une fois (la collection de départ est créée par le serveur).
 function collInit() {
-  const c = collLoad();
-  if (c.started) return false;
-  c.started = true; c.gift = today(); c.packs += 3;
-  for (const k of ['arasaka', 'mercs']) {
-    for (const id of DECKS[k].legends) c.cards[id] = (c.cards[id] || 0) + 1;
-    for (const [id, n] of Object.entries(DECKS[k].list)) c.cards[id] = (c.cards[id] || 0) + n;
-  }
-  collSave(c);
+  let seen = null; try { seen = localStorage.getItem('cptcg-welcomed'); } catch (e) {}
+  if (seen || collLoad().opened) return false;
+  try { localStorage.setItem('cptcg-welcomed', '1'); } catch (e) {}
   return true;
 }
-// Cadeau du jour : 1 booster par jour, une fois la collection commencée.
-function collDaily() {
-  const c = collLoad();
-  if (!c.started || c.gift === today()) return false;
-  c.gift = today(); c.packs++; collSave(c);
-  return true;
-}
-// Boosters gagnés à la fin d'une partie (une seule fois par partie, même après un rechargement).
+// Fin de partie : la partie ouvre-t-elle droit à des récompenses ? (c'est le serveur qui les calcule et les accorde)
 function collReward() {
   if (HEADLESS || !G || !G.over || !G.winner || !G.gameId || G.tutorial || G.sandbox || !G.players[VIEW].isHuman) return null;
-  const c = collLoad(), done = (c.rewarded || []).find(x => x[0] === G.gameId);
-  if (done) return { n: done[1], win: G.winner.idx === VIEW };
-  const win = G.winner.idx === VIEW, op = G.players[1 - VIEW];
-  const n = G.online ? (win ? 2 : 1) : win ? ({ easy: 1, medium: 1, hard: 2, expert: 3 }[op.level] || 1) : 0;
-  c.rewarded = [...(c.rewarded || []), [G.gameId, n]].slice(-60);
-  c.packs += n;
-  collSave(c);
-  return { n, win };
+  return { win: G.winner.idx === VIEW };
 }
-// Fin de partie : le détail de chaque booster gagné (partie, campagne, défi du jour, succès débloqués pendant la partie).
-function gainHTML(rw, dr, cr) {
-  if (!G) return '';
-  const rows = [], op = G.players[1 - VIEW];
-  if (cr && cr.win && !cr.again) rows.push([cr.finished ? L(`Fin de la campagne (et ${CARDS[cr.foil].name} en Brillante)`, `Campaign complete (plus a Foil ${CARDS[cr.foil].name})`)
-    : cr.f.boss ? L(`Campagne : chef vaincu (${CARDS[cr.f.d.boss].name})`, `Campaign: boss beaten (${CARDS[cr.f.d.boss].name})`) : L(`Campagne : lieutenant ${cr.f.d.gang} vaincu`, `Campaign: ${cr.f.d.gang} lieutenant beaten`), cr.packs]);
-  if (rw && rw.n) rows.push([G.online ? (rw.win ? L('Victoire en ligne', 'Online win') : L('Partie en ligne jouée', 'Online game played'))
-    : L(`Victoire contre l'IA (${levelName(op.level)})`, `Win against the AI (${levelName(op.level)})`), rw.n]);
-  if (dr && dr.ok && !dr.again && dr.packs) rows.push([L(`Défi du jour réussi${dr.packs > 1 ? ' (bonus de série)' : ''}`, `Daily challenge completed${dr.packs > 1 ? ' (streak bonus)' : ''}`), dr.packs]);
-  for (const id of G.achGain || []) { const a = ACH.find(x => x.id === id); if (a) rows.push([L(`Succès « ${a.fr[0]} »`, `Achievement "${a.en[0]}"`), a.packs || 1]); }
-  if (!rows.length) return rw ? `<p class="pk-rew none">${L('Pas de booster cette fois : gagnez une partie pour en recevoir.', 'No booster this time: win a game to earn some.')}</p>` : '';
-  const tot = rows.reduce((a, [, n]) => a + n, 0);
+// Fin de partie : l'encadré des boosters gagnés, rempli par la réponse du serveur.
+function gainBox(rw) {
+  return rw ? `<div class="gain" id="gain-box"><b class="gain-t"><span class="pk-rew-ic" aria-hidden="true"></span>${L('Boosters gagnés', 'Boosters earned')}</b><p class="gain-wait">${L('Le serveur calcule vos récompenses…', 'The server is computing your rewards…')}</p></div>` : '';
+}
+function gainRowsHTML(r) {
+  const rows = [];
+  for (const x of r.rows || []) {
+    if (x.k === 'game') rows.push([x.online ? (x.won ? L('Victoire en ligne', 'Online win') : L('Partie en ligne jouée', 'Online game played')) : L(`Victoire contre l'IA (${levelName(x.level || 'medium')})`, `Win against the AI (${levelName(x.level || 'medium')})`), x.n]);
+    else if (x.k === 'camp') { const d = CAMP[Math.floor(x.fight / 2)]; rows.push([x.foil ? L(`Fin de la campagne (et ${CARDS[x.foil].name} en Brillante)`, `Campaign complete (plus a Foil ${CARDS[x.foil].name})`) : x.boss ? L(`Campagne : chef vaincu (${CARDS[d.boss].name})`, `Campaign: boss beaten (${CARDS[d.boss].name})`) : L(`Campagne : lieutenant ${d.gang} vaincu`, `Campaign: ${d.gang} lieutenant beaten`), x.n]); }
+    else if (x.k === 'daily') rows.push([L(`Défi du jour réussi${x.n > 1 ? ' (bonus de série)' : ''}`, `Daily challenge completed${x.n > 1 ? ' (streak bonus)' : ''}`), x.n]);
+    else if (x.k === 'ach') { const a = ACH.find(y => y.id === x.id); rows.push([a ? L(`Succès « ${a.fr[0]} »`, `Achievement "${a.en[0]}"`) : L('Succès', 'Achievement'), x.n]); }
+  }
+  if (r.dup) return `<p class="pk-rew none">${L('Récompenses déjà reçues pour cette partie.', 'Rewards already received for this game.')}</p>`;
+  if (!rows.length) return `<p class="pk-rew none">${L('Pas de booster cette fois : gagnez une partie pour en recevoir.', 'No booster this time: win a game to earn some.')}</p>`;
+  const tot = rows.reduce((a, [, n]) => a + n, 0) - (r.capped || 0);
   return `<div class="gain"><b class="gain-t"><span class="pk-rew-ic" aria-hidden="true"></span>${L('Boosters gagnés', 'Boosters earned')}</b>
     <ul>${rows.map(([t, n]) => `<li><span>${esc(t)}</span><b>+${n}</b></li>`).join('')}</ul>
+    ${r.capped ? `<p class="gain-cap">${L(`Limite de 30 boosters gagnés en jouant par jour atteinte : ${r.capped} non accordé${r.capped > 1 ? 's' : ''}. Revenez demain !`, `Daily limit of 30 boosters earned by playing reached: ${r.capped} not granted. Come back tomorrow!`)}</p>` : ''}
     <div class="gain-tot"><span>${L('Total pour votre collection', 'Total for your collection')}</span><b>+${tot}</b><button class="btn solid" onclick="openPacks('open')">${L('Ouvrir', 'Open')}</button></div></div>`;
+}
+// Demande au serveur les récompenses de la partie ; s'il ne répond pas, la demande est gardée et renvoyée plus tard.
+async function claimGame(rw, dr) {
+  if (!rw || !G) return;
+  const p = { id: G.gameId, won: rw.win, level: G.players[1 - VIEW].level, online: !!G.online, ach: G.achGain || [] };
+  if (G.campaign != null && rw.win && (G.campMode === 'story' || !G.campMode)) p.camp = { mode: G.campMode === 'story' ? 'story' : 'classic', fight: G.campaign };
+  if (G.daily && dr && dr.ok) p.daily = { date: G.daily, ok: true };
+  const box = () => document.getElementById('gain-box');
+  try { const r = await srv('claim_game', { p }); if (box()) box().outerHTML = gainRowsHTML(r); }
+  catch (e) { claimLater(p); if (box()) box().querySelector('.gain-wait').textContent = L("Serveur injoignable : vos récompenses seront ajoutées dès qu'il répondra.", 'Server unreachable: your rewards will be added as soon as it responds.'); }
+}
+function claimLater(p) { try { const q = JSON.parse(localStorage.getItem('cptcg-claims') || '[]'); if (!q.some(x => x.id === p.id)) q.push(p); localStorage.setItem('cptcg-claims', JSON.stringify(q.slice(-20))); } catch (e) {} }
+async function flushClaims() {
+  let q = []; try { q = JSON.parse(localStorage.getItem('cptcg-claims') || '[]'); } catch (e) {}
+  for (const p of q) { try { await srv('claim_game', { p }); q = q.filter(x => x.id !== p.id); } catch (e) { break; } }
+  try { localStorage.setItem('cptcg-claims', JSON.stringify(q)); } catch (e) {}
 }
 function collBadge() {
   if (HEADLESS) return;
@@ -6803,7 +6795,6 @@ function openPacks(tab) {
   netClose();
   document.getElementById('start').style.display = 'none';
   PK.welcome = collInit();
-  PK.daily = !PK.welcome && (collDaily() || PK.daily);
   PK.tab = tab || 'open';
   if (PK.tab !== 'open' || !PK.reveal || PK.reveal.ctx !== 'coll') PK.reveal = null;
   const el = document.getElementById('packs');
@@ -6875,6 +6866,7 @@ function pkOpenHTML() {
         <dt>${L("Victoire contre l'IA", 'Win against the AI')}</dt><dd>${L('Facile et Moyen +1 · Difficile +2 · Expert +3', 'Easy and Medium +1 · Hard +2 · Expert +3')}</dd>
         <dt>${L('En ligne', 'Online')}</dt><dd>${L('victoire +2 · défaite +1', 'win +2 · loss +1')}</dd>
         <dt>${L('Succès débloqué', 'Achievement unlocked')}</dt><dd>+1</dd>
+        <dt>${L('Limite', 'Limit')}</dt><dd>${L('30 boosters par jour gagnés en jouant', '30 boosters a day earned by playing')}</dd>
         <dt>${L('Cadeau du jour', 'Daily gift')}</dt><dd>+1 ${gift ? `<span class="pk-ok">✓ ${L("reçu aujourd'hui", 'received today')}</span>` : ''}</dd>
       </dl>
       <h3>${L('Dans chaque booster', 'In every booster')}</h3>
@@ -6936,21 +6928,22 @@ function pkFlipAll() {
   todo.forEach((i, k) => setTimeout(() => pkFlip(i, k < todo.length - 1 && rarity(R.cards[i].id) === 'C'), k * 110));
 }
 // Ouvre un booster : secousse, l'opercule se déchire, puis les cartes arrivent face cachée.
-function pkOpen(ctx) {
+// Le booster est ouvert par le serveur : c'est lui qui tire les cartes et les ajoute à la collection.
+async function pkOpen(ctx) {
   if (PK.anim) return;
   let cards;
   {
-    const c = collLoad(); if (c.packs <= 0) return;
-    cards = packGen();
-    const seen = new Set(Object.keys(c.cards).filter(id => c.cards[id] > 0));
-    for (const x of cards) { x.isNew = !seen.has(x.id); x.wish = !!(c.wish || {})[x.id]; seen.add(x.id); c.cards[x.id] = (c.cards[x.id] || 0) + 1; if (x.foil) c.foil[x.id] = (c.foil[x.id] || 0) + 1; }
-    c.packs--; c.opened++;
-    c.log = [{ t: Date.now(), cards: cards.map(x => [x.id, x.foil ? 1 : 0, x.isNew ? 1 : 0]) }, ...(c.log || [])].slice(0, 30);
-    const saved = collSave(c);
-    // Vérification : on relit la collection enregistrée ; si les cartes n'y sont pas, on le dit tout de suite.
-    const back = collLoad(), miss = cards.filter(x => !back.cards[x.id]).length;
-    PK.warn = !saved || back.opened < c.opened || miss ? L("Attention : le navigateur n'a pas enregistré ce booster dans votre collection (stockage refusé ou plein). Exportez vos données depuis les Paramètres et signalez-le.", "Warning: the browser did not save this booster in your collection (storage refused or full). Export your data from Settings and report it.") : '';
+    if (collLoad().packs <= 0) return;
+    PK.anim = true;
+    let r;
+    try { r = await srv('open_pack'); }
+    catch (e) { PK.anim = false; PK.warn = srvErr(e); renderPacks(); return; }
+    PK.anim = false;
+    const wish = collLoad().wish || {};
+    cards = r.cards.map(x => ({ id: x.id, foil: !!x.foil, isNew: !!x.isNew, wish: !!wish[x.id] })).filter(x => CARDS[x.id]);
+    PK.warn = '';
   }
+
   PK.reveal = { ctx, cards: cards.map(x => ({ ...x, up: false })) };
   PK.welcome = PK.daily = false;
   if (pkReduced()) { renderPacks(); pkFocusFirst(); return; }
@@ -7021,11 +7014,11 @@ if (!HEADLESS) {
       case 'open': pkOpen('coll'); break;
       case 'flipall': pkFlipAll(); break;
       case 'play': closePacks(); break;
-      case 'buypack': if (collBuyPack()) { renderPacks(); const n = el.querySelector('.pk-tab[data-pkt="open"]'); if (n) n.focus({ preventScroll: true }); } break;
+      case 'buypack': collBuyPack().then(ok => { renderPacks(); if (ok) { const n = el.querySelector('.pk-tab[data-pkt="open"]'); if (n) n.focus({ preventScroll: true }); } }); break;
       case 'dismantle': {
         const v = collScrapValue(collLoad());
         if (!v || !confirm(L(`Démonter tous les doubles en trop contre ${v} composants ? Vous gardez 3 exemplaires de chaque carte (Brillantes comprises).`, `Dismantle every extra duplicate for ${v} components? You keep 3 copies of each card (foils included).`))) break;
-        collDismantle(); renderPacks(); break;
+        collDismantle().then(() => renderPacks()); break;
       }
       case 'buildcoll': try { localStorage.setItem('cptcg-collmode', '1'); } catch (e) {} closePacks(true); openBuilder(); break;
       case 'copen': pkOpen('coll'); break;
@@ -7060,7 +7053,6 @@ if (!HEADLESS) {
     const box = document.querySelector('#start .box'); if (box) box.prepend(w);
   }
   document.getElementById('b-packs').onclick = () => openPacks('open');
-  if (collDaily()) PK.daily = true;
   collBadge();
 }
 
@@ -7076,26 +7068,10 @@ function collScrapValue(c) {
   }
   return v;
 }
-function collDismantle() {
-  const c = collLoad(), v = collScrapValue(c);
-  if (!v) return 0;
-  for (const id of Object.keys(c.cards)) if (CARDS[id] && c.cards[id] > MAX_COPIES) { c.cards[id] = MAX_COPIES; if ((c.foil[id] || 0) > MAX_COPIES) c.foil[id] = MAX_COPIES; }
-  c.scrap = (c.scrap || 0) + v;
-  collSave(c);
-  return v;
-}
+function collDismantle() { return srv('dismantle').then(r => r.gained, e => { PK.warn = srvErr(e); return 0; }); }
 // Fabriquer : jusqu'à 3 exemplaires d'une carte (pas de Brillante).
-function collCraft(id) {
-  const c = collLoad(), cost = CRAFT_COST[rarity(id)];
-  if (!CARDS[id] || (c.cards[id] || 0) >= MAX_COPIES || (c.scrap || 0) < cost) return false;
-  c.scrap -= cost; c.cards[id] = (c.cards[id] || 0) + 1; c.crafted = (c.crafted || 0) + 1; c.started = true;
-  return collSave(c);
-}
-function collWish(id) {
-  const c = collLoad(); c.wish = c.wish || {};
-  if (c.wish[id]) delete c.wish[id]; else c.wish[id] = 1;
-  collSave(c); return !!c.wish[id];
-}
+function collCraft(id) { return srv('craft', { cid: id }).then(() => true, e => { alert(srvErr(e)); return false; }); }
+function collWish(id) { return srv('wish_toggle', { cid: id }).then(() => true, e => { alert(srvErr(e)); return false; }); }
 function craftHTML(id) {
   const c = collLoad(), r = rarity(id), cost = CRAFT_COST[r], have = c.cards[id] || 0, sc = c.scrap || 0;
   const why = have >= MAX_COPIES ? L('Vous avez déjà 3 exemplaires.', 'You already have 3 copies.') : sc < cost ? L(`Il vous manque ${cost - sc} composant${cost - sc > 1 ? 's' : ''}.`, `You need ${cost - sc} more component${cost - sc > 1 ? 's' : ''}.`) : '';
@@ -7108,12 +7084,7 @@ function craftHTML(id) {
    Un booster entièrement en double ne vaut qu'environ 25 composants : l'échange reste à perte, sinon on pourrait ouvrir des boosters sans fin. */
 const PACK_COST = 50;
 const collExtras = c => Object.entries(c.cards).reduce((s, [id, n]) => s + (CARDS[id] ? Math.max(0, n - MAX_COPIES) : 0), 0);
-function collBuyPack() {
-  const c = collLoad();
-  if ((c.scrap || 0) < PACK_COST) return false;
-  c.scrap -= PACK_COST; c.packs++; c.bought = (c.bought || 0) + 1;
-  return collSave(c);
-}
+function collBuyPack() { return srv('buy_pack').then(() => true, e => { PK.warn = srvErr(e); return false; }); }
 
 /* ---------- défi du jour : même défi pour tout le monde ce jour-là (tiré de la date) ---------- */
 var DAILY_KEY = 'cptcg-daily';
@@ -7161,9 +7132,7 @@ function dailyResult() {
   d.last = ch.date; d.best = Math.max(d.best, d.streak);
   const keep = Object.keys(d.done).sort().slice(-60); d.done = Object.fromEntries(keep.map(k => [k, true]));
   dailySave(d);
-  const packs = 1 + (d.streak % 7 === 0 ? 1 : 0);
-  collAddPacks(packs);
-  return { ok: true, ch, packs, streak: d.streak };
+  return { ok: true, ch, streak: d.streak };
 }
 function dailyHTML(r) {
   if (!r) return '';
@@ -7295,12 +7264,9 @@ function storyErrors(c = campLoad('story')) {
 }
 // Nouvelle histoire : la collection repart de zéro avec les cartes du deck de base choisi et 3 boosters.
 // Les succès et les statistiques restent.
-function storyStart(starter) {
-  const old = campLoad('story'), b = DECKS[starter];
-  const col = { v: 1, cards: {}, foil: {}, packs: 3, opened: 0, gift: today(), started: true, rewarded: [], scrap: 0, log: [] };
-  for (const id of b.legends) col.cards[id] = 1;
-  for (const [id, n] of Object.entries(b.list)) col.cards[id] = n;
-  collSave(col);
+async function storyStart(starter) {
+  await srv('story_start', { starter });
+  const old = campLoad('story');
   try { localStorage.setItem('cptcg-collmode', '1'); } catch (e) {}
   campSave({ v: 1, mode: 'story', started: true, starter, prog: 0, deck: storyBaseDeck({ starter }), ai: {}, done: false, wins: {}, told: {}, runs: (old.runs || 0) + 1 });
 }
@@ -7352,21 +7318,10 @@ function campResult() {
   if (c.wins[i] || i !== c.prog || (story && !c.started)) return { win: true, again: true, i, f, story };
   c.wins[i] = Date.now(); c.prog = i + 1;
   if (f.boss) c.story = Math.floor(i / 2);
-  let packs = f.boss ? 2 : 1, foil = null;
-  if (c.prog >= CAMP_FIGHTS && !c.done) {
-    c.done = true; packs += story ? 8 : 5;
-    // Brillante garantie : une Légende pas encore Brillante dans la collection.
-    const col = collLoad(), legs = Object.values(CARDS).filter(x => x.type === 'LEGEND' && !(col.foil || {})[x.id]);
-    const pick = legs.length ? legs[Math.floor(Math.random() * legs.length)] : CARDS[f.d.boss];
-    col.cards[pick.id] = (col.cards[pick.id] || 0) + 1; col.foil[pick.id] = (col.foil[pick.id] || 0) + 1; col.started = true;
-    collSave(col); foil = pick.id;
-  }
+  if (c.prog >= CAMP_FIGHTS && !c.done) c.done = true;   // boosters, Légende Brillante et succès : accordés par le serveur
   campSave(c);
-  collAddPacks(packs);
-  if (c.done) achUnlockCamp(mode);
-  return { win: true, i, f, packs, story, freed: f.boss, finished: c.done && foil, foil };
+  return { win: true, i, f, story, freed: f.boss, finished: c.done };
 }
-function achUnlockCamp(mode) { const id = mode === 'story' ? 'campseal' : 'campaign'; if (ACH.some(a => a.id === id)) achUnlock(id); }
 function campHTML(r) {
   if (!r) return '';
   if (!r.win) return `<p class="pk-rew none">${r.story ? L(`Combat perdu à ${r.f.d.name}. Retentez autant de fois que vous voulez, ou améliorez votre deck avec vos nouvelles cartes depuis la campagne.`, `Fight lost in ${r.f.d.name}. Try again as often as you like, or improve your deck with your new cards from the campaign screen.`)
@@ -7506,14 +7461,15 @@ if (!HEADLESS) {
     if (sb) {
       const have = Object.values(collLoad().cards).reduce((a, b) => a + b, 0);
       if (have && !confirm(L(`Commencer le mode Histoire avec ${sb.dataset.cpstart === 'arasaka' ? 'Arasaka' : 'Mercs'} ? Votre collection actuelle (${have} cartes) sera remise à zéro ; vos succès et statistiques restent.`, `Start story mode with ${sb.dataset.cpstart === 'arasaka' ? 'Arasaka' : 'Mercs'}? Your current collection (${have} cards) will be reset; your achievements and statistics stay.`))) return;
-      storyStart(sb.dataset.cpstart); CP_SEL = 0; campOpenPacks(); return;
+      storyStart(sb.dataset.cpstart).then(() => { CP_SEL = 0; campOpenPacks(); }, e => alert(srvErr(e))); return;
     }
     const a = e.target.closest('[data-cp]'); if (!a) return;
     const act = a.dataset.cp;
     if (act === 'back') closeCamp();
     else if (act === 'fight') campStart(campLoad().prog);
     else if (act === 'reset' && confirm(CP_MODE === 'story' ? L('Rejouer la campagne depuis Watson ? Vous gardez votre collection.', 'Replay the campaign from Watson? You keep your collection.') : L('Recommencer la campagne depuis Watson ? Les boosters déjà gagnés restent à vous.', 'Restart the campaign from Watson? Boosters already earned stay yours.'))) {
-      const c = campLoad(); campSave({ ...c, prog: 0, done: false, wins: {}, told: {}, ai: {}, runs: (c.runs || 0) + 1 }); CP_SEL = 0; renderCamp();
+      const c = campLoad(); srv('camp_reset', { mode: CP_MODE }).catch(() => {});
+      campSave({ ...c, prog: 0, done: false, wins: {}, told: {}, ai: {}, runs: (c.runs || 0) + 1 }); CP_SEL = 0; renderCamp();
     }
     else if (act === 'snew' && confirm(L("Recommencer l'histoire à zéro ? Vous choisirez un nouveau deck de départ et votre collection sera remise à zéro.", 'Restart the story from scratch? You will pick a new starter deck and your collection will be reset.'))) {
       const c = campLoad('story'); c.started = false; campSave(c); renderCamp(); const n = el.querySelector('[data-cpstart]'); if (n) n.focus({ preventScroll: true });
@@ -7609,6 +7565,26 @@ async function cloudToken() {
   catch (e) { if (e.status === 400 || e.status === 401) { cloudSet({ session: null }); renderCloud(); } return false; }
 }
 // Sur le site, le lien de l'e-mail ramène sur cette page (sinon sur l'adresse du site réglée dans Supabase).
+// Économie du jeu : chaque action passe par une fonction du serveur, qui renvoie la collection à jour.
+async function srv(fn, args = {}, quiet) {
+  if (!await cloudToken()) throw new Error(L("vous n'êtes plus connecté", 'you are no longer signed in'));
+  const r = await cloudFetch('/rest/v1/rpc/' + fn, { method: 'POST', body: args });
+  if (r && r.coll) collApply(r.coll, quiet);
+  return r;
+}
+function srvErr(e) { return L(`Action refusée ou serveur injoignable (${e.message}). Réessayez dans un instant.`, `Action refused or server unreachable (${e.message}). Try again in a moment.`); }
+// Ce que le serveur renvoie devient la collection affichée ; ses succès, sa campagne et son défi du jour font foi.
+function collApply(sv, quiet) {
+  collSave({ v: 1, started: true, cards: sv.cards || {}, foil: sv.foil || {}, wish: sv.wish || {}, packs: sv.packs | 0, opened: sv.opened | 0, scrap: sv.scrap | 0,
+    log: sv.log || [], gift: sv.gift || '', dayPacks: sv.day_packs | 0, dayCap: sv.day_cap | 0 });
+  for (const id of Object.keys(sv.ach || {})) achMark(id, quiet);
+  for (const m of ['story', 'classic']) {
+    const sc = sv.camp && sv.camp[m]; if (!sc) continue;
+    const lc = campLoad(m);
+    if (lc.prog !== sc.prog || !!lc.done !== !!sc.done) { lc.prog = sc.prog; lc.done = !!sc.done; campSave(lc); }
+  }
+  if (sv.daily) { const d = dailyLoad(); d.done = { ...(sv.daily.done || {}) }; d.streak = sv.daily.streak | 0; d.best = sv.daily.best | 0; d.last = sv.daily.last || ''; dailySave(d); dailyBadge(); }
+}
 async function cloudSendCode(email, back) { await cloudFetch('/auth/v1/otp' + (back ? '?redirect_to=' + encodeURIComponent(back) : ''), { method: 'POST', body: { email, create_user: true }, auth: false }); }
 // Ce qu'on a reçu par e-mail : soit un code à 6 chiffres, soit le lien de connexion (collé tel quel, utile pour la version locale).
 async function cloudVerify(email, input) {
@@ -7631,6 +7607,7 @@ async function cloudSync(force, serverWins) {
   CLOUD_BUSY = true;
   try {
     if (!await cloudToken()) return;
+    flushClaims().catch(() => {});
     const ses = cloudSession(), st = cloudState();
     const rows = await cloudFetch(`/rest/v1/saves?select=data,updated_at&user_id=eq.${ses.user_id}`);
     const row = rows && rows[0];
@@ -7641,7 +7618,7 @@ async function cloudSync(force, serverWins) {
         for (const k of Object.keys(local)) if (!(k in row.data)) localStorage.removeItem(k);
         for (const [k, v] of Object.entries(row.data)) if (k.startsWith('cptcg-') && !DATA_KEEP_LOCAL.includes(k) && typeof v === 'string') localStorage.setItem(k, v);
         renderStartDecks(); renderResume(); collBadge(); renderMenuState(); dailyBadge(); renderBackup();
-      } else importData(JSON.stringify({ app: 'cyberpunk-tcg', v: 1, data: row.data }), true);
+      } else { const data = { ...row.data }; delete data[COLL_KEY]; importData(JSON.stringify({ app: 'cyberpunk-tcg', v: 1, data }), true); }
       local = cloudSnapshot();
     }
     const h = cloudHash(local);
@@ -7743,6 +7720,13 @@ async function loginAct(a) {
     await cloudSync(true, LG.auto);
     const st = cloudState();
     if (st.err || !st.last || Date.now() - st.last > 15e3) return loginSay(L(`Impossible de joindre le serveur${st.err ? ` (${st.err})` : ''}. Vérifiez votre connexion puis réessayez.`, `Cannot reach the server${st.err ? ` (${st.err})` : ''}. Check your connection, then try again.`), true);
+    try {
+      await srv('coll_get', {}, true);
+      const g = await srv('claim_gift', {}, true); if (g && g.got) PK.daily = true;
+      await flushClaims();
+    } catch (e) {
+      return loginSay(L(`Votre collection n'a pas pu être chargée (${e.message}). Si le message parle d'une fonction introuvable, le script economie.sql n'a pas encore été lancé dans Supabase.`, `Your collection could not be loaded (${e.message}). If the message mentions a missing function, economie.sql has not been run in Supabase yet.`), true);
+    }
     closeLogin();
   } else if (a === 'retry') renderLogin();
   else if (a === 'close') closeLogin();
@@ -8104,13 +8088,22 @@ const ACH = [
 const achText = a => { const [t, d] = LANG === 'en' ? a.en : a.fr; return [t, a.packs ? `${d} ${L(`Récompense : ${a.packs} booster${a.packs > 1 ? 's' : ''}.`, `Reward: ${a.packs} booster${a.packs > 1 ? 's' : ''}.`)}` : d]; };
 function loadAch() { try { return JSON.parse(localStorage.getItem('cptcg-ach') || '{}') || {}; } catch (e) { return {}; } }
 var ACH_RUN = { id: null }, achQueue = [], achBusy = false;
+// Succès accordé par le serveur (collection, campagne) : affiché ici, sans boosters en plus.
+function achMark(id, quiet) {
+  const all = loadAch();
+  if (all[id] || !ACH.some(a => a.id === id)) return;
+  all[id] = Date.now();
+  try { localStorage.setItem('cptcg-ach', JSON.stringify(all)); } catch (e) {}
+  if (!quiet) { achQueue.push(id); achNext(); }
+}
 function achUnlock(id) {
   const all = loadAch();
   if (all[id]) return;
   all[id] = Date.now();
   try { localStorage.setItem('cptcg-ach', JSON.stringify(all)); } catch (e) {}
-  collAddPacks((ACH.find(a => a.id === id) || {}).packs || 1);   // chaque succès rapporte un booster (plus pour la collection)
+  // chaque succès rapporte des boosters, accordés par le serveur : avec la fin de partie, ou tout de suite hors partie
   if (G && !G.gainShown && !HEADLESS) (G.achGain = G.achGain || []).push(id);
+  else if (!HEADLESS && cloudSession()) srv('claim_ach', { ids: [id] }).catch(() => {});
   achQueue.push(id);
   achNext();
 }
