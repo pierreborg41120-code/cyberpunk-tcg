@@ -8886,6 +8886,6 @@ if (!HEADLESS) {
 
 if (typeof module !== 'undefined') module.exports = { newGame, getG: () => G, AI_PROFILE, CARDS, DECKS, autoComplete, validateDeck, deckSize };
 </script>
-<script>setTimeout(() => { const e = document.getElementById('hero-b64'); if (!window.initHero) return; if (e) { const t = e.textContent; e.remove(); initHero('data:video/webm;base64,' + t); } else initHero('hero.webm'); }, 0);</script>
+<script>setTimeout(() => { const e = document.getElementById('hero-b64'); if (!window.initHero) return; if (e) { const t = e.textContent; e.remove(); initHero('data:video/webm;base64,' + t); } else initHero(document.createElement('video').canPlayType('video/webm; codecs="av01.0.08M.10"') ? 'hero-1080.webm' : 'hero-1080-vp9.webm'); }, 0);</script>
 </body>
 </html>
