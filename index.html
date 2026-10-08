@@ -961,7 +961,8 @@ body.online label:has(#speed),body.online label:has(#advice){display:none}
 #online label{display:block;color:var(--mut);font-size:14px;margin:10px 0 4px}
 #online input,#online select{width:100%;background:var(--panel);color:var(--txt);border:1.5px solid var(--line);padding:8px;font-family:inherit;font-size:16px}
 #online .orank{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:10px 0 2px;color:#fff;font-weight:600;cursor:pointer}
-.orank input{accent-color:var(--cyan)}.orank small{flex-basis:100%;color:var(--mut);font-weight:500;font-size:13px}
+.orank input{accent-color:var(--cyan)}
+#online .orank input{width:18px;height:18px;padding:0;margin:0;flex:none;align-self:center}.orank small{flex-basis:100%;color:var(--mut);font-weight:500;font-size:13px}
 .rk-box .up{color:#7dffb0}.rk-box .down{color:#ffb3bb}
 .orow{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 #online .orow>*{flex:1}
@@ -1173,7 +1174,23 @@ label.set-row{cursor:pointer}
 .tr-sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:14.5px;color:#e6e8ef}
 .tr-sum small{display:block;color:var(--mut);font-size:13px}
 .tr-card .sc-acts{justify-content:flex-start}
-@media (max-width:560px){.tr-bal,.tr-sum{grid-template-columns:1fr}}
+@media (max-width:560px){
+  .tr-bal,.tr-sum{grid-template-columns:1fr}
+  .tr-bal{position:static;box-shadow:none}                         /* sur téléphone, le récapitulatif ne masque pas la moitié de l'écran */
+  .sc-list.sc-fr li{grid-template-columns:40px 1fr}                 /* amis : les boutons passent sous le pseudo */
+  .sc-fr li .sc-acts{grid-column:1/-1;justify-content:flex-start}
+  .sc-list li{grid-template-columns:34px 36px 1fr auto;gap:8px;padding:8px 6px}
+  .sc-av{width:36px;height:36px}
+}
+/* écrans tactiles : des cibles d'au moins 40 px pour le doigt */
+@media (pointer:coarse){
+  .seg button,.sc-tabs button{min-height:40px;box-sizing:border-box;display:inline-flex;align-items:center}
+  .sc-pl{padding:8px 0}
+  .tr-pm button{width:38px;height:38px}
+  .tr-filter label,.orank{min-height:40px}
+  .ad-chip button{width:34px;height:34px}
+  .sc-acts .btn{min-height:38px}
+}
 #invite-toast{position:fixed;right:16px;bottom:16px;z-index:65;width:min(380px,calc(100vw - 32px));padding:14px 16px;background:#0b0d13;border:1.5px solid var(--cyan);box-shadow:0 10px 40px rgba(0,0,0,.6),0 0 24px rgba(0,229,255,.18)}
 #invite-toast[hidden]{display:none}
 #invite-toast p{margin:0 0 10px;display:flex;align-items:center;gap:10px;color:#fff;font-size:16px}
@@ -1778,6 +1795,7 @@ var PACK_ART = { pack: "data:image/webp;base64,UklGRoozAQBXRUJQVlA4WAoAAAAQAAAAL
 </script>
 <script>
 'use strict';
+var PUSH = { state: 'unknown' };   // notifications de l'appareil (la page « Mon compte » peut s'afficher avant leur bloc)
 /* =====================================================================
    BASE DE DONNÉES DES CARTES (Print-and-Play Arasaka & Mercs)
    type: LEGEND | UNIT | GEAR | PROGRAM — color = couleur RAM
@@ -6383,15 +6401,19 @@ if (!HEADLESS && /^https?:$/.test(location.protocol)) {
     navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) document.getElementById('update').hidden = false; });
     document.getElementById('b-update').onclick = () => location.reload();
   }
-  addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; btn.hidden = false; });
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; });
   addEventListener('appinstalled', () => { btn.hidden = true; installEvt = null; });
-  if (ios && !standalone) btn.hidden = false;
+  // le bouton est là partout, sauf dans l'application installée
+  btn.hidden = standalone;
   btn.onclick = async () => {
     if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice; if (r.outcome === 'accepted') btn.hidden = true; installEvt = null; return; }
-    showInfo(L("Installer sur l'iPhone ou l'iPad", 'Install on iPhone or iPad'), `<div class="rules"><ol>
-      <li>${L('Dans Safari, touchez le bouton <b>Partager</b> (le carré avec une flèche vers le haut).', 'In Safari, tap the <b>Share</b> button (the square with an arrow pointing up).')}</li>
-      <li>${L('Choisissez <b>Sur l’écran d’accueil</b>.', 'Choose <b>Add to Home Screen</b>.')}</li>
-      <li>${L('Touchez <b>Ajouter</b> : le jeu s’ouvre ensuite en plein écran, même sans connexion.', 'Tap <b>Add</b>: the game then opens full screen, even offline.')}</li></ol></div>`);
+    const ua = navigator.userAgent, ff = /Firefox\//.test(ua), android = /Android/.test(ua), mac = /Macintosh/.test(ua) && !ios, safari = /Version\/[\d.]+ .*Safari/.test(ua) && !/Chrome|Chromium|Edg\//.test(ua);
+    const steps = ios ? [L('Dans Safari, touchez le bouton <b>Partager</b> (le carré avec une flèche vers le haut).', 'In Safari, tap the <b>Share</b> button (the square with an arrow pointing up).'), L('Choisissez <b>Sur l’écran d’accueil</b>, puis <b>Ajouter</b>.', 'Choose <b>Add to Home Screen</b>, then <b>Add</b>.'), L('Ouvrez ensuite le jeu depuis son icône : plein écran, et notifications possibles.', 'Then open the game from its icon: full screen, and notifications available.')]
+      : ff && android ? [L('Ouvrez le menu <b>⋮</b> de Firefox.', 'Open the Firefox <b>⋮</b> menu.'), L('Choisissez <b>Installer</b> (ou <b>Ajouter à l’écran d’accueil</b>).', 'Choose <b>Install</b> (or <b>Add to Home screen</b>).')]
+      : ff ? [L('Firefox ne sait pas installer un site comme une application sur ordinateur.', 'Firefox cannot install a website as an app on a computer.'), L('Ouvrez le jeu dans <b>Chrome</b> ou <b>Edge</b> (même adresse, même compte), puis cliquez l’icône d’installation <b>⊕</b> à droite de la barre d’adresse.', 'Open the game in <b>Chrome</b> or <b>Edge</b> (same address, same account), then click the install icon <b>⊕</b> on the right of the address bar.'), L('Le jeu aura alors sa propre fenêtre et son icône dans le menu Démarrer ou le Dock.', 'The game then gets its own window and an icon in the Start menu or the Dock.')]
+      : mac && safari ? [L('Dans Safari, ouvrez le menu <b>Fichier</b>.', 'In Safari, open the <b>File</b> menu.'), L('Choisissez <b>Ajouter au Dock…</b>, puis <b>Ajouter</b>.', 'Choose <b>Add to Dock…</b>, then <b>Add</b>.')]
+      : [L('Cliquez l’icône d’installation <b>⊕</b> à droite de la barre d’adresse, ou ouvrez le menu du navigateur <b>⋮</b>.', 'Click the install icon <b>⊕</b> on the right of the address bar, or open the browser menu <b>⋮</b>.'), L('Choisissez <b>Installer Cyberpunk TCG</b> (ou <b>Applications → Installer ce site</b>).', 'Choose <b>Install Cyberpunk TCG</b> (or <b>Apps → Install this site</b>).'), L('Le jeu aura sa propre fenêtre et son icône, sur ordinateur comme sur téléphone.', 'The game gets its own window and icon, on computer as on phone.')];
+    showInfo(L('Installer le jeu', 'Install the game'), `<div class="rules"><p>${L("Installé, le jeu s'ouvre dans sa propre fenêtre, sans barre d'adresse, et peut vous envoyer des notifications.", 'Once installed, the game opens in its own window, without an address bar, and can send you notifications.')}</p><ol>${steps.map(x => `<li>${x}</li>`).join('')}</ol></div>`);
   };
 }
 /* ---------- mes données : export / import en un fichier ----------
@@ -8073,6 +8095,10 @@ function accountHTML(st, ses) {
     <section class="ac-sec"><h3>${L('Synchronisation', 'Sync')}</h3>
       <p class="lg-sync ${st.err ? 'ko' : ''}">${st.err ? L(`Synchronisation impossible pour l'instant (${esc(st.err)}). Le jeu réessaiera tout seul.`, `Sync not possible right now (${esc(st.err)}). The game will try again on its own.`) : st.last ? L(`✓ Dernière synchronisation : ${loginTime(st.last)}`, `✓ Last sync: ${loginTime(st.last)}`) : L('Synchronisation en cours…', 'Syncing…')}</p>
       <div class="lg-acts"><button class="btn cy" data-lg="sync">${L('Synchroniser maintenant', 'Sync now')}</button></div></section>
+    <section class="ac-sec"><h3>${L('Notifications', 'Notifications')}</h3>
+      <p class="ac-lbl">${L("Invitations à jouer, demandes d'ami, échanges, annonces et nouvel événement du lundi, même quand le jeu est fermé. À activer sur chaque appareil.", 'Game invitations, friend requests, trades, announcements and the new Monday event, even when the game is closed. Turn on for each device.')}</p>
+      <p class="lg-sync ${PUSH.state === 'denied' || PUSH.state === 'error' ? 'ko' : ''}" id="ac-push">${pushText()}</p>
+      ${PUSH.state === 'on' || PUSH.state === 'off' ? `<div class="lg-acts"><button class="btn ${PUSH.state === 'on' ? '' : 'cy'}" data-lg="push">${PUSH.state === 'on' ? L('Désactiver sur cet appareil', 'Turn off on this device') : L('Activer sur cet appareil', 'Turn on on this device')}</button>${PUSH.state === 'on' ? `<button class="btn" data-lg="push-test">${L('Envoyer un essai', 'Send a test')}</button>` : ''}</div>` : ''}</section>
     <section class="ac-sec"><h3>${L('Mes données', 'My data')}</h3>
       <p class="lg-help">${L(`Ce qui est gardé et pourquoi : <a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Données personnelles</a>.`, `What is kept and why: <a href="${SITE_BASE}donnees.html" target="_blank" rel="noopener">Personal data</a>.`)}</p>
       <div class="lg-acts"><button class="btn cy" data-lg="export">${L('Télécharger mes données', 'Download my data')}</button><button class="btn" data-lg="out">${L('Se déconnecter', 'Sign out')}</button></div></section>
@@ -8088,6 +8114,8 @@ async function profileLoad() {
 function musicGo() { MUSIC_OK = true; LG.music = true; try { if (MUSIC.on && MUSIC.tracks.length) MUSIC.kick(); } catch (x) {} }
 async function loginAct(a) {
   const val = id => (document.getElementById(id) || {}).value || '';
+  if (a === 'push') return pushToggle();
+  if (a === 'push-test') return pushTest();
   if (a === 'profile') {
     const p = val('ac-pseudo').trim(), av = LG.av !== undefined ? LG.av : (cloudState().profile || {}).avatar || null;
     if (!/^[A-Za-z0-9À-ÖØ-öø-ÿ _.-]{3,20}$/.test(p)) return loginSay(L('Pseudo : 3 à 20 caractères (lettres, chiffres, espace, tiret, point ou tiret bas).', 'Nickname: 3 to 20 characters (letters, digits, space, dash, dot or underscore).'), true);
@@ -8120,7 +8148,7 @@ async function loginAct(a) {
   }
   else if (a === 'sync') { loginSay(L('Synchronisation…', 'Syncing…')); await cloudSync(true); LG.msg = ''; renderLogin(); }
   else if (a === 'out' && await uiConfirm(L('Se déconnecter ? Vos données restent sur cet appareil et dans votre compte.', 'Sign out? Your data stays on this device and in your account.'), { ok: L('Se déconnecter', 'Sign out') })) {
-    const ses = cloudSession(); rtStop();
+    const ses = cloudSession(); rtStop(); await pushOff(true);
     loginSay(L('Envoi de vos dernières modifications…', 'Sending your latest changes…'));
     await cloudSync(true);
     if (ses) await fetch(CLOUD.url + '/auth/v1/logout', { method: 'POST', headers: { apikey: CLOUD.key, Authorization: 'Bearer ' + ses.access_token } }).catch(() => {});
@@ -8268,6 +8296,76 @@ function renderSocial() {
   for (const [k, t] of keep) { const x = el.querySelector(`[data-keep="${k}"]`); if (x) x.scrollTop = t; }
   el.scrollTop = y;
 }
+/* ---------- notifications sur l'appareil (Web Push) ----------
+   L'appareil s'abonne auprès du service de son navigateur avec la clé publique du jeu, puis donne son adresse au serveur.
+   La fonction « notifier » de Supabase envoie ensuite les notifications ; le service worker (sw.js) les affiche. */
+const pushOk = () => typeof navigator !== 'undefined' && 'serviceWorker' in navigator && typeof PushManager !== 'undefined' && typeof Notification !== 'undefined' && /^https?:$/.test(location.protocol);
+const pushIOSBrowser = () => /iphone|ipad|ipod/i.test(navigator.userAgent) && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone === true);
+const b64uBytes = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
+const bytesB64u = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const swReady = () => Promise.race([navigator.serviceWorker.ready, new Promise((_, no) => setTimeout(() => no(new Error(L('service hors connexion indisponible', 'offline service unavailable'))), 8000))]);
+function pushText() {
+  return ({ on: L('✓ Activées sur cet appareil.', '✓ On for this device.'), off: L('Désactivées sur cet appareil.', 'Off for this device.'),
+    denied: L("Bloquées par le navigateur pour ce site. Pour les autoriser : cliquez le cadenas à gauche de l'adresse → Notifications → Autoriser, puis rechargez.", 'Blocked by the browser for this site. To allow them: click the padlock left of the address → Notifications → Allow, then reload.'),
+    ios: L("Sur iPhone et iPad, installez d'abord le jeu sur l'écran d'accueil (bouton Installer du menu), puis ouvrez-le depuis son icône.", 'On iPhone and iPad, first install the game on the home screen (Install button in the menu), then open it from its icon.'),
+    none: L('Ce navigateur ne sait pas recevoir de notifications.', 'This browser cannot receive notifications.'),
+    error: L(`Activation impossible${PUSH.err ? ` (${PUSH.err})` : ''}. Réessayez plus tard.`, `Could not turn on${PUSH.err ? ` (${PUSH.err})` : ''}. Try again later.`),
+    unknown: L('Vérification…', 'Checking…') })[PUSH.state];
+}
+async function pushRefresh() {
+  if (!pushOk()) PUSH.state = pushIOSBrowser() ? 'ios' : 'none';
+  else if (Notification.permission === 'denied') PUSH.state = 'denied';
+  else { try { const reg = await swReady(), sub = await reg.pushManager.getSubscription(); PUSH.state = sub && Notification.permission === 'granted' ? 'on' : 'off'; PUSH.sub = sub; } catch (e) { PUSH.state = 'off'; } }
+  if (document.getElementById('ac-push')) renderLogin();
+  return PUSH.state;
+}
+async function pushSave(sub) {
+  const j = sub.toJSON();
+  await socRpc('push_subscribe', { endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, lang: LANG });
+}
+async function pushToggle() {
+  if (PUSH.state === 'on') { await pushOff(); return pushRefresh(); }
+  try {
+    if (await Notification.requestPermission() !== 'granted') return pushRefresh();
+    // clé publique du jeu : gardée par le serveur ; la fonction « notifier » la crée à son premier appel
+    let key = await socRpc('push_key');
+    if (!key) { const r = await fetch(CLOUD.url + '/functions/v1/notifier'); if (!r.ok) throw new Error(L('fonction « notifier » absente du serveur', '"notifier" function missing on the server')); key = (await r.json()).key; }
+    const reg = await swReady();
+    let sub = await reg.pushManager.getSubscription();
+    if (sub && sub.options && sub.options.applicationServerKey && bytesB64u(sub.options.applicationServerKey) !== key) { await sub.unsubscribe(); sub = null; }
+    sub = sub || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64uBytes(key) });
+    await pushSave(sub);
+    PUSH.state = 'on'; PUSH.err = '';
+  } catch (e) { PUSH.state = 'error'; PUSH.err = e.message; }
+  renderLogin();
+}
+async function pushOff(quiet) {
+  if (!pushOk()) return;
+  try {
+    const reg = await swReady(), sub = await reg.pushManager.getSubscription(); if (!sub) return;
+    if (cloudSession()) await socRpc('push_unsubscribe', { endpoint: sub.endpoint }).catch(() => {});
+    await sub.unsubscribe();
+  } catch (e) {}
+  if (!quiet) PUSH.state = 'off';
+}
+// Après « Jouer » : l'appareil déjà abonné est rattaché au compte connecté (et à sa langue).
+async function pushResume() { if (await pushRefresh() === 'on' && PUSH.sub) pushSave(PUSH.sub).catch(() => {}); }
+async function pushTest() {
+  try { const reg = await swReady(); await reg.showNotification('Cyberpunk TCG', { body: L('Les notifications fonctionnent sur cet appareil.', 'Notifications work on this device.'), icon: 'icons/icon-192.png', tag: 'essai' }); }
+  catch (e) { PUSH.state = 'error'; PUSH.err = e.message; renderLogin(); }
+}
+// Une notification touchée ouvre le bon écran (adresse ?ouvrir=…, ou message du service worker si le jeu est déjà ouvert).
+function openFromNotif(url) {
+  const m = /[?&]ouvrir=([a-z]+)/.exec(url || ''); if (!m || !cloudSession()) return;
+  if (G && !G.over && document.getElementById('start').style.display === 'none') return;   // pas au milieu d'une partie
+  for (const id of ['camp', 'packs', 'end', 'online']) document.getElementById(id).classList.remove('on');
+  if (m[1] === 'amis' || m[1] === 'invitation') openSocial('friends');
+  else if (m[1] === 'echanges') openSocial('trades');
+  else if (m[1] === 'evenement') { closeSocial(true); document.getElementById('start').style.display = 'flex'; openWeek(); }
+  presenceTick();
+}
+if (!HEADLESS && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.t === 'notif') openFromNotif(e.data.url); });
+
 /* ---------- parties en ligne classées ----------
    Au début, chaque joueur annonce la partie au serveur ; à la fin, chacun envoie son résultat. Les points (départ à 1 000)
    ne changent que si les deux résultats concordent, ou qu'un joueur annonce sa défaite (abandon), et que la partie a duré 2 minutes. */
@@ -8671,6 +8769,8 @@ async function socialInit() {
   document.getElementById('b-admin').hidden = !SOC.admin;
   presenceTick();
   rtStart();
+  pushResume();
+  if (/[?&]ouvrir=/.test(location.search)) { const u = location.search; history.replaceState(null, '', location.pathname); setTimeout(() => openFromNotif(u), 300); }
 }
 /* ---------- temps réel (Supabase Realtime, protocole Phoenix sur WebSocket) ----------
    Invitations, demandes d'ami et échanges arrivent dans la seconde ; la liste des amis en ligne suit les arrivées et les départs.

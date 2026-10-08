@@ -1,7 +1,7 @@
 // Cyberpunk TCG — fonctionnement hors connexion.
 // Le jeu (un seul gros fichier) est gardé sur l'appareil ; publish.sh change VERSION à chaque mise à jour,
 // ce qui fait télécharger la nouvelle version en arrière-plan.
-const VERSION = 'bd1fef0234';
+const VERSION = 'bf6ebdbaff';
 const CACHE = 'cptcg-' + VERSION;
 const EXT = 'cptcg-ext';   // polices et PeerJS (sites externes)
 const MUS = 'cptcg-musique';   // musiques et vidéo d'accueil : téléchargées au premier passage, gardées d'une version à l'autre
@@ -44,4 +44,23 @@ self.addEventListener('fetch', e => {
       return hit || net;
     }));
   }
+});
+
+// ---------- notifications (envoyées par la fonction « notifier » du serveur) ----------
+// Si le jeu est ouvert et regardé, il affiche déjà tout lui-même : pas de notification en double.
+self.addEventListener('push', e => {
+  let d = {}; try { d = e.data ? e.data.json() : {}; } catch (x) { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+    if (cs.some(c => c.visibilityState === 'visible' && c.focused)) return;
+    return self.registration.showNotification(d.title || 'Cyberpunk TCG', { body: d.body || '', icon: 'icons/icon-192.png', badge: 'icons/favicon-32.png', tag: d.tag || undefined, renotify: !!d.tag, data: { url: d.url || './' } });
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = new URL((e.notification.data && e.notification.data.url) || './', self.registration.scope).href;
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+    const c = cs.find(x => x.url.startsWith(self.registration.scope));
+    if (c) { c.postMessage({ t: 'notif', url }); return c.focus(); }
+    return self.clients.openWindow(url);
+  }));
 });
