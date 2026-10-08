@@ -1025,6 +1025,67 @@ label.set-row{cursor:pointer}
 .set-row .sound.off input[type=range]{opacity:.35}
 .set-row select{padding:5px 8px;font-size:14px}
 .set-langs{display:flex;gap:6px}
+/* ---------- communauté : classement, amis, tableau de bord ---------- */
+#social{position:fixed;inset:0;z-index:58;display:none;overflow:auto;background:var(--bg)}
+#social.on{display:block}
+.sc-wrap{max-width:980px;margin:0 auto;padding:16px 16px 40px}
+.sc-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.sc-tabs button{all:unset;cursor:pointer;padding:8px 14px;font:600 15px 'Chakra Petch',sans-serif;color:var(--mut);border-bottom:2px solid transparent}
+.sc-tabs button[aria-selected="true"]{color:#fff;border-color:var(--ylw)}
+.sc-tabs button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.sc-kinds{margin:6px 0 16px}
+.sc-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.sc-list li{display:grid;grid-template-columns:48px 40px 1fr auto;align-items:center;gap:12px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.sc-list li.me{background:rgba(252,238,10,.07);box-shadow:inset 3px 0 0 var(--ylw)}
+.sc-rk{font:700 18px 'Chakra Petch',sans-serif;color:var(--mut);text-align:center}
+.sc-rk.r1{color:#ffd23f}.sc-rk.r2{color:#d6dbe6}.sc-rk.r3{color:#e09a5f}
+.sc-av{width:40px;height:40px;border-radius:50%;border:2px solid #2a3044;background:#141824 center 20%/cover;display:grid;place-items:center;font-size:18px}
+.sc-ps{font:600 17px 'Rajdhani',sans-serif;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-v{font:600 15px 'Chakra Petch',sans-serif;color:var(--ylw);text-align:right}
+.sc-me{margin:12px 0 0;color:#d6d9e4}
+.sc-note{margin:0 0 16px;padding:12px 14px;border-left:3px solid var(--cyan);background:#0f1420;color:#d6d9e4}
+.sc-note .btn{margin-top:8px}
+.sc-msg{min-height:1.4em;margin:8px 0;color:var(--cyan)}.sc-msg.ko{color:#ffb3bb}
+.sc-add{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.sc-add input{flex:1 1 220px;padding:10px 12px;background:#05070c;border:1.5px solid #2a3044;color:#fff;font:500 17px 'Rajdhani',sans-serif}
+.sc-add input:focus{outline:none;border-color:var(--cyan)}
+.sc-h{margin:18px 0 8px;font:700 16px 'Chakra Petch',sans-serif;color:#fff}
+.sc-fr li{grid-template-columns:40px 1fr auto}
+.sc-st{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--mut)}
+.sc-st i{width:9px;height:9px;border-radius:50%;background:#3a3f52}.sc-st.on i{background:var(--green);box-shadow:0 0 8px var(--green)}.sc-st.on{color:#b7f5cf}
+.sc-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.sc-acts .btn{padding:6px 10px;font-size:12px}
+.sc-empty{color:var(--mut);padding:10px 0}
+/* tableau de bord */
+.ad-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0 0 18px}
+.ad-tile{padding:12px 14px;background:#0b0d13;border:1px solid var(--line)}
+.ad-tile b{display:block;font:700 28px 'Chakra Petch',sans-serif;color:#fff;line-height:1.1}
+.ad-tile span{color:var(--mut);font-size:14px}
+.ad-charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:12px}
+.ad-ch{margin:0;padding:12px 14px 10px;background:#0b0d13;border:1px solid var(--line)}
+.ad-ch figcaption{display:flex;justify-content:space-between;gap:8px;font:600 15px 'Chakra Petch',sans-serif;color:#fff;margin-bottom:10px}
+.ad-ch figcaption small{font:500 13px 'Rajdhani',sans-serif;color:var(--mut)}
+.ad-bars{position:relative;display:flex;align-items:flex-end;gap:2px;height:110px;border-bottom:1px solid #3a3f52}
+.ad-b{position:relative;flex:1;height:100%;display:flex;align-items:flex-end;cursor:default;outline:none}
+.ad-b i{display:block;width:100%;height:var(--h);min-height:1px;background:var(--cyan);border-radius:4px 4px 0 0}
+.ad-b.zero i{background:#2a3044;min-height:2px}
+.ad-b:hover i,.ad-b:focus-visible i{filter:brightness(1.25)}
+.ad-b:hover::after,.ad-b:focus-visible::after{content:attr(data-tip);position:absolute;bottom:calc(var(--h) + 8px);left:50%;translate:-50% 0;z-index:2;white-space:nowrap;padding:4px 8px;background:#e6e8ef;color:#0b0d13;font:600 12.5px 'Rajdhani',sans-serif;border-radius:4px;pointer-events:none}
+.ad-x{display:flex;justify-content:space-between;margin-top:4px;color:var(--mut);font-size:12.5px}
+.ad-ch details{margin-top:6px;font-size:13.5px;color:var(--mut)}
+.ad-tbl{width:100%;border-collapse:collapse;margin:8px 0;font-size:14.5px}
+.ad-tbl th,.ad-tbl td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.ad-tbl th{font:600 13px 'Chakra Petch',sans-serif;color:var(--mut)}
+.ad-tbl td.n,.ad-tbl th.n{text-align:right;font-variant-numeric:tabular-nums}
+.ad-sec{margin:24px 0 0}
+.ad-sec h3{margin:0 0 6px;font:700 17px 'Chakra Petch',sans-serif;color:#fff}
+.ad-sec p{margin:0 0 6px;color:var(--mut);font-size:14px}
+/* invitation reçue */
+#invite-toast{position:fixed;right:16px;bottom:16px;z-index:65;width:min(380px,calc(100vw - 32px));padding:14px 16px;background:#0b0d13;border:1.5px solid var(--cyan);box-shadow:0 10px 40px rgba(0,0,0,.6),0 0 24px rgba(0,229,255,.18)}
+#invite-toast[hidden]{display:none}
+#invite-toast p{margin:0 0 10px;display:flex;align-items:center;gap:10px;color:#fff;font-size:16px}
+#invite-toast .sc-av{flex:none}
+#invite-toast .row{display:flex;gap:8px}
 /* un seul onglet à la fois */
 #tabblock{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(4,5,9,.94);backdrop-filter:blur(6px)}
 #tabblock[hidden]{display:none}
@@ -1458,7 +1519,7 @@ body.compact #mentor{bottom:calc(var(--peek) + 12px)}
 <div id="coach"></div>
 <div id="mentor" role="complementary" aria-label="Coach du deck" aria-live="polite"></div>
 <div id="end"></div>
-<div id="start" class="booting"><video id="herovid" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>
+<div id="start" class="booting"><video id="herovid" class="on" poster="hero-poster.webp" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>
   <div class="box menu">
     <div class="langs"><button class="lang" data-lang="fr">🇫🇷 Français</button><button class="lang" data-lang="en">🇬🇧 English</button><button class="lang" id="b-music2" aria-label="Musique / Music">🎵</button><button class="lang acct" id="b-account">👤</button></div>
     <div class="hero">
@@ -1489,7 +1550,11 @@ body.compact #mentor{bottom:calc(var(--peek) + 12px)}
         <button class="mm-item" id="b-packs"><b data-t="m_packs">Boosters et collection</b><span data-t="m_packs_d">Ouvrez vos boosters, complétez les 150 cartes</span><i class="mm-badge" id="pk-badge" hidden></i></button>
         <button class="mm-item" id="b-builder"><b data-t="m_builder">Construire un deck</b><span data-t="m_builder_d">Les 150 cartes, règles officielles</span></button>
         <button class="mm-item" id="b-cards"><b data-t="m_cards">Base de cartes</b><span data-t="m_cards_d">Les 150 cartes, avec filtres et carte en grand</span></button>
+        <h3 class="mm-h" data-t="mh_soc">Communauté</h3>
+        <button class="mm-item" id="b-rank"><b data-t="m_rank">Classement</b><span data-t="m_rank_d">Les meilleurs joueurs de Night City</span></button>
+        <button class="mm-item" id="b-friends"><b data-t="m_friends">Amis</b><span data-t="m_friends_d">Ajoutez vos amis et invitez-les à jouer</span><i class="mm-badge" id="fr-badge" hidden></i></button>
         <div class="mm-foot">
+          <button class="mm-k mm-mini" id="b-admin" hidden><span aria-hidden="true">◫</span> <span data-t="m_admin">Tableau de bord</span></button>
           <button class="mm-k mm-mini" id="b-stats"><span aria-hidden="true">▤</span> <span data-t="m_stats">Statistiques</span></button>
           <button class="mm-k mm-mini" id="b-rules2"><span aria-hidden="true">?</span> <span data-t="m_rules">Règles</span></button>
           <button class="mm-k mm-mini" id="b-settings2" aria-haspopup="dialog"><span aria-hidden="true">⚙</span> <span data-t="settings">Paramètres</span></button>
@@ -1554,6 +1619,8 @@ body.compact #mentor{bottom:calc(var(--peek) + 12px)}
 <div id="builder"></div>
 <div id="packs"></div>
 <div id="camp"></div>
+<div id="social"></div>
+<div id="invite-toast" role="status" aria-live="polite" hidden></div>
 <div id="login"></div>
 <div id="tabblock" role="alertdialog" aria-modal="true" aria-labelledby="tb-t" hidden></div>
 <div id="online"></div>
@@ -4356,10 +4423,11 @@ if (!HEADLESS) {
   const hv = document.getElementById('herovid');
   // La vidéo est déclarée tout en bas du fichier : l'accueil s'affiche d'abord, la vidéo arrive ensuite.
   // Décodage natif en mémoire (Blob) : plus fluide qu'une lecture directe depuis le texte du fichier.
-  window.initHero = src => fetch(src).then(r => r.blob()).then(b => { hv.src = URL.createObjectURL(b); if (document.getElementById('start').style.display !== 'none') hv.play().catch(() => {}); }).catch(() => { hv.src = src; });
+  // Site : l'image fixe du début s'affiche tout de suite, et la vidéo démarre dès que ses premières secondes sont arrivées.
+  window.initHero = src => !/^data:/.test(src) ? (hv.poster = 'hero-poster.webp', hv.classList.add('on'), hv.preload = 'auto', hv.src = src, syncVid()) : fetch(src).then(r => r.blob()).then(b => { hv.src = URL.createObjectURL(b); if (document.getElementById('start').style.display !== 'none') hv.play().catch(() => {}); }).catch(() => { hv.src = src; });
   hv.oncanplay = () => hv.classList.add('on');
   const st = document.getElementById('start');
-  const syncVid = () => { if (st.style.display === 'none' || document.hidden) hv.pause(); else if (hv.src) hv.play().catch(() => {}); };
+  function syncVid() { if (st.style.display === 'none' || document.hidden) hv.pause(); else if (hv.src) hv.play().catch(() => {}); }
   new MutationObserver(syncVid).observe(st, { attributes: true, attributeFilter: ['style'] });
   document.addEventListener('visibilitychange', syncVid);   // onglet caché : la vidéo s'arrête
 }
@@ -4998,7 +5066,7 @@ const STATIC = {
   speed: ["Vitesse de l'IA", 'AI speed'], sp_n: ['Normale', 'Normal'], sp_s: ['Lente', 'Slow'], sp_f: ['Rapide', 'Fast'],
   advice: ['Conseils', 'Tips'], call: ['Appeler une Légende (1 €$)', 'Call a Legend (1 €$)'], end: ['Fin du tour', 'End turn'],
   rules: ['Règles', 'Rules'], new: ['Nouvelle partie', 'New game'], menu: ['Menu', 'Menu'], settings: ['Paramètres', 'Settings'], undo: ['Annuler', 'Undo'], s_data: ['Mes données', 'My data'], s_data_d: ["Une copie de vos decks, statistiques et progression dans un fichier (tout est déjà gardé sur le serveur)", 'A copy of your decks, statistics and progress in a file (everything is already kept on the server)'], s_export: ['Exporter', 'Export'], s_import: ['Importer', 'Import'], upd: ['Nouvelle version du jeu installée.', 'A new version of the game is installed.'], upd_b: ['Recharger', 'Reload'], logbtn: ['Journal', 'Log'],
-  m_cards: ['Base de cartes', 'Card database'], m_cards_d: ['Les 150 cartes, avec filtres et carte en grand', 'All 150 cards, with filters and full-size view'],
+  m_cards: ['Base de cartes', 'Card database'], mh_soc: ['Communauté', 'Community'], m_rank: ['Classement', 'Leaderboard'], m_rank_d: ['Les meilleurs joueurs de Night City', 'The best players in Night City'], m_friends: ['Amis', 'Friends'], m_friends_d: ['Ajoutez vos amis et invitez-les à jouer', 'Add your friends and invite them to play'], m_admin: ['Tableau de bord', 'Dashboard'], m_cards_d: ['Les 150 cartes, avec filtres et carte en grand', 'All 150 cards, with filters and full-size view'],
   s_music: ['Musique', 'Music'], s_sfx: ['Effets sonores', 'Sound effects'], advice_d: ["Fiches d'aide pendant la partie", 'Help cards during the game'],
   s_compact: ["Plateau adapté à l'écran", 'Fit the board to the screen'], s_compact_d: ['Tout le plateau tient sans défiler, la main reste en bas', 'The whole board fits without scrolling, your hand stays at the bottom'],
   s_calm: ['Animations réduites', 'Reduced animations'], s_calm_d: ['Pour les ordinateurs lents ou si les effets gênent', 'For slower computers, or if the effects bother you'], s_lang: ['Langue', 'Language'],
@@ -5054,8 +5122,10 @@ function showStart() {
   renderMenuState();
   dailyBadge();
   document.getElementById('camp').classList.remove('on');
+  document.getElementById('social').classList.remove('on');
   renderBackup();
   renderCardSeg();
+  if (typeof renderInvites === 'function') setTimeout(renderInvites, 300);
   if (typeof cloudSync === 'function') setTimeout(() => cloudSync(), 800);
   // Les éléments flottants de la partie ne doivent pas rester sur l'accueil.
   document.getElementById('coach').classList.remove('on');
@@ -7879,6 +7949,7 @@ async function loginAct(a) {
       await srv('coll_get', {}, true);
       const g = await srv('claim_gift', {}, true); if (g && g.got) PK.daily = true;
       await flushClaims();
+      socialInit();
     } catch (e) {
       return loginSay(L(`Votre collection n'a pas pu être chargée (${e.message}). Si le message parle d'une fonction introuvable, le script economie.sql n'a pas encore été lancé dans Supabase.`, `Your collection could not be loaded (${e.message}). If the message mentions a missing function, economie.sql has not been run in Supabase yet.`), true);
     }
@@ -7928,6 +7999,186 @@ if (!HEADLESS) {
   setInterval(() => { if (cloudSession() && cloudHash(cloudSnapshot()) !== cloudState().hash) cloudSync(); }, 60e3);
   addEventListener('online', () => cloudSync());
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloudSession() && cloudHash(cloudSnapshot()) !== cloudState().hash) cloudSync(true); });
+}
+
+/* =====================================================================
+   COMMUNAUTÉ : classement, amis et invitations aux parties en ligne, tableau de bord de l'organisateur.
+   Tout passe par des fonctions du serveur ; il faut un pseudo (Mon compte) pour apparaître au classement et avoir des amis.
+   ===================================================================== */
+const SOC = { tab: 'rank', kind: 'story', rank: {}, friends: null, admin: false, adminData: null, invites: [], requests: 0, msg: '', bad: false, poll: null };
+async function socRpc(fn, args = {}) {
+  if (!await cloudToken()) throw new Error(L("vous n'êtes plus connecté", 'you are no longer signed in'));
+  return cloudFetch('/rest/v1/rpc/' + fn, { method: 'POST', body: args });
+}
+const socAv = id => id && IMGS[id] && IMGS[id].art ? `<span class="sc-av art-${id}" aria-hidden="true"></span>` : '<span class="sc-av" aria-hidden="true">👤</span>';
+const hasPseudo = () => !!((cloudState().profile || {}).pseudo);
+const RANK_KINDS = () => [['story', L('Mode Histoire', 'Story mode')], ['coll', L('Collection', 'Collection')], ['expert', L('Victoires Expert', 'Expert wins')], ['daily', L('Défi du jour', 'Daily challenge')]];
+function rankVal(k, v) {
+  if (k === 'story') return v >= 12 ? L('Campagne terminée ★', 'Campaign complete ★') : L(`${v}/12 combats`, `${v}/12 fights`);
+  if (k === 'coll') return L(`${v}/150 cartes`, `${v}/150 cards`);
+  if (k === 'expert') return L(`${v} victoire${v > 1 ? 's' : ''}`, `${v} win${v > 1 ? 's' : ''}`);
+  return L(`${v} jour${v > 1 ? 's' : ''} de suite`, `${v}-day streak`);
+}
+function openSocial(tab) {
+  hideHover();
+  for (const id of ['camp', 'end', 'online']) document.getElementById(id).classList.remove('on');
+  document.getElementById('modal').classList.remove('on');
+  document.getElementById('start').style.display = 'none';
+  SOC.tab = tab === 'admin' && !SOC.admin ? 'rank' : tab || 'rank'; SOC.msg = '';
+  const el = document.getElementById('social'); el.classList.add('on'); el.scrollTop = 0;
+  renderSocial(); socLoad();
+  clearInterval(SOC.poll); SOC.poll = setInterval(() => { if (SOC.tab === 'friends' && el.classList.contains('on')) socLoad(); }, 15000);
+  const f = el.querySelector('.sc-tabs [aria-selected="true"]'); if (f) f.focus({ preventScroll: true });
+}
+function closeSocial(keep) { clearInterval(SOC.poll); document.getElementById('social').classList.remove('on'); if (!keep) { showStart(); const b = document.getElementById(SOC.tab === 'friends' ? 'b-friends' : SOC.tab === 'admin' ? 'b-admin' : 'b-rank'); if (b) b.focus(); } }
+async function socLoad() {
+  try {
+    if (SOC.tab === 'rank') SOC.rank[SOC.kind] = await socRpc('leaderboard', { kind: SOC.kind });
+    else if (SOC.tab === 'friends') SOC.friends = await socRpc('friends_list');
+    else if (SOC.tab === 'admin') SOC.adminData = await socRpc('admin_stats');
+    SOC.loadErr = '';
+  } catch (e) { SOC.loadErr = e.message; }
+  renderSocial();
+}
+function socSay(t, bad) { SOC.msg = t; SOC.bad = !!bad; const m = document.querySelector('#social .sc-msg'); if (m) { m.textContent = t; m.classList.toggle('ko', !!bad); } }
+function renderSocial() {
+  const el = document.getElementById('social');
+  if (!el.classList.contains('on')) return;
+  const tabs = [['rank', L('Classement', 'Leaderboard')], ['friends', L('Amis', 'Friends') + (SOC.requests ? ` (${SOC.requests})` : '')], ...(SOC.admin ? [['admin', L('Tableau de bord', 'Dashboard')]] : [])];
+  const noPseudo = `<div class="sc-note">${L('Choisissez un pseudo pour apparaître au classement et avoir des amis.', 'Choose a nickname to appear on the leaderboard and have friends.')}<br><button class="btn solid" data-soc="pseudo">${L('Choisir mon pseudo', 'Choose my nickname')}</button></div>`;
+  let body = '';
+  if (SOC.loadErr) body = `<p class="sc-msg ko">${L(`Le serveur ne répond pas (${esc(SOC.loadErr)}). Réessayez dans un instant.`, `The server is not responding (${esc(SOC.loadErr)}). Try again in a moment.`)}</p>`;
+  else if (SOC.tab === 'rank') {
+    const d = SOC.rank[SOC.kind];
+    body = `<div class="seg sc-kinds" role="radiogroup" aria-label="${L('Classement', 'Leaderboard')}">${RANK_KINDS().map(([k, t]) => `<button role="radio" data-kind="${k}" aria-checked="${SOC.kind === k}" tabindex="${SOC.kind === k ? 0 : -1}">${t}</button>`).join('')}</div>
+      ${d && !d.profile ? noPseudo : ''}
+      ${!d ? `<p class="sc-empty">${L('Chargement…', 'Loading…')}</p>` : !d.rows.length ? `<p class="sc-empty">${L("Personne n'est encore classé ici. À vous de jouer !", 'Nobody is ranked here yet. Your move!')}</p>`
+        : `<ol class="sc-list">${d.rows.map(r => `<li class="${r.me ? 'me' : ''}"><b class="sc-rk ${r.rank <= 3 ? 'r' + r.rank : ''}">${r.rank}</b>${socAv(r.avatar)}<span class="sc-ps">${esc(r.pseudo)}${r.me ? L(' (vous)', ' (you)') : ''}</span><span class="sc-v">${rankVal(SOC.kind, r.value)}</span></li>`).join('')}</ol>`}
+      ${d && d.me && !d.rows.some(r => r.me) ? `<p class="sc-me">${L(`Votre place : <b>${d.me.rank}e</b>`, `Your rank: <b>#${d.me.rank}</b>`)} · ${rankVal(SOC.kind, d.me.value)}</p>` : ''}`;
+  } else if (SOC.tab === 'friends') {
+    const fl = SOC.friends || [], inc = fl.filter(f => f.status === 'incoming'), fr = fl.filter(f => f.status === 'friend'), out = fl.filter(f => f.status === 'outgoing');
+    const row = (f, acts) => `<li>${socAv(f.avatar)}<span class="sc-ps">${esc(f.pseudo)} ${f.status === 'friend' ? `<span class="sc-st ${f.online ? 'on' : ''}"><i></i>${f.online ? L('En ligne', 'Online') : L('Hors ligne', 'Offline')}</span>` : ''}</span><span class="sc-acts">${acts}</span></li>`;
+    body = !hasPseudo() ? noPseudo : `<div class="sc-add"><input id="sc-add" maxlength="20" placeholder="${L("Pseudo d'un ami", "A friend's nickname")}" aria-label="${L("Pseudo d'un ami", "A friend's nickname")}"><button class="btn solid" data-soc="add">${L('Ajouter', 'Add')}</button></div>
+      <p class="sc-msg ${SOC.bad ? 'ko' : ''}" role="status">${esc(SOC.msg)}</p>
+      ${inc.length ? `<h3 class="sc-h">${L('Demandes reçues', 'Requests received')}</h3><ul class="sc-list sc-fr">${inc.map(f => row(f, `<button class="btn solid" data-soc="accept" data-id="${f.id}">${L('Accepter', 'Accept')}</button><button class="btn" data-soc="refuse" data-id="${f.id}">${L('Refuser', 'Decline')}</button>`)).join('')}</ul>` : ''}
+      <h3 class="sc-h">${L('Mes amis', 'My friends')}</h3>
+      ${!SOC.friends ? `<p class="sc-empty">${L('Chargement…', 'Loading…')}</p>` : fr.length ? `<ul class="sc-list sc-fr">${fr.map(f => row(f, `<button class="btn ${f.online ? 'cy' : ''}" data-soc="invite" data-id="${f.id}" ${f.online ? '' : `disabled title="${escAttr(L('Disponible quand cet ami est en ligne', 'Available when this friend is online'))}"`}>${L('Inviter à jouer', 'Invite to play')}</button><button class="btn" data-soc="remove" data-id="${f.id}">${L('Retirer', 'Remove')}</button>`)).join('')}</ul>`
+        : `<p class="sc-empty">${L("Pas encore d'amis : ajoutez-en un avec son pseudo.", 'No friends yet: add one with their nickname.')}</p>`}
+      ${out.length ? `<h3 class="sc-h">${L('Demandes envoyées', 'Requests sent')}</h3><ul class="sc-list sc-fr">${out.map(f => row(f, `<span class="sc-st">${L('En attente', 'Pending')}</span><button class="btn" data-soc="remove" data-id="${f.id}">${L('Annuler', 'Cancel')}</button>`)).join('')}</ul>` : ''}`;
+  } else body = adminHTML(SOC.adminData);
+  el.innerHTML = `<div class="sc-wrap"><header class="pk-top"><button class="bback" data-soc="back">← ${L('Menu', 'Menu')}</button><h2 class="cp-title">${L('Communauté', 'Community')}</h2>
+    <div class="sc-tabs" role="tablist">${tabs.map(([k, t]) => `<button role="tab" data-soct="${k}" aria-selected="${SOC.tab === k}" tabindex="${SOC.tab === k ? 0 : -1}">${t}</button>`).join('')}</div></header>${body}</div>`;
+}
+// ---------- tableau de bord ----------
+const fmtDay = d => new Date(d + 'T12:00:00').toLocaleDateString(LANG === 'en' ? 'en-GB' : 'fr-FR', { day: 'numeric', month: 'short' });
+function adBars(title, days, key, unit) {
+  const max = Math.max(1, ...days.map(d => d[key] | 0)), tot = days.reduce((t, d) => t + (d[key] | 0), 0);
+  return `<figure class="ad-ch"><figcaption>${title}<small>${L(`${tot} sur 14 jours`, `${tot} over 14 days`)}</small></figcaption>
+    <div class="ad-bars" role="img" aria-label="${escAttr(`${title} : ${days.map(d => `${fmtDay(d.day)} ${d[key] | 0}`).join(', ')}`)}">${days.map(d => { const v = d[key] | 0; return `<span class="ad-b ${v ? '' : 'zero'}" tabindex="0" style="--h:${(v / max * 100).toFixed(1)}%" data-tip="${escAttr(`${fmtDay(d.day)} : ${v} ${unit}`)}"><i></i></span>`; }).join('')}</div>
+    <div class="ad-x"><span>${fmtDay(days[0].day)}</span><span>${L('max', 'max')} ${max}</span><span>${fmtDay(days[days.length - 1].day)}</span></div>
+    <details><summary>${L('Voir les chiffres', 'Show the numbers')}</summary><table class="ad-tbl"><tbody>${days.map(d => `<tr><td>${fmtDay(d.day)}</td><td class="n">${d[key] | 0}</td></tr>`).join('')}</tbody></table></details></figure>`;
+}
+function adminHTML(a) {
+  if (!a) return `<p class="sc-empty">${L('Chargement…', 'Loading…')}</p>`;
+  const tile = (v, t) => `<div class="ad-tile"><b>${v}</b><span>${t}</span></div>`;
+  const people = list => list.length ? `<table class="ad-tbl"><thead><tr><th>${L('Pseudo', 'Nickname')}</th><th>E-mail</th><th class="n">${L('Jours au plafond', 'Days at limit')}</th><th class="n">${L('Boosters gagnés', 'Boosters earned')}</th><th class="n">${L('Parties', 'Games')}</th><th class="n">${L('Victoires', 'Wins')}</th><th class="n">${L('Boosters ouverts', 'Boosters opened')}</th></tr></thead>
+    <tbody>${list.map(x => `<tr><td>${esc(x.pseudo || '—')}</td><td>${esc(x.email || '')}</td><td class="n">${x.cap_days ?? '—'}</td><td class="n">${x.packs | 0}</td><td class="n">${x.games | 0}</td><td class="n">${x.wins != null ? `${x.wins} (${Math.round(100 * x.wins / Math.max(1, x.games))} %)` : '—'}</td><td class="n">${x.opened | 0}</td></tr>`).join('')}</tbody></table>` : `<p class="sc-empty">${L('Rien à signaler.', 'Nothing to report.')}</p>`;
+  return `<div class="ad-tiles">${tile(a.players, L('joueurs inscrits', 'registered players'))}${tile(a.profiles, L('avec un pseudo', 'with a nickname'))}${tile(a.online, L('en ligne maintenant', 'online now'))}${tile(a.games_total, L('parties récompensées', 'rewarded games'))}${tile(a.opened_total, L('boosters ouverts', 'boosters opened'))}</div>
+    <div class="ad-charts">${adBars(L('Inscriptions', 'Sign-ups'), a.days, 'signups', L('inscription(s)', 'sign-up(s)'))}${adBars(L('Joueurs actifs', 'Active players'), a.days, 'active', L('joueur(s)', 'player(s)'))}
+      ${adBars(L('Parties récompensées', 'Rewarded games'), a.days, 'games', L('partie(s)', 'game(s)'))}${adBars(L('Boosters gagnés', 'Boosters earned'), a.days, 'packs', L('booster(s)', 'booster(s)'))}</div>
+    <section class="ad-sec"><h3>${L('Comptes à surveiller', 'Accounts to watch')}</h3><p>${L('Au plafond de 30 boosters plusieurs jours sur les 14 derniers, ou plus de 95 % de victoires sur au moins 20 parties.', 'At the 30-booster limit on several of the last 14 days, or over 95% wins on at least 20 games.')}</p>${people(a.suspects)}</section>
+    <section class="ad-sec"><h3>${L('Joueurs les plus actifs (14 jours)', 'Most active players (14 days)')}</h3>${people(a.top)}</section>`;
+}
+// ---------- amis : actions ----------
+async function socAct(a, b) {
+  const id = b && b.dataset.id, f = (SOC.friends || []).find(x => x.id === id);
+  try {
+    if (a === 'add') {
+      const p = (document.getElementById('sc-add').value || '').trim();
+      if (p.length < 3) return socSay(L("Entrez le pseudo de votre ami.", "Enter your friend's nickname."), true);
+      const r = await socRpc('friend_request', { pseudo: p });
+      SOC.msg = r.status === 'friend' ? L(`✓ ${p} et vous êtes maintenant amis.`, `✓ You and ${p} are now friends.`) : r.status === 'already' ? L(`Vous avez déjà demandé ${p} en ami.`, `You already asked ${p} to be friends.`) : L(`✓ Demande envoyée à ${p}.`, `✓ Request sent to ${p}.`);
+      SOC.bad = false; await socLoad(); return;
+    }
+    if (a === 'accept' || a === 'refuse') { await socRpc('friend_respond', { other: id, accept: a === 'accept' }); SOC.msg = a === 'accept' ? L(`✓ ${f.pseudo} et vous êtes maintenant amis.`, `✓ You and ${f.pseudo} are now friends.`) : ''; await socLoad(); presenceTick(); return; }
+    if (a === 'remove') { if (f.status === 'friend' && !confirm(L(`Retirer ${f.pseudo} de vos amis ?`, `Remove ${f.pseudo} from your friends?`))) return; await socRpc('friend_remove', { other: id }); SOC.msg = ''; await socLoad(); return; }
+    if (a === 'invite') return inviteFriend(f);
+  } catch (e) {
+    socSay(/introuvable/.test(e.message) ? L("Aucun joueur n'a ce pseudo.", 'No player has this nickname.') : /vous/.test(e.message) ? L("C'est votre propre pseudo.", 'That is your own nickname.') : L(`Impossible : ${e.message}`, `Not possible: ${e.message}`), true);
+  }
+}
+// Inviter : je crée une partie en ligne, puis le serveur transmet son code à mon ami.
+async function inviteFriend(f) {
+  closeSocial(true); document.getElementById('start').style.display = 'flex';
+  openOnline();
+  document.getElementById('o-status').insertAdjacentHTML('afterend', '<div class="ostatus" id="o-inv"></div>');
+  await onlineGo('host');
+  const box = document.getElementById('o-inv');
+  if (NET.role !== 'host' || !NET.code) return;
+  try { await socRpc('friend_invite', { other: f.id, code: NET.code }); if (box) box.innerHTML = L(`✓ Invitation envoyée à <b>${esc(f.pseudo)}</b> : elle s'affichera sur son écran dans les 30 secondes. La partie démarre dès qu'il rejoint.`, `✓ Invitation sent to <b>${esc(f.pseudo)}</b>: it will show on their screen within 30 seconds. The game starts as soon as they join.`); }
+  catch (e) { if (box) { box.textContent = L(`L'invitation n'a pas pu être envoyée (${e.message}). Donnez-lui le code ci-dessus.`, `The invitation could not be sent (${e.message}). Give them the code above.`); box.classList.add('err'); } }
+}
+// ---------- présence et invitations reçues (toutes les 30 s) ----------
+async function presenceTick() {
+  if (!cloudSession() || (TAB.lock && !TAB.held) || !navigator.onLine) return;
+  try { const r = await socRpc('presence'); SOC.invites = r.invites || []; SOC.requests = +r.requests || 0; } catch (e) { return; }
+  const n = SOC.requests + SOC.invites.length, bd = document.getElementById('fr-badge');
+  bd.hidden = !n; bd.textContent = n;
+  renderInvites();
+  if (document.getElementById('social').classList.contains('on') && SOC.tab !== 'admin') renderSocial();
+}
+function renderInvites() {
+  const el = document.getElementById('invite-toast'), inv = SOC.invites[0];
+  const busy = (G && !G.over && document.getElementById('start').style.display === 'none') || document.getElementById('login').classList.contains('on') || NET.role;
+  if (!inv || busy) { el.hidden = true; return; }
+  el.innerHTML = `<p>${socAv(inv.avatar)}<span>${L(`<b>${esc(inv.from)}</b> vous invite à une partie en ligne.`, `<b>${esc(inv.from)}</b> invites you to an online game.`)}</span></p>
+    <div class="row"><button class="btn solid" data-inv="join">${L('Rejoindre', 'Join')}</button><button class="btn" data-inv="no">${L('Refuser', 'Decline')}</button></div>`;
+  el.hidden = false;
+}
+async function inviteAnswer(join) {
+  const inv = SOC.invites.shift(); if (!inv) return;
+  document.getElementById('invite-toast').hidden = true;
+  socRpc('invite_answer', { id: inv.id }).catch(() => {});
+  if (!join) return renderInvites();
+  closeSocial(true); for (const id of ['camp', 'packs', 'end']) document.getElementById(id).classList.remove('on');
+  document.getElementById('start').style.display = 'flex';
+  openOnline();
+  document.getElementById('o-code').value = inv.code;
+  onlineStatus(L(`<b>${esc(inv.from)}</b> vous attend. Choisissez votre deck, puis cliquez <b>Rejoindre</b>.`, `<b>${esc(inv.from)}</b> is waiting for you. Choose your deck, then click <b>Join</b>.`));
+  document.querySelector('#online .obox').classList.add('invited');
+  document.getElementById('o-deck').focus();
+}
+// Après « Jouer » : profil, droits d'organisateur, présence.
+async function socialInit() {
+  profileLoad();
+  try { SOC.admin = (await socRpc('is_admin')) === true; } catch (e) { SOC.admin = false; }
+  document.getElementById('b-admin').hidden = !SOC.admin;
+  presenceTick();
+}
+if (!HEADLESS) {
+  setInterval(presenceTick, 30000);
+  const el = document.getElementById('social');
+  el.addEventListener('click', e => {
+    const t = e.target.closest('[data-soct]');
+    if (t) { SOC.tab = t.dataset.soct; SOC.msg = ''; renderSocial(); socLoad(); const n = el.querySelector(`[data-soct="${SOC.tab}"]`); if (n) n.focus({ preventScroll: true }); return; }
+    const k = e.target.closest('[data-kind]');
+    if (k) { SOC.kind = k.dataset.kind; renderSocial(); socLoad(); const n = el.querySelector(`[data-kind="${SOC.kind}"]`); if (n) n.focus({ preventScroll: true }); return; }
+    const b = e.target.closest('[data-soc]'); if (!b) return;
+    if (b.dataset.soc === 'back') return closeSocial();
+    if (b.dataset.soc === 'pseudo') return openLogin(false);
+    socAct(b.dataset.soc, b);
+  });
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.id === 'sc-add') { e.preventDefault(); socAct('add'); }
+    const t = e.target.closest('[role="tab"], [data-kind]');
+    if (t && /^Arrow(Left|Right)$/.test(e.key)) {
+      e.preventDefault(); const all = [...t.parentElement.children], n = all[(all.indexOf(t) + (e.key === 'ArrowRight' ? 1 : all.length - 1)) % all.length]; n.click();
+    }
+  });
+  document.getElementById('invite-toast').addEventListener('click', e => { const b = e.target.closest('[data-inv]'); if (b) inviteAnswer(b.dataset.inv === 'join'); });
+  document.getElementById('b-rank').onclick = () => openSocial('rank');
+  document.getElementById('b-friends').onclick = () => openSocial('friends');
+  document.getElementById('b-admin').onclick = () => openSocial('admin');
 }
 
 /* ---------- un seul onglet du jeu à la fois ----------
@@ -8843,6 +9094,7 @@ if (!HEADLESS) {
     }
     if (document.getElementById('online').classList.contains('on')) { const c = document.getElementById('o-cancel'); if (c) c.click(); return; }
     if (document.getElementById('camp').classList.contains('on')) { closeCamp(); return; }
+    if (document.getElementById('social').classList.contains('on')) { closeSocial(); return; }
     if (document.getElementById('packs').classList.contains('on')) { if (PK.reveal && !PK.anim) { PK.reveal = null; renderPacks(); } else if (!PK.anim) closePacks(); return; }
     if (B.open) { builderAction('back'); return; }
     if (document.getElementById('end').classList.contains('on')) { document.getElementById('end').classList.remove('on'); return; }
