@@ -1535,6 +1535,7 @@ body.compact #mentor{bottom:calc(var(--peek) + 12px)}
 <script id="music-data">
 /* Musiques libres de droits, normalisées et encodées en Opus 40 kbit/s : intégrés juste en dessous (version locale)
    ou un fichier par morceau dans le dossier musique/ (site). moment : intro (premier morceau de l'accueil), menu, game (partie), overtime. */
+var MUSIC_OK = false;   // devient vrai quand le joueur se connecte, crée son compte, ou clique sur « Jouer » une fois connecté
 const MUSIC_TRACKS = [{"id": "lazerpunk", "title": "Lazerpunk", "artist": "Infraction", "mode": "intro", "dur": 166}, {"id": "futuristic-city", "title": "Cyberpunk Futuristic City", "artist": "Poradovskyi", "mode": "menu", "dur": 129}, {"id": "suspense", "title": "Suspense Cyberpunk", "artist": "prettyjohn1", "mode": "menu", "dur": 87}, {"id": "futuristic", "title": "Cyberpunk Futuristic", "artist": "Poradovskyi", "mode": "menu", "dur": 123}, {"id": "utopia", "title": "Utopia", "artist": "Infraction", "mode": "menu", "dur": 202}, {"id": "virtual-reality", "title": "Virtual Reality", "artist": "Infraction", "mode": "menu", "dur": 209}, {"id": "overnight", "title": "Overnight", "artist": "Infraction", "mode": "menu", "dur": 175}, {"id": "promise-me", "title": "Promise Me", "artist": "Infraction", "mode": "menu", "dur": 182}, {"id": "dont-leave", "title": "Don't Leave", "artist": "Infraction", "mode": "menu", "dur": 158}, {"id": "sorry", "title": "Sorry", "artist": "Infraction", "mode": "menu", "dur": 211}, {"id": "no-more-tears", "title": "No More Tears", "artist": "Infraction", "mode": "menu", "dur": 192}, {"id": "post-blue", "title": "Post Blue", "artist": "Infraction", "mode": "menu", "dur": 160}, {"id": "soft-evil", "title": "Soft Evil", "artist": "Infraction", "mode": "menu", "dur": 154}, {"id": "hs-cyberpunk", "title": "Cyberpunk", "artist": "HumanStudioEd", "mode": "game", "dur": 152}, {"id": "hs-gaming", "title": "Cyberpunk Gaming", "artist": "HumanStudioEd", "mode": "game", "dur": 156}, {"id": "hs-nocopyright", "title": "Cyberpunk II", "artist": "HumanStudioEd", "mode": "game", "dur": 126}, {"id": "leberch", "title": "Cyberpunk", "artist": "Leberch", "mode": "game", "dur": 100}, {"id": "aim-to-head", "title": "Aim To Head (Falling)", "artist": "Infraction", "mode": "game", "dur": 182}, {"id": "atomic", "title": "Atomic", "artist": "Infraction & Alexi Action", "mode": "game", "dur": 173}, {"id": "dune", "title": "Dune", "artist": "Infraction & Alexi Action", "mode": "game", "dur": 143}, {"id": "almost-evil", "title": "Almost Evil", "artist": "Infraction", "mode": "game", "dur": 247}, {"id": "badly", "title": "Badly", "artist": "Infraction", "mode": "game", "dur": 204}, {"id": "behind", "title": "Behind", "artist": "Infraction", "mode": "game", "dur": 204}, {"id": "break-me-down", "title": "Break Me Down", "artist": "Infraction", "mode": "game", "dur": 133}, {"id": "breathe", "title": "Breathe", "artist": "Infraction", "mode": "game", "dur": 112}, {"id": "can-you-feel", "title": "Can You Feel", "artist": "Infraction", "mode": "game", "dur": 223}, {"id": "centipede", "title": "Centipede", "artist": "Infraction", "mode": "game", "dur": 156}, {"id": "chimera", "title": "Chimera", "artist": "Infraction", "mode": "game", "dur": 220}, {"id": "colaphonk", "title": "Colaphonk", "artist": "Infraction", "mode": "game", "dur": 83}, {"id": "control", "title": "Control", "artist": "Infraction", "mode": "game", "dur": 259}, {"id": "cyber-attack", "title": "Cyber Attack", "artist": "Infraction", "mode": "game", "dur": 209}, {"id": "cyberguitar", "title": "Cyberguitar", "artist": "Infraction", "mode": "game", "dur": 204}, {"id": "cyberphonk", "title": "Cyberphonk", "artist": "Infraction", "mode": "game", "dur": 235}, {"id": "cyberpunk-2021", "title": "Cyberpunk 2021", "artist": "Infraction", "mode": "game", "dur": 206}, {"id": "devil-red-dress", "title": "Devil In A Red Dress", "artist": "Infraction", "mode": "game", "dur": 204}, {"id": "diamonds", "title": "Diamonds", "artist": "Infraction", "mode": "game", "dur": 212}, {"id": "dizziness", "title": "Dizziness", "artist": "Infraction", "mode": "game", "dur": 194}, {"id": "error", "title": "Error", "artist": "Infraction", "mode": "game", "dur": 157}, {"id": "human-error", "title": "Human Error", "artist": "Infraction feat. Karl Casey", "mode": "game", "dur": 175}, {"id": "freak", "title": "Freak", "artist": "Infraction", "mode": "game", "dur": 157}, {"id": "freaky", "title": "Freaky", "artist": "Infraction", "mode": "game", "dur": 202}, {"id": "hardwave", "title": "Hardwave", "artist": "Infraction", "mode": "game", "dur": 219}, {"id": "id-phonk", "title": "ID Phonk", "artist": "Infraction", "mode": "game", "dur": 70}, {"id": "mad-at-chu", "title": "Mad At Chu", "artist": "Infraction & Jinaction", "mode": "game", "dur": 180}, {"id": "keep-on-fire", "title": "Keep On Fire", "artist": "Infraction", "mode": "game", "dur": 125}, {"id": "lets-play", "title": "Let's Play", "artist": "Infraction", "mode": "game", "dur": 142}, {"id": "lie", "title": "Lie", "artist": "Infraction", "mode": "game", "dur": 202}, {"id": "loony", "title": "Loony", "artist": "Infraction", "mode": "game", "dur": 164}, {"id": "meds", "title": "Meds", "artist": "Infraction & MOKKA", "mode": "game", "dur": 221}, {"id": "place-to-hide", "title": "Place To Hide", "artist": "Infraction & MOKKA", "mode": "game", "dur": 154}, {"id": "nothing-to-lose", "title": "Nothing To Lose", "artist": "Infraction", "mode": "game", "dur": 197}, {"id": "phonk", "title": "Phonk", "artist": "Infraction", "mode": "game", "dur": 117}, {"id": "phonk-soul", "title": "Phonk Soul", "artist": "Infraction", "mode": "game", "dur": 209}, {"id": "rollin", "title": "Rollin", "artist": "Infraction", "mode": "game", "dur": 90}, {"id": "same-disease", "title": "Same Disease", "artist": "Infraction", "mode": "game", "dur": 105}, {"id": "scammer", "title": "Scammer", "artist": "Infraction", "mode": "game", "dur": 185}, {"id": "shock-absorber", "title": "Shock Absorber", "artist": "Infraction", "mode": "game", "dur": 126}, {"id": "s-witch", "title": "S-Witch", "artist": "Infraction", "mode": "game", "dur": 168}, {"id": "two-blasters", "title": "Two Blasters", "artist": "Infraction", "mode": "game", "dur": 107}, {"id": "virus", "title": "Virus", "artist": "Infraction", "mode": "game", "dur": 192}, {"id": "wanna-feel-it", "title": "Wanna Feel It", "artist": "Infraction", "mode": "game", "dur": 125}, {"id": "hard-cyberpunk", "title": "Hard Cyberpunk", "artist": "Kulakovka", "mode": "overtime", "dur": 191}, {"id": "echoes-terrifier", "title": "Echoes Of The Terrifier", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 162}, {"id": "out-of-control", "title": "Out Of Control", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 192}, {"id": "sekiro", "title": "Sekiro", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 157}, {"id": "voxygen", "title": "Voxygen", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 158}, {"id": "your-love", "title": "Your Love", "artist": "Infraction & Emerel Gray", "mode": "overtime", "dur": 200}, {"id": "chemicals", "title": "Chemicals", "artist": "Infraction", "mode": "overtime", "dur": 243}, {"id": "detonate", "title": "Detonate", "artist": "Infraction", "mode": "overtime", "dur": 251}, {"id": "fast-evil", "title": "Fast Evil", "artist": "Infraction", "mode": "overtime", "dur": 194}, {"id": "just-evil", "title": "Just Evil", "artist": "Infraction", "mode": "overtime", "dur": 224}, {"id": "totally-evil", "title": "Totally Evil", "artist": "Infraction", "mode": "overtime", "dur": 214}, {"id": "night-chat", "title": "Night Chat", "artist": "Infraction", "mode": "overtime", "dur": 199}, {"id": "no-escape", "title": "No Escape", "artist": "Infraction", "mode": "overtime", "dur": 222}];
 </script>
 <script>document.querySelector('#start .hero').dataset.pct = '50 %';</script>
@@ -5832,6 +5833,7 @@ const MUSIC = {
   },
   // Couper puis remettre la musique reprend le morceau là où il en était.
   start() {
+    if (!MUSIC_OK) return;   // pas de musique avant une connexion (ou une création de compte) réussie
     if (HEADLESS || !this.on || this.timer || !this.tracks.length) return;
     this.timer = setInterval(() => this.tick(), 400);
     const c = this.cur;
@@ -5994,7 +5996,7 @@ if (!HEADLESS) {
   msync();
   // Lancement dès l'ouverture ; si le navigateur bloque la lecture automatique, elle démarre à la première interaction.
   MUSIC.start();
-  const wake = () => { if (!MUSIC.on) return; if (!MUSIC.timer) MUSIC.start(); else MUSIC.resume(); };
+  const wake = () => { if (!MUSIC.on || !MUSIC_OK) return; if (!MUSIC.timer) MUSIC.start(); else MUSIC.resume(); };
   for (const ev of ['pointerdown', 'keydown', 'touchstart']) document.addEventListener(ev, wake, { capture: true });
   // Retour du réseau : les morceaux pas encore téléchargés redeviennent disponibles.
   addEventListener('online', () => MUSIC.bad.clear());
@@ -7714,6 +7716,8 @@ function loginAtStart() {
   openLogin(true); return true;
 }
 function loginSay(t, bad) { LG.msg = t; LG.bad = !!bad; const m = document.querySelector('#login .lg-msg'); if (m) { m.textContent = t; m.classList.toggle('ko', !!bad); } }
+// Connexion réussie (ou « Jouer » une fois connecté) : la musique peut démarrer, et seulement à ce moment-là.
+function musicGo() { MUSIC_OK = true; LG.music = true; try { if (MUSIC.on && MUSIC.tracks.length) MUSIC.kick(); } catch (x) {} }
 async function loginAct(a) {
   const val = id => (document.getElementById(id) || {}).value || '';
   const okMail = m => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m);
@@ -7730,6 +7734,7 @@ async function loginAct(a) {
       if (a === 'signup' && !await cloudSignUp(m, p)) { LG.step = 'login'; LG.msg = L(`Compte créé. Un e-mail de confirmation a été envoyé à ${m} : cliquez sur son lien, puis connectez-vous ici.`, `Account created. A confirmation e-mail was sent to ${m}: click its link, then sign in here.`); LG.bad = false; return renderLogin(); }
       if (a === 'signin') await cloudSignIn(m, p);
       cloudSet({ synced: '', hash: '' }); renderCloud();
+      musicGo();
       return loginAct('play');   // connecté : on charge la progression et on joue (ce clic a aussi lancé la musique)
     } catch (e) { return loginSay(authErr(e), true); }
   }
@@ -7750,6 +7755,7 @@ async function loginAct(a) {
     try { for (const k of Object.keys(localStorage)) if (k.startsWith('cptcg-') && !DATA_KEEP_LOCAL.includes(k)) localStorage.removeItem(k); } catch (e) {}
     location.reload();
   } else if (a === 'play') {
+    if (cloudSession()) musicGo();
     // Les données du serveur font foi : on les charge avant de jouer ; sans serveur, pas de partie.
     loginSay(L('Chargement de votre progression…', 'Loading your progress…'));
     await cloudSync(true, LG.auto);
@@ -7781,10 +7787,7 @@ function renderCloud() {
 if (!HEADLESS) {
   const lg = document.getElementById('login');
   lg.addEventListener('click', e => { const b = e.target.closest('[data-lg]'); if (b) loginAct(b.dataset.lg); });
-  const music = () => { if (LG.music) return; LG.music = true; try { if (MUSIC.on && MUSIC.tracks.length) MUSIC.kick(); } catch (x) {} };
-  lg.addEventListener('pointerdown', music, true);
   lg.addEventListener('keydown', e => {
-    if (!['Tab', 'Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) music();
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (!LG.auto) closeLogin(); return; }
     if (e.key === 'Enter' && /^lg-(mail|pass2?)$/.test(e.target.id)) { e.preventDefault(); const b = lg.querySelector('[data-lg="signin"], [data-lg="signup"], [data-lg="recover"]'); if (b) b.click(); }
     if (e.key === 'Tab') { const f = [...lg.querySelectorAll('button, input')]; if (!f.length) return; const i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } }
